@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // drawer stuff!!!!!!!!!!!!!!!!!!!!!!
+        // drawer stuff! To copy paste on each activity
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         bar = this.getSupportActionBar();
