@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">SynApps</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="SynApps">Welcome to \nSynApps!</string>
+    <string name="notifications">Notifications</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="wifidirect">Wifi-Direct</string>
+    <string name="connectivity">Connectivity</string>
+    <string name="updates">Updates</string>
+    <string name="last_data_update">Last Data Update:\n21/03/2016</string>
+    <string name="clear_data">Clear Data</string>
+    <string name="network_details">Network Details</string>
+    <string name="generate_graph">Generate Graph</string>
+    <string name="popup_name_text">A device having the following MAC address has been detected. Do you wish to name it?\nMAC Address: 01:23:45:67:89:AB</string>
+    <string name="name_optionnal">Name (optionnal)</string>
+    <string name="ok">OK</string>
+    <string name="ignore">Ignore</string>
+    <string name="popup_clear_data">Are you sure you want to clear all the network data on this device?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="title_activity_network_details">Network Details</string>
+
+    <string name="hello_world">Hello world!</string>
+</resources>
