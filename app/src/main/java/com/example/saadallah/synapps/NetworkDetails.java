@@ -66,6 +66,12 @@ public class NetworkDetails extends AppCompatActivity {
         // Note that I populated the array from static dummy string arrays for testing.
         // We need to populate them programmatically using our data
 
+        // Try to do the following: input: database; output: write directly into the ListView (no CustomAdapter needed anymore)
+        // activity_network_details.xml is NOT modified
+        // CustomAdapterNetwork.java + network_details_list.xml are not called/used anymore
+        // Changes in NetworkDetails.java --> comment out the code below and rewrite the query;
+        // also comment out the private string arrays
+
         deviceNames = getResources().getStringArray(R.array.device_names);
         MACaddresses = getResources().getStringArray(R.array.MAC_addresses);
         phoneNumbers = getResources().getStringArray(R.array.phone_numbers);
