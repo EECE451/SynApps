@@ -21,7 +21,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 
 public class MainActivity extends AppCompatActivity {
-
+// Bassel test
     private android.support.v7.app.ActionBar bar; //ActionBar-Drawer
     private ActionBarDrawerToggle toggle; //ActionBar-Drawer
     private DrawerLayout drawer; //ActionBar-Drawer
