@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -35,6 +36,10 @@ public class MainActivity extends AppCompatActivity {
 
     // Bluetooth stuff
     final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+    //Cellular Network
+    TelephonyManager teleMan;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +134,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Cellular Network
+        teleMan =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+
         //-------------------------------------------------------------------------------------------------------------
     }
 
@@ -147,6 +155,8 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_connectivity_state) {
             Intent connectivityStateIntent = new Intent(this, Connectivity_State.class);
             connectivityStateIntent.putExtra("bluetooth_state", mBluetoothAdapter.isEnabled());
+            connectivityStateIntent.putExtra("wifi_state", wifiManager.isWifiEnabled());
+            connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
             startActivity(connectivityStateIntent);
         }
         return super.onOptionsItemSelected(item);

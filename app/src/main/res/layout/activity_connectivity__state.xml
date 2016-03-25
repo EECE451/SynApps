@@ -42,7 +42,8 @@
         android:id="@+id/bt_value"
         android:layout_alignBottom="@+id/bt_state"
         android:layout_toRightOf="@+id/bt_state"
-        android:layout_toEndOf="@+id/bt_state" />
+        android:layout_toEndOf="@+id/bt_state"
+        android:layout_marginLeft="10dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -51,13 +52,14 @@
         android:id="@+id/wifi_value"
         android:layout_alignBottom="@+id/wifi_state"
         android:layout_toRightOf="@+id/wifi_state"
-        android:layout_toEndOf="@+id/wifi_state" />
+        android:layout_toEndOf="@+id/wifi_state"
+        android:layout_marginLeft="10dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
+        android:text="@string/cell_state"
         android:id="@+id/cell_value"
         android:layout_alignBottom="@+id/cell_state"
         android:layout_toRightOf="@+id/cell_state"
