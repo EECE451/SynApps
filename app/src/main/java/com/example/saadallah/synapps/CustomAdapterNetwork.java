@@ -37,7 +37,7 @@ public class CustomAdapterNetwork extends ArrayAdapter<String> {
         this.numberOfDetections = numberOfDetections;
         this.cummulativeTime = cummulativeTime;
     }
-
+/*
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         LayoutInflater inflater = context.getLayoutInflater();
@@ -63,4 +63,6 @@ public class CustomAdapterNetwork extends ArrayAdapter<String> {
 
         return rowView;
     }
+
+    */
 }

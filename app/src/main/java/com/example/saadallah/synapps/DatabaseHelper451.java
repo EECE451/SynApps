@@ -9,32 +9,36 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.sql.Date;
 
+
 /**
  * Created by Jad Aboul Hosn on 3/24/2016.
  */
 
+// We must add a clear function
+// For the dates, there is the possibility to add java.util.date in order to manage it well for the
+// detection time and range
 
 public class DatabaseHelper451 extends SQLiteOpenHelper {
 
-    public static final String DB_Name = "devices.db";
-
-    // Creation table for devices
+    public static final String DB_Name = "devices101.db";
     public static final String TABLE_DEVICE = "device";
-    public static final String COLUMN_DEVICE_ID = "_Pid";
-    public static final String COLUMN_DEVICE_DESCRIPTION = "description";
-    public static final String COLUMN_DEVICE_START_DATE = "start_date";
-    public static final String COLUMN_DEVICE_END_DATE = "end_date";
-    public static final String COLUMN_DEVICE_COST = "estimated_cost";
-    public static final String COLUMN_DEVICE_LEADER_ID = "device_id";
+    public static final String COLUMN_DEVICE_ID = "_Did_MAC";
+    public static final String COLUMN_DEVICE_LAST_TIME_DETECTION = "lt_detection";
+    public static final String COLUMN_DEVICE_LAST_TIME_RANGE = "lt_range";
+    public static final String COLUMN_DEVICE_DETECTION_FREQUENCY= "detection_frequency";
+    public static final String COLUMN_DEVICE_CUMULATIVE_DETECTION_DURATION = "cum_detection_duration";
+    public static final String COLUMN_DEVICE_PHONE_NUMBER = "phone_number";
+    public static final String COLUMN_DEVICE_DESCRIPTIVE_NAME = "description_name";
 
-    // SQL QUERY FOR DEVICES
+    //---------------------------------------------------------------------------------------------
     private static final String SQL_CREATE_TABLE_DEVICE = "CREATE TABLE " + TABLE_DEVICE + "("
-            + COLUMN_DEVICE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_DEVICE_DESCRIPTION + " TEXT NOT NULL, "
-            + COLUMN_DEVICE_START_DATE + " TEXT NOT NULL, "
-            + COLUMN_DEVICE_END_DATE + " TEXT NOT NULL, "
-            + COLUMN_DEVICE_COST + " REAL NOT NULL, "
-            + COLUMN_DEVICE_LEADER_ID + " INTEGER NOT NULL "
+            + COLUMN_DEVICE_ID + " TEXT PRIMARY KEY, "
+            + COLUMN_DEVICE_LAST_TIME_DETECTION + " NUMERIC, "
+            + COLUMN_DEVICE_LAST_TIME_RANGE + " REAL, "
+            + COLUMN_DEVICE_DETECTION_FREQUENCY + " INTEGER, "
+            + COLUMN_DEVICE_CUMULATIVE_DETECTION_DURATION + " REAL, "
+            + COLUMN_DEVICE_PHONE_NUMBER + " VARCHAR(50), "
+            + COLUMN_DEVICE_DESCRIPTIVE_NAME + " TEXT "
             +");";
 
     public DatabaseHelper451(Context context) {
@@ -48,23 +52,25 @@ public class DatabaseHelper451 extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("drop table if exists " + TABLE_DEVICE +"");
+        db.execSQL("drop table if exists " + TABLE_DEVICE + "");
         onCreate(db);
     }
 
-    public boolean insertData(String desc,String startdate, String enddate, String Cost,String leaderid)
-    {
-        SQLiteDatabase db =this.getWritableDatabase();
+    public boolean insertData(String MAC, String lt_detection, long lt_range, int detection_frequency,long cum_detection_duration,String phone_number, String description_name) {
+        SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(COLUMN_DEVICE_DESCRIPTION, desc);
-        contentValues.put(COLUMN_DEVICE_START_DATE,startdate);
-        contentValues.put(COLUMN_DEVICE_END_DATE,enddate);
-        contentValues.put(COLUMN_DEVICE_COST, Cost);
-        contentValues.put(COLUMN_DEVICE_LEADER_ID, leaderid);
 
-        long result = db.insert(TABLE_DEVICE,null,contentValues);
-        if(result == -1)return false;
+        contentValues.put(COLUMN_DEVICE_ID, MAC);
+        contentValues.put(COLUMN_DEVICE_LAST_TIME_DETECTION, lt_detection);
+        contentValues.put(COLUMN_DEVICE_LAST_TIME_RANGE, lt_range);
+        contentValues.put(COLUMN_DEVICE_DETECTION_FREQUENCY, detection_frequency);
+        contentValues.put(COLUMN_DEVICE_CUMULATIVE_DETECTION_DURATION, cum_detection_duration);
+        contentValues.put(COLUMN_DEVICE_PHONE_NUMBER, phone_number);
+        contentValues.put(COLUMN_DEVICE_DESCRIPTIVE_NAME, description_name);
+
+        long result = db.insert(TABLE_DEVICE, null, contentValues);
+        if (result == -1) return false;
         else return true;
     }
 
@@ -76,18 +82,29 @@ public class DatabaseHelper451 extends SQLiteOpenHelper {
     }
 
 
-    public Cursor getdonationdonor(String DEVICEMAC)
+    public Cursor getDevice(String MAC)
     {
         SQLiteDatabase db =this.getWritableDatabase();
-        Cursor result = db.rawQuery("select count(*) from "+TABLE_DEVICE+" where _Did = "+DEVICEMAC,null);
+        Cursor result = db.rawQuery("select count(*) from "+TABLE_DEVICE+" where _Did_MAC = "+MAC,null);
         return result;
     }
 
-    public Cursor checkDEVICE(String DEVICEID, String phone)
+    public Cursor checkDevice(String MAC)
     {
         SQLiteDatabase db =this.getWritableDatabase();
-        Cursor result = db.rawQuery("select * from "+TABLE_DEVICE+" where name = '"+DEVICEID+"' and phone_number = '"+phone+"'",null);
+        Cursor result = db.rawQuery("select * from "+TABLE_DEVICE+" where _Did_MAC = '"+MAC+"'",null);
         return result;
     }
+
+    /*
+    public int update(String MAC, String lt_detection, long lt_range, int detection_frequency,long cum_detection_duration,String phone_number, String description_name) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+
+        return 1;
+    }
+    */
 
 }
+
