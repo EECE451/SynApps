@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.ColorDrawable;
 import android.net.wifi.WifiManager;
+import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -18,11 +19,15 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-// Bassel test
+// Saadallah TEST
     private android.support.v7.app.ActionBar bar; //ActionBar-Drawer
     private ActionBarDrawerToggle toggle; //ActionBar-Drawer
     private DrawerLayout drawer; //ActionBar-Drawer
@@ -40,6 +45,15 @@ public class MainActivity extends AppCompatActivity {
     //Cellular Network
     TelephonyManager teleMan;
 
+    // Creating an ArrayList to store the detected p2p peers
+    private ArrayList PeerNames= new ArrayList();
+    private WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
+        @Override
+        public void onPeersAvailable(WifiP2pDeviceList peerList) {
+            PeerNames.clear();
+            PeerNames.addAll(peerList.getDeviceList());
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,7 +152,22 @@ public class MainActivity extends AppCompatActivity {
         teleMan =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 
         //-------------------------------------------------------------------------------------------------------------
+        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Log.d("p2p Notification", "Starting Discovery");
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Toast.makeText(MainActivity.this, "Could not initiate peer discovery", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
