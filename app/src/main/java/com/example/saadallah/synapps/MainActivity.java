@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Wifi
 
-        Switch wifiSwitch = (Switch) findViewById(R.id.wifidirect_switch);
+        Switch wifiSwitch = (Switch) findViewById(R.id.wifi_switch);
         wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
         if(wifiManager.isWifiEnabled()) // checks is Wifi is ON or OFF and sets the initial value of the toggle
