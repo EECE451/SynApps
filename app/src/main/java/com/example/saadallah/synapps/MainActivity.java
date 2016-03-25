@@ -33,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
     BroadcastReceiver mReceiver;
     IntentFilter p2pIntent;
 
+    // Bluetooth stuff
+    final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Bluetooth
         Switch bluetoothSwitch = (Switch) findViewById(R.id.bluetooth_switch);
-        final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth, popup here??
         }
@@ -137,6 +140,14 @@ public class MainActivity extends AppCompatActivity {
         }
         else{
             drawer.closeDrawer(Gravity.LEFT);
+        }
+
+        int id = item.getItemId();
+
+        if (id == R.id.action_connectivity_state) {
+            Intent connectivityStateIntent = new Intent(this, Connectivity_State.class);
+            connectivityStateIntent.putExtra("bluetooth_state", mBluetoothAdapter.isEnabled());
+            startActivity(connectivityStateIntent);
         }
         return super.onOptionsItemSelected(item);
     }

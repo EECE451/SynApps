@@ -21,6 +21,10 @@
     <string name="no">No</string>
     <string name="title_activity_network_details">Network Details</string>
     <string name="mobile_data">Mobile Data</string>
+    <string name="action_connectivity_state">Connectivity State</string>
+    <string name="bluetooth_state">Bluetooth State: </string>
+    <string name="wifi_state">Wifi State: </string>
+    <string name="cell_state">Cellular Network: </string>
 
     <!--> Dummy Values for Network Details Arrays<-->
 
@@ -73,4 +77,5 @@
     </string-array>
 
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_connectivity__state">Connectivity_State</string>
 </resources>
