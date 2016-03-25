@@ -19,7 +19,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
-//Hello world!
+//Hello world!!
 
 public class MainActivity extends AppCompatActivity {
 
