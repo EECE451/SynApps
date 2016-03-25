@@ -20,6 +20,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="title_activity_network_details">Network Details</string>
+    <string name="mobile_data">Mobile Data</string>
 
     <!--> Dummy Values for Network Details Arrays<-->
 

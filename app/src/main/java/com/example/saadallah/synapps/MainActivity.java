@@ -1,5 +1,6 @@
 package com.example.saadallah.synapps;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,8 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
-
-import java.nio.channels.Channel;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -79,16 +78,18 @@ public class MainActivity extends AppCompatActivity {
         //------------------------------------------------------------------------------------
         // setting the toggle button in drawer
 
-        Switch p2pSwitch = (Switch) findViewById(R.id.wifidirect_switch);
+        //Wifi
+
+        Switch wifiSwitch = (Switch) findViewById(R.id.wifi_switch);
         wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
         if(wifiManager.isWifiEnabled()) // checks is Wifi is ON or OFF and sets the initial value of the toggle
-            p2pSwitch.setChecked(true);
+            wifiSwitch.setChecked(true);
         else
-            p2pSwitch.setChecked(false);
+            wifiSwitch.setChecked(false);
 
-        p2pSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { // switches wifi
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        wifiSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { // switches wifi
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) { // Enable/Disable wifi when switch event
                 if (isChecked) {
                     wifiManager.setWifiEnabled(true);
                     Log.d("wifiIsEnabled=", "true");
@@ -96,6 +97,31 @@ public class MainActivity extends AppCompatActivity {
                 else {
                     wifiManager.setWifiEnabled(false);
                     Log.d("wifiIsEnabled=", "false");
+                }
+            }
+        });
+
+        //Bluetooth
+        Switch bluetoothSwitch = (Switch) findViewById(R.id.bluetooth_switch);
+        final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth, popup here??
+        }
+
+        if(mBluetoothAdapter.isEnabled()) // checks is Bluetooth is ON or OFF and sets the initial value of the toggle
+            bluetoothSwitch.setChecked(true);
+        else
+            bluetoothSwitch.setChecked(false);
+
+        bluetoothSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { // switches wifi
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) { // Enable/Disable wifi when switch event
+                if (isChecked) {
+                    mBluetoothAdapter.enable();
+                    Log.d("bluetoothIsEnabled=", "true");
+                }
+                else {
+                    mBluetoothAdapter.disable();
+                    Log.d("bluetoothIsEnabled=", "false");
                 }
             }
         });
