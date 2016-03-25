@@ -1,21 +1,38 @@
 package com.example.saadallah.synapps;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.ColorDrawable;
+import android.net.wifi.WifiManager;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.Switch;
+
+import java.nio.channels.Channel;
 
 public class MainActivity extends AppCompatActivity {
 
     private android.support.v7.app.ActionBar bar; //ActionBar-Drawer
     private ActionBarDrawerToggle toggle; //ActionBar-Drawer
     private DrawerLayout drawer; //ActionBar-Drawer
+
+    // WiFi p2p stuff
+    WifiManager wifiManager;
+    WifiP2pManager mManager;
+    WifiP2pManager.Channel mChannel;
+    BroadcastReceiver mReceiver;
+    IntentFilter p2pIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +64,43 @@ public class MainActivity extends AppCompatActivity {
         drawer.setDrawerListener(toggle);
 
         //-----------------------------------------------------------------------------------
+        // WiFi p2p status checking
+
+        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
+
+        p2pIntent = new IntentFilter();
+        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+
+        //------------------------------------------------------------------------------------
+        // setting the toggle button in drawer
+
+        Switch p2pSwitch = (Switch) findViewById(R.id.wifidirect_switch);
+        wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+        if(wifiManager.isWifiEnabled()) // checks is Wifi is ON or OFF and sets the initial value of the toggle
+            p2pSwitch.setChecked(true);
+        else
+            p2pSwitch.setChecked(false);
+
+        p2pSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { // switches wifi
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    wifiManager.setWifiEnabled(true);
+                    Log.d("wifiIsEnabled=", "true");
+                }
+                else {
+                    wifiManager.setWifiEnabled(false);
+                    Log.d("wifiIsEnabled=", "false");
+                }
+            }
+        });
+
+        //-------------------------------------------------------------------------------------------------------------
     }
 
     @Override
@@ -66,6 +120,18 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mReceiver, p2pIntent);
+    }
+    /* unregister the broadcast receiver */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mReceiver);
     }
 
     public void onClickClearData(View view) { //Don't forget to implement this method!

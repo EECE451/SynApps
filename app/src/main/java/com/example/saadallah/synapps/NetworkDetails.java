@@ -72,19 +72,19 @@ public class NetworkDetails extends AppCompatActivity {
         // Changes in NetworkDetails.java --> comment out the code below and rewrite the query;
         // also comment out the private string arrays
 
-        deviceNames = getResources().getStringArray(R.array.device_names);
-        MACaddresses = getResources().getStringArray(R.array.MAC_addresses);
-        phoneNumbers = getResources().getStringArray(R.array.phone_numbers);
-        lastDetected = getResources().getStringArray(R.array.last_detected);
-        lastStarted = getResources().getStringArray(R.array.last_started);
-        lastDuration = getResources().getStringArray(R.array.last_duration);
-        numberOfDetections = getResources().getStringArray(R.array.number_detection);
-        cummulativeTime = getResources().getStringArray(R.array.cummulative_detection);
-
-        CustomAdapterNetwork myNetworkListAdapter = new CustomAdapterNetwork(this,deviceNames,MACaddresses,phoneNumbers,
-                lastDetected,lastStarted,lastDuration,numberOfDetections,cummulativeTime);
-
-        network_details_listview.setAdapter(myNetworkListAdapter);
+//        deviceNames = getResources().getStringArray(R.array.device_names);
+//        MACaddresses = getResources().getStringArray(R.array.MAC_addresses);
+//        phoneNumbers = getResources().getStringArray(R.array.phone_numbers);
+//        lastDetected = getResources().getStringArray(R.array.last_detected);
+//        lastStarted = getResources().getStringArray(R.array.last_started);
+//        lastDuration = getResources().getStringArray(R.array.last_duration);
+//        numberOfDetections = getResources().getStringArray(R.array.number_detection);
+//        cummulativeTime = getResources().getStringArray(R.array.cummulative_detection);
+//
+//        CustomAdapterNetwork myNetworkListAdapter = new CustomAdapterNetwork(this,deviceNames,MACaddresses,phoneNumbers,
+//                lastDetected,lastStarted,lastDuration,numberOfDetections,cummulativeTime);
+//
+//        network_details_listview.setAdapter(myNetworkListAdapter);
     }
 
 
