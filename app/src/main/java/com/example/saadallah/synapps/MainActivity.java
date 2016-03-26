@@ -183,6 +183,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                     }
                 }
 
+                // Thread calling connect
+
                 PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
                     peersMacArrayStr = new String[PeerNames.size()];
 
@@ -196,6 +198,10 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         // connect to all the devices
                         connect(i);
                     }
+
+                Intent networkDetailsIntent = new Intent(MainActivity.this, NetworkDetails.class);
+                networkDetailsIntent.putExtra("MacArray", peersMacArrayStr);
+                startActivity(networkDetailsIntent);
             }
         };
 
