@@ -2,16 +2,17 @@ package com.example.saadallah.synapps;
 
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 
 public class NetworkDetails extends AppCompatActivity {
 
@@ -20,10 +21,10 @@ public class NetworkDetails extends AppCompatActivity {
     private DrawerLayout drawer; //ActionBar-Drawer
 
     //---DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area---
-    DatabaseHelper451 myDb;
+    DatabaseHelper myDb;
     private static Button Btn_ReadAll;
-    TextView Txt_Test, Text2;
-
+    TextView txt_ReadAllData, txt_ReadSpecific;
+    android.widget.EditText t1,t2;
 
 
 
@@ -38,29 +39,33 @@ public class NetworkDetails extends AppCompatActivity {
 
         //---DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area---
 
-        myDb = new DatabaseHelper451(this);
-        Txt_Test = (TextView)findViewById(R.id.Txt_Test);
-        Text2 = (TextView)findViewById(R.id.Text2);
+        myDb = new DatabaseHelper(this);
+        txt_ReadAllData = (TextView)findViewById(R.id.txt_ReadAllData);
+        txt_ReadSpecific = (TextView)findViewById(R.id.txt_ReadSpecific);
 
         //Filling Date
         java.util.Date date = new java.util.Date();
         String Detection_time = String.format("%tc", date);
 
         //Dummy Filling
-        myDb.insertData("0153456787AE",Detection_time,0,2,4,"03649774","1");
-        myDb.insertData("01:24:45:67:89:AC",Detection_time,1,2,4,"03649674","1");
-        myDb.insertData("01:26:45:67:89:AE",Detection_time,3,2,4,"03549774","1");
-        myDb.insertData("01:24:45:67:89:AF",Detection_time,5,2,4,"01642774","1");
+        myDb.insertData("0153456787ae",Detection_time,0,2,4,"03649774","1");
+        myDb.insertData("0124456789ac",Detection_time,1,2,4,"03649674","1");
+        myDb.insertData("0126456789ae",Detection_time,3,2,4,"03549774","1");
+        myDb.insertData("0124456789af",Detection_time,5,2,4,"01642774","1");
+        myDb.insertData("0125456789af",Detection_time,5,2,4,"01642774","1");
+        myDb.insertData("0153451787ae",Detection_time,0,2,4,"03649774","1");
+        myDb.insertData("0125556789a1",Detection_time,1,2,4,"03649674","1");
+        myDb.insertData("0126451119ae",Detection_time,3,2,4,"03549774","1");
+        myDb.insertData("0114116789af",Detection_time,5,2,4,"01642774","1");
+        myDb.insertData("1124991199af",Detection_time,5,2,4,"01642774","1");
+        myDb.insertData("0153116787ae",Detection_time,0,2,4,"03649774","1");
+        myDb.insertData("0124451189ac",Detection_time,1,2,4,"03649674","1");
+        myDb.insertData("1126456711ae",Detection_time,3,2,4,"03549774","1");
+        myDb.insertData("017777678911",Detection_time,5,2,4,"01642774","1");
+        myDb.insertData("0121156789af",Detection_time,5,2,4,"01642774","1");
 
-
-//                        Cursor result2 = myDb.getDevice("0143456789AB");
-//
-//                        while (result.moveToNext()) {
-//                            Text2.setText(result.getString(0));
-//                        }
-
-
-
+        t1 = (android.widget.EditText)findViewById(R.id.input1);
+        t2 = (android.widget.EditText)findViewById(R.id.t2);
 
         //---DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area---
 
@@ -92,27 +97,6 @@ public class NetworkDetails extends AppCompatActivity {
         }
 
         //---------------------------------------------------------------------------------
-
-
-        /*
-        ListView network_details_listview = (ListView)findViewById(R.id.network_details_listview); // referencing the ListView object
-
-
-        deviceNames = getResources().getStringArray(R.array.device_names);
-        MACaddresses = getResources().getStringArray(R.array.MAC_addresses);
-        phoneNumbers = getResources().getStringArray(R.array.phone_numbers);
-        lastDetected = getResources().getStringArray(R.array.last_detected);
-        lastStarted = getResources().getStringArray(R.array.last_started);
-        lastDuration = getResources().getStringArray(R.array.last_duration);
-        numberOfDetections = getResources().getStringArray(R.array.number_detection);
-        cummulativeTime = getResources().getStringArray(R.array.cummulative_detection);
-
-        CustomAdapterNetwork myNetworkListAdapter = new CustomAdapterNetwork(this,deviceNames,MACaddresses,phoneNumbers,
-                lastDetected,lastStarted,lastDuration,numberOfDetections,cummulativeTime);
-
-        network_details_listview.setAdapter(myNetworkListAdapter);
-
-        */
 
 
     }
@@ -147,12 +131,55 @@ public class NetworkDetails extends AppCompatActivity {
 
         StringBuffer buffer = new StringBuffer();
         while (result.moveToNext()) {
-            buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + "\n");
+            buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+ "\n");
 
         }
-        Txt_Test.setText(buffer.toString());
+        txt_ReadAllData.setText(buffer.toString());
+
+        Cursor result2 = myDb.getMAC_ID();
+
+        StringBuffer buffer2 = new StringBuffer();
+        while (result2.moveToNext()) {
+            buffer2.append(result2.getString(0)+" "+result2.getString(1)+"\n");
+        }
+        txt_ReadSpecific.setText(buffer2.toString());
 
     }
+
+    public void onbtnclick2(View view) {
+
+
+            Cursor result2 = myDb.getDatabyMAC("0153456787ae");
+
+        StringBuffer buffer = new StringBuffer();
+        while (result2.moveToNext()) {
+            buffer.append(result2.getString(0)+" "+result2.getString(1)+" "+result2.getString(2)+"\n");
+        }
+        txt_ReadSpecific.setText(buffer.toString());
+
+
+    }
+
+
+    public void onclickbtnreadID(View view) {
+
+        Cursor result = myDb.getDatabyID(t1.getText().toString());
+        StringBuffer buffer = new StringBuffer();
+        while (result.moveToNext()) {
+            buffer.append(result.getString(0)+" "+result.getString(1)+" "+result.getString(2)+"\n");
+        }
+        txt_ReadSpecific.setText(buffer.toString());
+    }
+
+    public void onbtnclickupdatemac(View view) {
+
+        myDb.updateDescriptionName("1124991199af",t2.getText().toString());
+    }
+
+    public void onbtnclickdelete(View view) {
+        myDb.deleteData(t2.getText().toString());
+    }
+
 }
 
 
