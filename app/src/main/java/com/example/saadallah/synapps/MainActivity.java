@@ -41,11 +41,12 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     private DrawerLayout drawer; //ActionBar-Drawer
 
     // WiFi p2p stuff
-    WifiManager wifiManager;
-    WifiP2pManager mManager;
-    WifiP2pManager.Channel mChannel;
-    WiFiDirectBroadcastReceiver mReceiver;
-    IntentFilter p2pIntent;
+    private WifiManager wifiManager;
+    private WifiP2pManager mManager;
+    private WifiP2pManager.Channel mChannel;
+    private WiFiDirectBroadcastReceiver mReceiver;
+    private final IntentFilter p2pIntent = new IntentFilter();
+
 
     // Bluetooth stuff
     final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -89,14 +90,15 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         //-----------------------------------------------------------------------------------
         // WiFi p2p status checking
 
-        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = mManager.initialize(this, getMainLooper(), null);
-        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
-
-        p2pIntent = new IntentFilter();
         p2pIntent.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         p2pIntent.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
+
+        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+        //mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
 
         //------------------------------------------------------------------------------------
         // setting the toggle button in drawer
@@ -141,8 +143,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                 if (isChecked) {
                     mBluetoothAdapter.enable();
                     Log.d("bluetoothIsEnabled=", "true");
-                }
-                else {
+                } else {
                     mBluetoothAdapter.disable();
                     Log.d("bluetoothIsEnabled=", "false");
                 }
@@ -158,6 +159,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
             public void onSuccess() {
                 Log.d("p2p Notification", "Starting Discovery");
                 Toast.makeText(getApplicationContext(), "Starting Discovery", Toast.LENGTH_SHORT).show();
+
+
             }
 
             @Override
@@ -167,23 +170,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
             }
         });
+        // Should be sending an intent, but not sending
 
-        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-
-        PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
-        peersMacArrayStr = new String[PeerNames.size()];
-         //error before: size =0
-
-        for (int i=0; i<PeerNames.size(); i++){
-
-            // retrieve MAC Address of device i
-            WifiP2pDevice targetDevice = PeerNames.get(i);
-            peersMacArrayStr[i] = targetDevice.deviceAddress;
-
-            // connect to all the devices
-            connect(i);
-        }
 
 
 
@@ -223,7 +211,22 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     @Override
     protected void onResume() {
         super.onResume();
+        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
         registerReceiver(mReceiver, p2pIntent);
+
+        PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
+        peersMacArrayStr = new String[PeerNames.size()];
+        //error before: size =0
+
+        for (int i=0; i<PeerNames.size(); i++){
+
+            // retrieve MAC Address of device i
+            WifiP2pDevice targetDevice = PeerNames.get(i);
+            peersMacArrayStr[i] = targetDevice.deviceAddress;
+
+            // connect to all the devices
+            connect(i);
+        }
     }
     /* unregister the broadcast receiver */
     @Override
@@ -269,13 +272,13 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
             @Override
             public void onSuccess() {
-                Toast.makeText(getApplicationContext(), "Connect succeeded!",
+                Toast.makeText(getApplicationContext(), "Connection succeeded!",
                         Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int reason) {
-                Toast.makeText(getApplicationContext(), "Connect failed. Retry.",
+                Toast.makeText(getApplicationContext(), "Connection failed. Retry.",
                         Toast.LENGTH_SHORT).show();
             }
         });

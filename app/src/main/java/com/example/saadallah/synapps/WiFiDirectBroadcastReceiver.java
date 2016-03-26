@@ -25,17 +25,18 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
     private Activity mActivity;
-    private ArrayList PeerNames= new ArrayList();
-    private WifiP2pDeviceList peerlist= new WifiP2pDeviceList();
-    private WifiP2pManager.PeerListListener peerListListener= new WifiP2pManager.PeerListListener() {
-        @Override
-        public void onPeersAvailable(WifiP2pDeviceList peers) {
-            PeerNames.clear();
-            PeerNames.addAll(peerlist.getDeviceList());
 
-            // update any where the peers are stored
-        }
-    };
+    private ArrayList<WifiP2pDevice> PeerNames= new ArrayList<WifiP2pDevice>();
+    private WifiP2pDeviceList peerlist= new WifiP2pDeviceList();
+//    private WifiP2pManager.PeerListListener peerListListener= new WifiP2pManager.PeerListListener() {
+//        @Override
+//        public void onPeersAvailable(WifiP2pDeviceList peers) {
+//            PeerNames.clear();
+//            PeerNames.addAll(peerlist.getDeviceList());
+//
+//            // update any where the peers are stored
+//        }
+//    };
 
 
 
@@ -66,10 +67,38 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         }
         else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             if (mManager != null) {
-                mManager.requestPeers(mChannel, peerListListener);
+                mManager.requestPeers(mChannel, new WifiP2pManager.PeerListListener() {
+
+                    @Override
+                    public void onPeersAvailable(WifiP2pDeviceList peers) {
+                        if (peers != null) {
+                            PeerNames.clear();
+                            PeerNames.addAll(peers.getDeviceList());
+                            ArrayList<String> deviceNames = new ArrayList<String>();
+                            for (WifiP2pDevice device : PeerNames) {
+                                deviceNames.add(device.deviceName);
+                            }
+
+                            } else {
+                                Toast.makeText(mActivity, "Device list is empty.", Toast.LENGTH_SHORT).show();
+                                Log.d("P2P Notification", "Device List empty!");
+                            }
+                        }
+
+                });
             }
+
+
             Log.d("P2P Notification", "Peers discovered!");
             Toast.makeText(mActivity,"Peers discovered!", Toast.LENGTH_SHORT).show();
+
+            Log.d("P2P Notification", "begin print devices list====>");
+            for (int i = 0; i < PeerNames.size(); i++)
+            {
+                Log.d("P2P Notification",
+                        "device[" + i + "]:" + PeerNames.get(i).deviceAddress +" deviceName:"+ PeerNames.get(i).deviceName);
+            }
+            Log.d("P2P Notification", "print devices end====>");
 
             // At that stage all the devices are listed in peerNames.
             // Working till here!
@@ -88,8 +117,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 // We are connected with the other device, request connection
                 // info to find group owner IP
 
-                Log.d("P2P Notification", "Connected!");
-                Toast.makeText(mActivity,"Connected!", Toast.LENGTH_SHORT).show();
+                Log.d("P2P Notification", "Connected to "+networkInfo.toString());
+                Toast.makeText(mActivity,"Connected to "+networkInfo.toString(), Toast.LENGTH_SHORT).show();
 
 
                 mManager.requestConnectionInfo(mChannel, new WifiP2pManager.ConnectionInfoListener() {
@@ -103,14 +132,10 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                             // Do whatever tasks are specific to the group owner.
                             // One common case is creating a server thread and accepting
                             // incoming connections.
-                            Log.d("P2P Notification", "test1!");
-                            Toast.makeText(mActivity,"test1!", Toast.LENGTH_SHORT).show();
                         } else if (info.groupFormed) {
                             // The other device acts as the client. In this case,
                             // you'll want to create a client thread that connects to the group
                             // owner.
-                            Log.d("P2P Notification", "test2!");
-                            Toast.makeText(mActivity,"test2!", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
