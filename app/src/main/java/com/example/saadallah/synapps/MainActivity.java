@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
         mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         mChannel = mManager.initialize(this, getMainLooper(), null);
-        //mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
+        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
 
         //------------------------------------------------------------------------------------
         // setting the toggle button in drawer
@@ -166,11 +166,42 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
             @Override
             public void onFailure(int reason) {
                 Toast.makeText(MainActivity.this, "Could not initiate peer discovery", Toast.LENGTH_SHORT).show();
-
-
             }
         });
         // Should be sending an intent, but not sending
+
+        Runnable myRunnable = new Runnable() {
+            @Override
+            public void run() {
+                Log.d("P2P Notification", "entered thread");
+
+                synchronized (this) {
+                    try {
+                        wait(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
+                    peersMacArrayStr = new String[PeerNames.size()];
+
+                    for (int i = 0; i < PeerNames.size(); i++) {
+                        Log.d("P2P Notification", "entered for loop");
+
+                        // retrieve MAC Address of device i
+                        WifiP2pDevice targetDevice = PeerNames.get(i);
+                        peersMacArrayStr[i] = targetDevice.deviceAddress;
+
+                        // connect to all the devices
+                        connect(i);
+                    }
+            }
+        };
+
+        Thread myThread = new Thread(myRunnable);
+        myThread.start();
+
 
 
 
@@ -211,22 +242,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     @Override
     protected void onResume() {
         super.onResume();
-        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
         registerReceiver(mReceiver, p2pIntent);
 
-        PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
-        peersMacArrayStr = new String[PeerNames.size()];
-        //error before: size =0
 
-        for (int i=0; i<PeerNames.size(); i++){
-
-            // retrieve MAC Address of device i
-            WifiP2pDevice targetDevice = PeerNames.get(i);
-            peersMacArrayStr[i] = targetDevice.deviceAddress;
-
-            // connect to all the devices
-            connect(i);
-        }
     }
     /* unregister the broadcast receiver */
     @Override
@@ -272,8 +290,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
             @Override
             public void onSuccess() {
-                Toast.makeText(getApplicationContext(), "Connection succeeded!",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Connection succeeded!", Toast.LENGTH_SHORT).show();
+
             }
 
             @Override

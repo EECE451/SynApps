@@ -88,7 +88,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 });
             }
 
-
             Log.d("P2P Notification", "Peers discovered!");
             Toast.makeText(mActivity,"Peers discovered!", Toast.LENGTH_SHORT).show();
 
@@ -99,6 +98,13 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                         "device[" + i + "]:" + PeerNames.get(i).deviceAddress +" deviceName:"+ PeerNames.get(i).deviceName);
             }
             Log.d("P2P Notification", "print devices end====>");
+
+            Toast.makeText(mActivity,"begin print devices list====>", Toast.LENGTH_SHORT).show();
+            for (int i = 0; i < PeerNames.size(); i++)
+            {
+                Toast.makeText(mActivity, "device[" + i + "]:" + PeerNames.get(i).deviceAddress + " deviceName:" + PeerNames.get(i).deviceName, Toast.LENGTH_SHORT).show();
+            }
+            Toast.makeText(mActivity,"print devices end====>", Toast.LENGTH_SHORT).show();
 
             // At that stage all the devices are listed in peerNames.
             // Working till here!
@@ -152,8 +158,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
 
     public ArrayList getPeerNames() {
-        Log.d("mytest", "size peers name"+PeerNames.size());
-        Toast.makeText(mActivity, "size peers name"+PeerNames.size(), Toast.LENGTH_SHORT).show();
+//        Log.d("mytest", "size peers name"+PeerNames.size());
+//        Toast.makeText(mActivity, "size peers name"+PeerNames.size(), Toast.LENGTH_SHORT).show();
         return PeerNames;
     }
 }
