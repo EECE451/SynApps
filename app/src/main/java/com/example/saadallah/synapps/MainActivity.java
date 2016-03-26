@@ -1,5 +1,6 @@
 package com.example.saadallah.synapps;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,7 +8,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.ColorDrawable;
 import android.net.wifi.WifiManager;
+import android.net.wifi.WpsInfo;
+import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -24,10 +29,13 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import java.net.InetAddress;
+import java.nio.channels.Channel;
 import java.util.ArrayList;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
-// Saadallah TEST
+public class MainActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, DeviceActionListener {
+
     private android.support.v7.app.ActionBar bar; //ActionBar-Drawer
     private ActionBarDrawerToggle toggle; //ActionBar-Drawer
     private DrawerLayout drawer; //ActionBar-Drawer
@@ -36,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     WifiManager wifiManager;
     WifiP2pManager mManager;
     WifiP2pManager.Channel mChannel;
-    BroadcastReceiver mReceiver;
+    WiFiDirectBroadcastReceiver mReceiver;
     IntentFilter p2pIntent;
 
     // Bluetooth stuff
@@ -45,15 +53,9 @@ public class MainActivity extends AppCompatActivity {
     //Cellular Network
     TelephonyManager teleMan;
 
-    // Creating an ArrayList to store the detected p2p peers
-    private ArrayList PeerNames= new ArrayList();
-    private WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
-        @Override
-        public void onPeersAvailable(WifiP2pDeviceList peerList) {
-            PeerNames.clear();
-            PeerNames.addAll(peerList.getDeviceList());
-        }
-    };
+    // Discovered Device List
+    private String[] peersMacArrayStr;
+    private ArrayList<WifiP2pDevice> PeerNames;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +96,7 @@ public class MainActivity extends AppCompatActivity {
         p2pIntent = new IntentFilter();
         p2pIntent.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         p2pIntent.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+
 
         //------------------------------------------------------------------------------------
         // setting the toggle button in drawer
@@ -152,18 +153,39 @@ public class MainActivity extends AppCompatActivity {
         teleMan =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 
         //-------------------------------------------------------------------------------------------------------------
-        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() { // starts discovering peers
             @Override
             public void onSuccess() {
                 Log.d("p2p Notification", "Starting Discovery");
+                Toast.makeText(getApplicationContext(), "Starting Discovery", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int reason) {
                 Toast.makeText(MainActivity.this, "Could not initiate peer discovery", Toast.LENGTH_SHORT).show();
 
+
             }
         });
+
+        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+
+        PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
+        peersMacArrayStr = new String[PeerNames.size()];
+         //error before: size =0
+
+        for (int i=0; i<PeerNames.size(); i++){
+
+            // retrieve MAC Address of device i
+            WifiP2pDevice targetDevice = PeerNames.get(i);
+            peersMacArrayStr[i] = targetDevice.deviceAddress;
+
+            // connect to all the devices
+            connect(i);
+        }
+
+
 
     }
 
@@ -233,5 +255,103 @@ public class MainActivity extends AppCompatActivity {
     public void onClickNo(View view) { //Don't forget to implement this method!
 
     }
+
+    @Override
+    public void connect(int deviceIndex) {
+        // Picking the first device found on the network.
+        WifiP2pDevice device = PeerNames.get(deviceIndex);
+
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = device.deviceAddress;
+        config.wps.setup = WpsInfo.PBC;
+
+        mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(), "Connect succeeded!",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Toast.makeText(getApplicationContext(), "Connect failed. Retry.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+//   @Override
+//    public void connect() {
+//        // Picking the first device found on the network.
+//        WifiP2pDevice device = PeerNames.get(0);
+//
+//        WifiP2pConfig config = new WifiP2pConfig();
+//        config.deviceAddress = device.deviceAddress;
+//        config.wps.setup = WpsInfo.PBC;
+//
+//        mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+//
+//            @Override
+//            public void onSuccess() {
+//                Toast.makeText(MainActivity.this, "Success!", Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onFailure(int reason) {
+//                Toast.makeText(MainActivity.this, "Connect failed. Retry.", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
+
+    @Override
+    public void onChannelDisconnected() {
+        // we will try once more
+
+        if (mManager != null) {
+            Toast.makeText(getApplicationContext(), "Channel lost. Trying again", Toast.LENGTH_SHORT).show();
+            mManager.initialize(this, getMainLooper(), this);
+        } else {
+            Toast.makeText(getApplicationContext(), "Severe! Channel is probably lost permanently. Try Disable/Re-Enable P2P.", Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
+    @Override
+    public void disconnect(WifiP2pDevice device) {
+        WifiP2pManager.ActionListener actionListener = new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(), "Disconnected Successfully.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Toast.makeText(getApplicationContext(), "Error Disconnecting", Toast.LENGTH_SHORT).show();
+            }
+        };
+        if (device.status == WifiP2pDevice.INVITED) {
+            mManager.cancelConnect(mChannel, actionListener);
+        } else if (device.status == WifiP2pDevice.CONNECTED) {
+            mManager.removeGroup(mChannel, actionListener);
+        }
+    }
+
+    @Override
+    public void disconnect() {
+        mManager.removeGroup(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(), "Disconnected Successfully.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Toast.makeText(getApplicationContext(), "Error Disconnecting", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 }
+
 
