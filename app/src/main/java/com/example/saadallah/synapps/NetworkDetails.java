@@ -51,7 +51,7 @@ public class NetworkDetails extends AppCompatActivity {
         String Detection_time = String.format("%tc", date);
 
         //Dummy Filling
-        myDb.insertData("0153456787ae",Detection_time,0,2,4,"03649774","1");
+//        myDb.insertData("0153456787ae",Detection_time,0,2,4,"03649774","1");
 //        myDb.insertData("0124456789ac",Detection_time,1,2,4,"03649674","1");
 //        myDb.insertData("0126456789ae",Detection_time,3,2,4,"03549774","1");
 //        myDb.insertData("0124456789af",Detection_time,5,2,4,"01642774","1");
@@ -116,6 +116,7 @@ public class NetworkDetails extends AppCompatActivity {
         String[] macAddressParts = macAddress.split(":");
         String MACS= macAddressParts[0]+macAddressParts[1]+macAddressParts[2]+macAddressParts[3]+macAddressParts[4]+macAddressParts[5];
         txt_ReadAllData.setText(MACS);
+        myDb.insertData(MACS,Detection_time,0,2,4,"03649774","1");
 
 
 
