@@ -51,21 +51,21 @@ public class NetworkDetails extends AppCompatActivity {
         String Detection_time = String.format("%tc", date);
 
         //Dummy Filling
-//        myDb.insertData("0153456787ae",Detection_time,0,2,4,"03649774","1");
-//        myDb.insertData("0124456789ac",Detection_time,1,2,4,"03649674","1");
-//        myDb.insertData("0126456789ae",Detection_time,3,2,4,"03549774","1");
-//        myDb.insertData("0124456789af",Detection_time,5,2,4,"01642774","1");
-//        myDb.insertData("0125456789af",Detection_time,5,2,4,"01642774","1");
-//        myDb.insertData("0153451787ae",Detection_time,0,2,4,"03649774","1");
-//        myDb.insertData("0125556789a1",Detection_time,1,2,4,"03649674","1");
-//        myDb.insertData("0126451119ae",Detection_time,3,2,4,"03549774","1");
-//        myDb.insertData("0114116789af",Detection_time,5,2,4,"01642774","1");
-//        myDb.insertData("1124991199af",Detection_time,5,2,4,"01642774","1");
-//        myDb.insertData("0153116787ae",Detection_time,0,2,4,"03649774","1");
-//        myDb.insertData("0124451189ac",Detection_time,1,2,4,"03649674","1");
-//        myDb.insertData("1126456711ae",Detection_time,3,2,4,"03549774","1");
-//        myDb.insertData("017777678911",Detection_time,5,2,4,"01642774","1");
-//        myDb.insertData("0121156789af",Detection_time,5,2,4,"01642774","1");
+//        myDb.insertData("0153456787ae",Detection_time,0,2,4,"03649774","1",1);
+//        myDb.insertData("0124456789ac",Detection_time,1,2,4,"03649674","1",1);
+//        myDb.insertData("0126456789ae",Detection_time,3,2,4,"03549774","1",1);
+//        myDb.insertData("0124456789af",Detection_time,5,2,4,"01642774","1",1);
+//        myDb.insertData("0125456789af",Detection_time,5,2,4,"01642774","1",1);
+//        myDb.insertData("0153451787ae",Detection_time,0,2,4,"03649774","1",1);
+//        myDb.insertData("0125556789a1",Detection_time,1,2,4,"03649674","1",1);
+//        myDb.insertData("0126451119ae",Detection_time,3,2,4,"03549774","1",1);
+//        myDb.insertData("0114116789af",Detection_time,5,2,4,"01642774","1",1);
+//        myDb.insertData("1124991199af",Detection_time,5,2,4,"01642774","1",1);
+//        myDb.insertData("0153116787ae",Detection_time,0,2,4,"03649774","1",1);
+//        myDb.insertData("0124451189ac",Detection_time,1,2,4,"03649674","1",1);
+//        myDb.insertData("1126456711ae",Detection_time,3,2,4,"03549774","1",1);
+//        myDb.insertData("017777678911",Detection_time,5,2,4,"01642774","1",1);
+//        myDb.insertData("0121156789af",Detection_time,5,2,4,"01642774","1",1);
 
         t1 = (android.widget.EditText)findViewById(R.id.input1);
         t2 = (android.widget.EditText)findViewById(R.id.t2);
@@ -116,7 +116,7 @@ public class NetworkDetails extends AppCompatActivity {
         String[] macAddressParts = macAddress.split(":");
         String MACS= macAddressParts[0]+macAddressParts[1]+macAddressParts[2]+macAddressParts[3]+macAddressParts[4]+macAddressParts[5];
         txt_ReadAllData.setText(MACS);
-        myDb.insertData(MACS,Detection_time,0,2,4,"03649774","1");
+        myDb.insertData(MACS, Detection_time, 0, 2, 4, "03649774", "1", 1);
 
 
 
@@ -152,7 +152,7 @@ public class NetworkDetails extends AppCompatActivity {
 
         StringBuffer buffer = new StringBuffer();
         while (result.moveToNext()) {
-            buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+ "\n");
+            buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+  " " + result.getString(8)+"\n");
 
         }
         txt_ReadAllData.setText(buffer.toString());
