@@ -1,18 +1,15 @@
 package com.example.saadallah.synapps;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pDeviceList;
-import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -24,16 +21,12 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import java.net.InetAddress;
-import java.nio.channels.Channel;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, DeviceActionListener {
 
@@ -56,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
     //Cellular Network
     TelephonyManager teleMan;
+    String phoneNumber;
 
     // Discovered Device List
     private String[] peersMacArrayStr;
@@ -92,19 +86,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
         toggle.syncState();
         drawer.setDrawerListener(toggle);
-
-        //-----------------------------------------------------------------------------------
-        // WiFi p2p status checking
-
-        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-
-
-        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = mManager.initialize(this, getMainLooper(), null);
-        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
 
         //------------------------------------------------------------------------------------
         // setting the toggle button in drawer
@@ -156,17 +137,34 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
             }
         });
 
+        //----------------------------------------------------------------------------------
         //Cellular Network
         teleMan =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        phoneNumber = teleMan.getSimSerialNumber(); // get the phone number
+
+        //-----------------------------------------------------------------------------------
+        // WiFi p2p status checking
+
+        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        p2pIntent.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+
+
+        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
 
         //-------------------------------------------------------------------------------------------------------------
+        // WiFi p2p discovering peers and connecting to them
+
+        // discovering peers
+
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() { // starts discovering peers
             @Override
             public void onSuccess() {
                 Log.d("p2p Notification", "Starting Discovery");
                 Toast.makeText(getApplicationContext(), "Starting Discovery", Toast.LENGTH_SHORT).show();
-
-
             }
 
             @Override
@@ -200,6 +198,14 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         WifiP2pDevice targetDevice = PeerNames.get(i);
                         peersMacArrayStr[i] = targetDevice.deviceAddress;
 
+                        // removing the columns from the strings in MAC addresses
+                        String[] macAddressParts = peersMacArrayStr[i].split(":");
+                        peersMacArrayStr[i]= macAddressParts[0]+macAddressParts[1]+macAddressParts[2]+macAddressParts[3]+macAddressParts[4]+macAddressParts[5];
+
+                        Cursor result = myDb.getDatabyMAC(peersMacArrayStr[i]);
+                        if (result.getCount() == 0) { // if new device (first time detected)
+                        }
+
                         //saves the time at which the device got connected/discovered
                         timeDiscovered[i] = new java.util.Date();
 
@@ -213,8 +219,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         Thread myThread = new Thread(myRunnable);
         myThread.start();
 
-
-
+        //------------------------------------------------------------------------------------------
 
 
     }
@@ -234,10 +239,12 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         int id = item.getItemId();
 
         if (id == R.id.action_connectivity_state) {
-            Intent connectivityStateIntent = new Intent(this, Connectivity_State.class);
+
+            Intent connectivityStateIntent = new Intent(MainActivity.this, Connectivity_State.class);
             connectivityStateIntent.putExtra("bluetooth_state", mBluetoothAdapter.isEnabled());
             connectivityStateIntent.putExtra("wifi_state", wifiManager.isWifiEnabled());
             connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
+            connectivityStateIntent.putExtra("phone_number", phoneNumber); // attach the phone number to the intent
             startActivity(connectivityStateIntent);
         }
         return super.onOptionsItemSelected(item);
@@ -254,7 +261,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     protected void onResume() {
         super.onResume();
         registerReceiver(mReceiver, p2pIntent);
-
 
     }
     /* unregister the broadcast receiver */
@@ -289,6 +295,15 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
     }
 
+    public void onConnectivityClick(View view) {
+        Intent connectivityStateIntent = new Intent(MainActivity.this, Connectivity_State.class);
+        connectivityStateIntent.putExtra("bluetooth_state", mBluetoothAdapter.isEnabled());
+        connectivityStateIntent.putExtra("wifi_state", wifiManager.isWifiEnabled());
+        connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
+        connectivityStateIntent.putExtra("phone_number", phoneNumber); // attach the phone number to the intent
+        startActivity(connectivityStateIntent);
+    }
+
     @Override
     public void connect(int deviceIndex) {
         // Picking the first device found on the network.
@@ -314,28 +329,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         });
     }
 
-//   @Override
-//    public void connect() {
-//        // Picking the first device found on the network.
-//        WifiP2pDevice device = PeerNames.get(0);
-//
-//        WifiP2pConfig config = new WifiP2pConfig();
-//        config.deviceAddress = device.deviceAddress;
-//        config.wps.setup = WpsInfo.PBC;
-//
-//        mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
-//
-//            @Override
-//            public void onSuccess() {
-//                Toast.makeText(MainActivity.this, "Success!", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onFailure(int reason) {
-//                Toast.makeText(MainActivity.this, "Connect failed. Retry.", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
 
     @Override
     public void onChannelDisconnected() {
@@ -363,11 +356,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                 Toast.makeText(getApplicationContext(), "Error Disconnecting", Toast.LENGTH_SHORT).show();
             }
         };
-        if (device.status == WifiP2pDevice.INVITED) {
-            mManager.cancelConnect(mChannel, actionListener);
-        } else if (device.status == WifiP2pDevice.CONNECTED) {
-            mManager.removeGroup(mChannel, actionListener);
-        }
     }
 
     @Override
@@ -384,6 +372,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
             }
         });
     }
+
 
 }
 

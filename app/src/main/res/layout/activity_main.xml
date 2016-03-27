@@ -27,12 +27,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/network_details"
                 android:id="@+id/network_details_button"
-                android:layout_below="@+id/Title"
+                android:layout_below="@+id/connectivity_button"
                 android:layout_centerHorizontal="true"
                 android:onClick="onNetworkDetailsClick"
                 android:background="@color/myBlue"
                 android:textColor="@color/myWhite"
-                android:layout_marginTop="70dp"
+                android:layout_marginTop="50dp"
                 android:textSize="20sp"
                 android:outlineProvider="paddedBounds" />
 
@@ -44,6 +44,20 @@
                 android:layout_below="@+id/network_details_button"
                 android:layout_centerHorizontal="true"
                 android:onClick="onGenerateGraphClick"
+                android:background="@color/myBlue"
+                android:textColor="@color/myWhite"
+                android:layout_marginTop="50dp"
+                android:textSize="20sp"
+                android:outlineProvider="paddedBounds" />
+
+            <Button
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:text="@string/myconnectivity"
+                android:id="@+id/connectivity_button"
+                android:layout_below="@+id/Title"
+                android:layout_centerHorizontal="true"
+                android:onClick="onConnectivityClick"
                 android:background="@color/myBlue"
                 android:textColor="@color/myWhite"
                 android:layout_marginTop="50dp"

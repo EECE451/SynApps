@@ -7,6 +7,7 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="wifidirect">Wifi-Direct</string>
     <string name="connectivity">Connectivity</string>
+    <string name="myconnectivity">My Connectivity</string>
     <string name="updates">Updates</string>
     <string name="last_data_update">Last Data Update:\n21/03/2016</string>
     <string name="clear_data">Clear Data</string>
@@ -25,57 +26,9 @@
     <string name="bluetooth_state">Bluetooth State: </string>
     <string name="wifi_state">Wifi State: </string>
     <string name="cell_state">Cellular Network: </string>
+    <string name="phone_nb">Phone Number: </string>
+    <string name="unknown">Unknown</string>
 
-    <!--> Dummy Values for Network Details Arrays<-->
 
-    <string-array name="device_names">
-        <item>Device A</item>
-        <item>Device B</item>
-        <item>Device C</item>
-    </string-array>
-
-    <string-array name="MAC_addresses">
-        <item>01:23:45:67:89:AB</item>
-        <item>00:11:22:33:44:55</item>
-        <item>10:20:30:40:50:60</item>
-    </string-array>
-
-    <string-array name="phone_numbers">
-        <item>71 123 456</item>
-        <item>71 100 200</item>
-        <item>71 666 999</item>
-    </string-array>
-
-    <string-array name="last_detected">
-        <item>21/03/2016 - 15:28</item>
-        <item>20/03/2016 - 17:41</item>
-        <item>21/03/2016 - 10:27</item>
-    </string-array>
-
-    <string-array name="last_started">
-        <item>21/03/2016 - 15:18</item>
-        <item>20/03/2016 - 17:28</item>
-        <item>21/03/2016 - 10:23</item>
-    </string-array>
-
-    <string-array name="last_duration">
-        <item>9min 47s</item>
-        <item>12min 03s</item>
-        <item>3min 31</item>
-    </string-array>
-
-    <string-array name="number_detection">
-        <item>3</item>
-        <item>2</item>
-        <item>6</item>
-    </string-array>
-
-    <string-array name="cummulative_detection">
-        <item>21min 17s</item>
-        <item>26min 10s</item>
-        <item>34min 49s</item>
-    </string-array>
-
-    <string name="hello_world">Hello world!</string>
-    <string name="title_activity_connectivity__state">Connectivity_State</string>
+    <string name="title_activity_connectivity__state">Connectivity State</string>
 </resources>
