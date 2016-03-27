@@ -32,6 +32,7 @@ import android.widget.Toast;
 import java.net.InetAddress;
 import java.nio.channels.Channel;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements WifiP2pManager.ChannelListener, DeviceActionListener {
@@ -47,9 +48,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     private WiFiDirectBroadcastReceiver mReceiver;
     private final IntentFilter p2pIntent = new IntentFilter();
 
-    //Intents
-
-
+    // Database helper
+    DatabaseHelper myDb =new DatabaseHelper(this);
 
     // Bluetooth stuff
     final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -60,6 +60,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     // Discovered Device List
     private String[] peersMacArrayStr;
     private ArrayList<WifiP2pDevice> PeerNames;
+
+    // Time discovered = connected Device List
+    private Date[] timeDiscovered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,12 +174,11 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                 Toast.makeText(MainActivity.this, "Could not initiate peer discovery", Toast.LENGTH_SHORT).show();
             }
         });
-        // Should be sending an intent, but not sending
+
 
         Runnable myRunnable = new Runnable() {
             @Override
             public void run() {
-                Log.d("P2P Notification", "entered thread");
 
                 synchronized (this) {
                     try {
@@ -190,13 +192,16 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
                 PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
                     peersMacArrayStr = new String[PeerNames.size()];
+                    timeDiscovered = new java.util.Date[PeerNames.size()];
 
                     for (int i = 0; i < PeerNames.size(); i++) {
-                        Log.d("P2P Notification", "entered for loop");
 
                         // retrieve MAC Address of device i
                         WifiP2pDevice targetDevice = PeerNames.get(i);
                         peersMacArrayStr[i] = targetDevice.deviceAddress;
+
+                        //saves the time at which the device got connected/discovered
+                        timeDiscovered[i] = new java.util.Date();
 
                         // connect to all the devices
                         connect(i);

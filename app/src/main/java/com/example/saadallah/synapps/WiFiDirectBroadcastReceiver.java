@@ -99,15 +99,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             }
             Log.d("P2P Notification", "print devices end====>");
 
-            Toast.makeText(mActivity,"begin print devices list====>", Toast.LENGTH_SHORT).show();
-            for (int i = 0; i < PeerNames.size(); i++)
-            {
-                Toast.makeText(mActivity, "device[" + i + "]:" + PeerNames.get(i).deviceAddress + " deviceName:" + PeerNames.get(i).deviceName, Toast.LENGTH_SHORT).show();
-            }
-            Toast.makeText(mActivity,"print devices end====>", Toast.LENGTH_SHORT).show();
-
-            // At that stage all the devices are listed in peerNames.
-            // Working till here!
 
         }
         else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
