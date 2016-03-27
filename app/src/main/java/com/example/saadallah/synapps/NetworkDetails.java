@@ -39,9 +39,6 @@ public class NetworkDetails extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_network_details);
 
-        Intent intent = getIntent();
-        String mystring = intent.getStringArrayExtra("MacArray")[0];
-        t2.setText(mystring);
 
         //---DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area---
 
@@ -115,6 +112,15 @@ public class NetworkDetails extends AppCompatActivity {
 //            t2.setText(tempConcatenation);
 //        }
 
+        Intent intent = getIntent();
+        String[] mystringarray = intent.getStringArrayExtra("MacArray");
+
+        String tempString = "";
+        for (int i=0; i<mystringarray.length; i++) {
+            tempString = tempString + " " + mystringarray[i];
+        }
+
+        txt_ReadSpecific.setText(tempString);
     }
 
 
