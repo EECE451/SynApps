@@ -47,6 +47,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     private WiFiDirectBroadcastReceiver mReceiver;
     private final IntentFilter p2pIntent = new IntentFilter();
 
+    //Intents
+
+
 
     // Bluetooth stuff
     final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -199,9 +202,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         connect(i);
                     }
 
-                Intent networkDetailsIntent = new Intent(MainActivity.this, NetworkDetails.class);
-                networkDetailsIntent.putExtra("MacArray", peersMacArrayStr);
-                startActivity(networkDetailsIntent);
             }
         };
 
@@ -266,7 +266,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     }
 
     public void onNetworkDetailsClick(View view) {
-        Intent networkDetailsIntent = new Intent(this, NetworkDetails.class);
+        Intent networkDetailsIntent = new Intent(MainActivity.this, NetworkDetails.class);
+        networkDetailsIntent.putExtra("MacArray", peersMacArrayStr);
         startActivity(networkDetailsIntent);
     }
 

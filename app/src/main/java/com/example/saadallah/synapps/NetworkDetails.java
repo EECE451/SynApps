@@ -1,5 +1,6 @@
 package com.example.saadallah.synapps;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ public class NetworkDetails extends AppCompatActivity {
 
 
 
+
     //---DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area---
 
 
@@ -36,6 +38,10 @@ public class NetworkDetails extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_network_details);
+
+        Intent intent = getIntent();
+        String mystring = intent.getStringArrayExtra("MacArray")[0];
+        t2.setText(mystring);
 
         //---DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area---
 
@@ -98,6 +104,16 @@ public class NetworkDetails extends AppCompatActivity {
 
         //---------------------------------------------------------------------------------
 
+//        String tempConcatenation = new String();
+//        tempConcatenation ="";
+//
+//        if (MacArray != null) {
+//            for (String entry : MacArray) {
+//                tempConcatenation = tempConcatenation + entry;
+//            }
+//
+//            t2.setText(tempConcatenation);
+//        }
 
     }
 

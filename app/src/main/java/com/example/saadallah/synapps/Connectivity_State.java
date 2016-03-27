@@ -85,6 +85,10 @@ public class Connectivity_State extends AppCompatActivity {
                 break;
         }
 
+//        Intent intent = getIntent();
+//        String mystring = intent.getStringArrayExtra("MacArray")[0];
+//        cell_value_textview.setText(mystring);
+
 
     }
 

@@ -33,11 +33,13 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+
             </intent-filter>
         </activity>
         <activity
             android:name=".NetworkDetails"
             android:label="@string/title_activity_network_details" >
+
         </activity>
         <activity
             android:name=".Connectivity_State"
