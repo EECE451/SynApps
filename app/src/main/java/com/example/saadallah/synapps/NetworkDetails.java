@@ -101,37 +101,22 @@ public class NetworkDetails extends AppCompatActivity {
 
         //---------------------------------------------------------------------------------
 
-//        String tempConcatenation = new String();
-//        tempConcatenation ="";
-//
-//        if (MacArray != null) {
-//            for (String entry : MacArray) {
-//                tempConcatenation = tempConcatenation + entry;
-//            }
-//
-//            t2.setText(tempConcatenation);
-//        }
+
 
         Intent intent = getIntent();
         String[] mystringarray = intent.getStringArrayExtra("MacArray");
 
         String tempString = "";
-        for (int i=0; i<mystringarray.length; i++) {
+        for(int i=0;i<mystringarray.length;i++)
+        {
             tempString = tempString + " " + mystringarray[i];
         }
-
         txt_ReadSpecific.setText(tempString);
-
         String macAddress = tempString;
         String[] macAddressParts = macAddress.split(":");
+        String MACS= macAddressParts[0]+macAddressParts[1]+macAddressParts[2]+macAddressParts[3]+macAddressParts[4]+macAddressParts[5];
+        txt_ReadAllData.setText(MACS);
 
-       // convert hex string to byte values
-        Byte[] macAddressBytes = new Byte[6];
-        for(int i=0; i<6; i++){
-            Integer hex = Integer.parseInt(macAddressParts[i], 16);
-            macAddressBytes[i] = hex.byteValue();
-        }
-        txt_ReadAllData.setText(macAddressBytes[0]);
 
 
     }
