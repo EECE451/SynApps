@@ -11,11 +11,12 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    public static final String DB_Name = "devices1000.db";
+    public static final String DB_Name = "devices2021.db";
     public static final String TABLE_DEVICESS = "DevicesTable";
     public static final String COLUMN_DEVICESS_ID = "_Did";
     public static final String COLUMN_DEVICESS_MAC = "device_MAC";
     public static final String COLUMN_DEVICESS_LAST_TIME_DETECTION = "lt_detection";
+    public static final String COLUMN_DEVICESS_LAST_TIME_INIT = "lt_init";
     public static final String COLUMN_DEVICESS_LAST_TIME_RANGE = "lt_range";
     public static final String COLUMN_DEVICESS_DETECTION_FREQUENCY= "detection_frequency";
     public static final String COLUMN_DEVICESS_CUMULATIVE_DETECTION_DURATION = "cum_detection_duration";
@@ -28,6 +29,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_DEVICESS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_DEVICESS_MAC + " TEXT NOT NULL UNIQUE, "
             + COLUMN_DEVICESS_LAST_TIME_DETECTION + " NUMERIC, "
+            + COLUMN_DEVICESS_LAST_TIME_INIT + " NUMERIC,"
             + COLUMN_DEVICESS_LAST_TIME_RANGE + " REAL, "
             + COLUMN_DEVICESS_DETECTION_FREQUENCY + " REAL, "
             + COLUMN_DEVICESS_CUMULATIVE_DETECTION_DURATION + " REAL, "
@@ -51,11 +53,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public void onDropTable() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("drop table DevicesTable");
+
+    }
 
 
 
-
-    public boolean insertData(String MAC, String lt_detection, long lt_range, int detection_frequency,long cum_detection_duration,String phone_number, String description_name, int device_exists) {
+    public boolean insertData(String MAC, String lt_detection, String lt_init, long lt_range, int detection_frequency,long cum_detection_duration,String phone_number, String description_name, int device_exists) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -63,6 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_DEVICESS_MAC, MAC);
         contentValues.put(COLUMN_DEVICESS_LAST_TIME_DETECTION, lt_detection);
         contentValues.put(COLUMN_DEVICESS_LAST_TIME_RANGE, lt_range);
+        contentValues.put(COLUMN_DEVICESS_LAST_TIME_INIT, lt_init);
         contentValues.put(COLUMN_DEVICESS_DETECTION_FREQUENCY, detection_frequency);
         contentValues.put(COLUMN_DEVICESS_CUMULATIVE_DETECTION_DURATION, cum_detection_duration);
         contentValues.put(COLUMN_DEVICESS_PHONE_NUMBER, phone_number);
@@ -84,6 +91,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
+    //to use this function, we must access the db first to get the detection frequency
+    public boolean updateDetectionFrequency(String MAC, int detection_freq)
+    {   int detection_freq_updated = detection_freq +1;
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_DEVICESS_MAC, MAC);
+        contentValues.put(COLUMN_DEVICESS_DETECTION_FREQUENCY, detection_freq_updated);
+        db.update(TABLE_DEVICESS, contentValues, "device_MAC =?", new String[]{MAC});
+        return true;
+    }
 
     public boolean updateExistsStatus(String MAC, int device_exists)
     {
@@ -96,12 +113,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //not yet used
-    public boolean updatebyDescriptionName(String description_name, String lt_detection, long lt_range, int detection_frequency,long cum_detection_duration,String phone_number)
+    public boolean updatebyDescriptionName(String description_name, String lt_detection,String lt_init, long lt_range, int detection_frequency,long cum_detection_duration,String phone_number)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_DEVICESS_LAST_TIME_DETECTION, lt_detection);
         contentValues.put(COLUMN_DEVICESS_LAST_TIME_RANGE, lt_range);
+        contentValues.put(COLUMN_DEVICESS_LAST_TIME_INIT, lt_init);
         contentValues.put(COLUMN_DEVICESS_DETECTION_FREQUENCY, detection_frequency);
         contentValues.put(COLUMN_DEVICESS_CUMULATIVE_DETECTION_DURATION, cum_detection_duration);
         contentValues.put(COLUMN_DEVICESS_PHONE_NUMBER, phone_number);
@@ -121,7 +139,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getAllData()
     {
         SQLiteDatabase db =this.getWritableDatabase();
-        Cursor result = db.rawQuery("select * from "+TABLE_DEVICESS,null);
+        Cursor result = db.rawQuery("select * from " + TABLE_DEVICESS, null);
         return result;
     }
 
@@ -146,6 +164,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor result = db.rawQuery("select _Did, device_MAC from " + TABLE_DEVICESS, null);
         return result;
 
+    }
+    //reset flags function
+    public boolean resetFlags()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+       // db.update(TABLE_DEVICESS, contentValues, "device_MAC =?",);
+
+
+        db.rawQuery("UPDATE "+ TABLE_DEVICESS + " SET '"+ COLUMN_DEVICESS_EXISTS +"' = " + "('"+COLUMN_DEVICESS_EXISTS +"' * -1)", null);
+        db.rawQuery("update DevicesTable set device_exists = 0 ",null);
+        return true;
     }
 
 

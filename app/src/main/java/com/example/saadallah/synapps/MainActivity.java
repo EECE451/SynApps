@@ -189,10 +189,15 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                 // Thread calling connect
 
                 PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
+                //Up here, we are feeling the MAC array string: the thread takes MAC address from devices that are discovered
+                //It only discovers devices
                     peersMacArrayStr = new String[PeerNames.size()];
                     timeDiscovered = new java.util.Date[PeerNames.size()];
 
                     for (int i = 0; i < PeerNames.size(); i++) {
+                        //saves the time at which the device got connected/discovered
+                        timeDiscovered[i] = new java.util.Date();
+                        String Detection_time = String.format("%tc", timeDiscovered[i]);
 
                         // retrieve MAC Address of device i
                         WifiP2pDevice targetDevice = PeerNames.get(i);
@@ -202,12 +207,34 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         String[] macAddressParts = peersMacArrayStr[i].split(":");
                         peersMacArrayStr[i]= macAddressParts[0]+macAddressParts[1]+macAddressParts[2]+macAddressParts[3]+macAddressParts[4]+macAddressParts[5];
 
+
+                        //Checking if its a new device
                         Cursor result = myDb.getDatabyMAC(peersMacArrayStr[i]);
-                        if (result.getCount() == 0) { // if new device (first time detected)
+                        if (result.getCount() == 0)
+                        {
+                            Log.d("Device=","New");
+                            myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 1, "", "", 1);
+
+                        }
+                        else if(result.getCount()==1)   //Its an old device:  if the MAC appears here, it means that its still connected
+                        {
+
+                            Log.d("Device=", "old");
+                        }
+                        else
+                        {
+                            Log.d("Device=", "khabissa");
                         }
 
-                        //saves the time at which the device got connected/discovered
-                        timeDiscovered[i] = new java.util.Date();
+
+
+
+
+
+
+
+
+
 
                         // connect to all the devices
                         connect(i);

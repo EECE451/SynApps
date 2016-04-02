@@ -104,7 +104,28 @@
         android:layout_alignStart="@+id/txt_ReadAllData"
         android:layout_toLeftOf="@+id/btnupdate"
         android:layout_toStartOf="@+id/btnupdate" />
+
+    <Button
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Drop Table"
+        android:id="@+id/btn_DropTable"
+        android:layout_marginTop="31dp"
+        android:layout_below="@+id/txt_ReadAllData"
+        android:layout_alignLeft="@+id/txt_ReadAllData"
+        android:layout_alignStart="@+id/txt_ReadAllData"
+        android:onClick="onbtnclickdroptable" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reset all flags"
+        android:id="@+id/btn_resetFlags"
+        android:layout_below="@+id/btn_DropTable"
+        android:layout_alignRight="@+id/btn_DropTable"
+        android:layout_alignEnd="@+id/btn_DropTable"
+        android:onClick="onbtnclickresetflags" />
+    android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Drop Table"
         android:id="@+id/btndrop"
