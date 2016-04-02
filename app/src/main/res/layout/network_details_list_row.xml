@@ -1,181 +1,129 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Device Name"
-        android:id="@+id/deviceName"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textColor="@color/myBlue"
-        android:textSize="20dp"
-        android:textStyle="bold"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="5dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="MAC Address:"
-        android:id="@+id/mac_address"
-        android:layout_below="@+id/deviceName"
-        android:layout_alignLeft="@+id/deviceName"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="5dp"
-        android:textSize="13dp"
-        android:textColor="#333333" />
+    </RelativeLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="01:23:45:67:89:AB"
-        android:id="@+id/mac_address_val"
-        android:layout_alignBottom="@+id/mac_address"
-        android:layout_toRightOf="@+id/mac_address"
-        android:textSize="13dp"
-        android:layout_marginLeft="10dp"
-        android:textColor="#333333" />
+    <RelativeLayout
+        android:id="@+id/left_drawer"
+        android:layout_width="220dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:orientation="vertical"
+        android:background="@color/myWhite">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="70 012 345"
-        android:id="@+id/phone_number_val"
-        android:layout_alignBottom="@+id/phone_number"
-        android:layout_toRightOf="@+id/phone_number"
-        android:textSize="13dp"
-        android:layout_marginLeft="10dp"
-        android:textColor="#333333" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Phone Number:"
-        android:id="@+id/phone_number"
-        android:layout_below="@+id/mac_address"
-        android:layout_alignLeft="@+id/deviceName"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="5dp"
-        android:textSize="13dp"
-        android:textColor="#333333" />
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/notifications"
+            android:id="@+id/notif_switch"
+            android:textColor="@color/myBlue"
+            android:textSize="20sp"
+            android:layout_below="@+id/updates_textview"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="25dp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="21/03/2016 - 15:21"
-        android:id="@+id/last_time_detected_val"
-        android:layout_alignBottom="@+id/last_time_detected"
-        android:layout_toRightOf="@+id/last_time_detected"
-        android:textSize="13dp"
-        android:layout_marginLeft="10dp"
-        android:textColor="#333333" />
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bluetooth"
+            android:id="@+id/bluetooth_switch"
+            android:textColor="@color/myBlue"
+            android:textSize="20sp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:layout_below="@+id/connectivity_textview"
+            android:textStyle="bold" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Last Time Detected:"
-        android:id="@+id/last_time_detected"
-        android:layout_below="@+id/phone_number"
-        android:layout_alignLeft="@+id/deviceName"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="5dp"
-        android:textSize="13dp"
-        android:textColor="#333333" />
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/wifidirect"
+            android:id="@+id/wifi_switch"
+            android:textColor="@color/myBlue"
+            android:textSize="20sp"
+            android:layout_below="@+id/bluetooth_switch"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="21/03/2016 - 15:06"
-        android:id="@+id/last_time_started_val"
-        android:layout_alignBottom="@+id/last_time_started"
-        android:layout_toRightOf="@+id/last_time_started"
-        android:textSize="13dp"
-        android:layout_marginLeft="10dp"
-        android:textColor="#333333" />
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/mobile_data"
+            android:id="@+id/mobile_data_"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:layout_below="@+id/wifi_switch"
+            android:textColor="@color/myBlue"
+            android:textSize="20dp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Last Time Started:"
-        android:id="@+id/last_time_started"
-        android:layout_below="@+id/last_time_detected"
-        android:layout_alignLeft="@+id/deviceName"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="5dp"
-        android:textSize="13dp"
-        android:textColor="#333333" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/connectivity"
+            android:id="@+id/connectivity_textview"
+            android:textColor="@color/myBlue"
+            android:textSize="15dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="15dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="14min 36s"
-        android:id="@+id/last_duration_val"
-        android:layout_alignBottom="@+id/last_duration"
-        android:layout_toRightOf="@+id/last_duration"
-        android:textSize="13dp"
-        android:layout_marginLeft="10dp"
-        android:textColor="#333333" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/updates"
+            android:id="@+id/updates_textview"
+            android:textColor="@color/myBlue"
+            android:layout_below="@+id/mobile_data_"
+            android:textSize="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Last Duration:"
-        android:id="@+id/last_duration"
-        android:layout_below="@+id/last_time_started"
-        android:layout_alignLeft="@+id/deviceName"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="5dp"
-        android:textSize="13dp"
-        android:textColor="#333333" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/last_data_update"
+            android:id="@+id/last_data_update"
+            android:textColor="@color/myBlue"
+            android:layout_above="@+id/clear_data"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="15dp"
+            android:textSize="18dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="3"
-        android:id="@+id/number_times_detected_val"
-        android:layout_alignBottom="@+id/number_times_detected"
-        android:layout_toRightOf="@+id/number_times_detected"
-        android:textSize="13dp"
-        android:layout_marginLeft="10dp"
-        android:textColor="#333333" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/clear_data"
+            android:id="@+id/clear_data"
+            android:textColor="@color/myBlue"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:textSize="18dp"
+            android:onClick="onClickClearData" />
+    </RelativeLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Number of Detections:"
-        android:id="@+id/number_times_detected"
-        android:layout_below="@+id/last_duration"
-        android:layout_alignLeft="@+id/deviceName"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="5dp"
-        android:textSize="13dp"
-        android:textColor="#333333" />
+</android.support.v4.widget.DrawerLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="38min 17sec"
-        android:id="@+id/cummulative_detection_val"
-        android:layout_alignBottom="@+id/cummulative_detection"
-        android:layout_toRightOf="@+id/cummulative_detection"
-        android:textSize="13dp"
-        android:layout_marginLeft="10dp"
-        android:textColor="#333333"
-        android:layout_marginTop="5dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cummulative time detected:"
-        android:id="@+id/cummulative_detection"
-        android:layout_below="@+id/number_times_detected"
-        android:layout_alignLeft="@+id/deviceName"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="5dp"
-        android:textSize="13dp"
-        android:textColor="#333333"
-        android:layout_marginBottom="20dp" />
-</RelativeLayout>

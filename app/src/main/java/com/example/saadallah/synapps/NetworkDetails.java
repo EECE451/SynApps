@@ -51,21 +51,21 @@ public class NetworkDetails extends AppCompatActivity {
         String Detection_time = String.format("%tc", date);
 
         //Dummy Filling
-//        myDb.insertData("0153456787ae",Detection_time,Detection_time,0,2,4,"03649774","1",1);
-//        myDb.insertData("0124456789ac",Detection_time,Detection_time,1,2,4,"03649674","1",1);
-//        myDb.insertData("0126456789ae",Detection_time,Detection_time,3,2,4,"03549774","1",1);
-//        myDb.insertData("0124456789af",Detection_time,Detection_time,5,2,4,"01642774","1",1);
-//        myDb.insertData("0125456789af",Detection_time,Detection_time,5,2,4,"01642774","1",1);
-//        myDb.insertData("0153451787ae",Detection_time,Detection_time,0,2,4,"03649774","1",1);
-//        myDb.insertData("0125556789a1",Detection_time,Detection_time,1,2,4,"03649674","1",1);
-//        myDb.insertData("0126451119ae",Detection_time,Detection_time,3,2,4,"03549774","1",1);
-//        myDb.insertData("0114116789af",Detection_time,Detection_time,5,2,4,"01642774","1",1);
-//        myDb.insertData("1124991199af",Detection_time,Detection_time,5,2,4,"01642774","1",1);
-//        myDb.insertData("0153116787ae",Detection_time,Detection_time,0,2,4,"03649774","1",1);
-//        myDb.insertData("0124451189ac",Detection_time,Detection_time,1,2,4,"03649674","1",1);
-//        myDb.insertData("1126456711ae",Detection_time,Detection_time,3,2,4,"03549774","1",1);
-//        myDb.insertData("017777678911",Detection_time,Detection_time,5,2,4,"01642774","1",1);
-//        myDb.insertData("0121156789af",Detection_time,Detection_time,5,2,4,"01642774","1",1);
+        myDb.insertData("0153456787ae",111111,111111,0,5,4,"03649774","1",1);
+//        myDb.insertData("0124456789ac",111111,111111,1,9,4,"03649674","1",1);
+//        myDb.insertData("0126456789ae",111111,111111,3,2,4,"03549774","1",1);
+//        myDb.insertData("0124456789af",111111,111111,5,2,4,"01642774","1",1);
+//        myDb.insertData("0125456789af",111111,111111,5,2,4,"01642774","1",1);
+//        myDb.insertData("0153451787ae",111111,111111,0,2,4,"03649774","1",1);
+//        myDb.insertData("0125556789a1",111111,111111,1,2,4,"03649674","1",1);
+//        myDb.insertData("0126451119ae",111111,111111,3,2,4,"03549774","1",1);
+//        myDb.insertData("0114116789af",111111,111111,5,2,4,"01642774","1",1);
+//        myDb.insertData("1124991199af",111111,111111,5,2,4,"01642774","1",1);
+//        myDb.insertData("0153116787ae",111111,111111,0,2,4,"03649774","1",1);
+//        myDb.insertData("0124451189ac",111111,111111,1,2,4,"03649674","1",1);
+//        myDb.insertData("1126456711ae",111111,111111,3,2,4,"03549774","1",1);
+//        myDb.insertData("017777678911",111111,111111,5,2,4,"01642774","1",1);
+//        myDb.insertData("0121156789af",111111,111111,5,2,4,"01642774","1",1);
 
         t1 = (android.widget.EditText)findViewById(R.id.input1);
         t2 = (android.widget.EditText)findViewById(R.id.t2);
@@ -206,7 +206,31 @@ public class NetworkDetails extends AppCompatActivity {
     }
 
     public void onbtnclickdelete(View view) {
-        myDb.deleteData(t2.getText().toString());
+       // myDb.deleteData(t2.getText().toString());
+
+        Cursor result = myDb.getDetectionFrequency("0153456787ae");
+
+        if (result != null && result.getCount() > 0 ) {
+            result.moveToFirst();
+            String lightRowId = result.getString(0);
+            t2.setText(lightRowId);
+            int lightRowId2 = result.getInt(0);
+            t2.setText(lightRowId2);
+
+
+        }
+
+
+        //  int testing = result_Detection_Frequency.getCount();
+
+       // myDb.updateDetectionFrequency("2264323ad46a", result.getString(0));
+        Cursor result_lt_init = myDb.getlttimeinit("2264323ad46a");
+
+//        long fetched_lt_init = Long.valueOf(result_lt_init.getString(0)).longValue();
+//        long lt_range = Detection_time - fetched_lt_init;
+//        myDb.update_lt_detection_lt_range(peersMacArrayStr[i],Detection_time,lt_range);
+
+
     }
 
     public void onbtnclickdroptable(View view) {

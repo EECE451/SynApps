@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
     // Discovered Device List
     private String[] peersMacArrayStr;
+    private String[] peersNameArrayStr;
     private ArrayList<WifiP2pDevice> PeerNames;
 
     // Time discovered = connected Device List
@@ -175,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
 
         Runnable myRunnable = new Runnable() {
+
             @Override
             public void run() {
 
@@ -187,21 +189,28 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                 }
 
                 // Thread calling connect
+                Log.d("Thread=","entered");
 
+                myDb.resetFlags();
                 PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
                 //Up here, we are feeling the MAC array string: the thread takes MAC address from devices that are discovered
                 //It only discovers devices
+                    peersMacArrayStr = new String[PeerNames.size()];
                     peersMacArrayStr = new String[PeerNames.size()];
                     timeDiscovered = new java.util.Date[PeerNames.size()];
 
                     for (int i = 0; i < PeerNames.size(); i++) {
                         //saves the time at which the device got connected/discovered
                         timeDiscovered[i] = new java.util.Date();
-                        String Detection_time = String.format("%tc", timeDiscovered[i]);
+                        long Detection_time = System.currentTimeMillis();
+
 
                         // retrieve MAC Address of device i
                         WifiP2pDevice targetDevice = PeerNames.get(i);
                         peersMacArrayStr[i] = targetDevice.deviceAddress;
+                        WifiP2pDevice targetDevice2 = PeerNames.get(i);
+                        // retrieve Phone Name
+
 
                         // removing the columns from the strings in MAC addresses
                         String[] macAddressParts = peersMacArrayStr[i].split(":");
@@ -210,20 +219,41 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
                         //Checking if its a new device
                         Cursor result = myDb.getDatabyMAC(peersMacArrayStr[i]);
+
                         if (result.getCount() == 0)
                         {
-                            Log.d("Device=","New");
-                            myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 1, "", "", 1);
+                            Log.d("Device=", "New");
+
+                            myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 1, "", targetDevice2.deviceName, 1);
+                            myDb.updateDescriptionName(peersMacArrayStr[i],"");// to connect to pop up function
 
                         }
                         else if(result.getCount()==1)   //Its an old device:  if the MAC appears here, it means that its still connected
                         {
-
                             Log.d("Device=", "old");
+                            String detected_frequency = "";
+
+                            myDb.updateExistsStatus(peersMacArrayStr[i], 1);
+                            Cursor result_Detection_Frequency = myDb.getDetectionFrequency(peersMacArrayStr[i]);
+
+                            if (result != null && result.getCount() > 0 ) {
+                                result.moveToFirst();
+                                detected_frequency = result.getString(0);
+                            }
+                            int detected_frequency_int = 0;
+                            detected_frequency_int = Integer.parseInt(detected_frequency);
+
+                              myDb.updateDetectionFrequency(peersMacArrayStr[i], detected_frequency_int);
+//                              Cursor result_lt_init = myDb.getlttimeinit(peersMacArrayStr[i]);
+//
+//                            long fetched_lt_init = Long.valueOf(result_lt_init.getString(0)).longValue();
+//                            long lt_range = Detection_time - fetched_lt_init;
+//                            myDb.update_lt_detection_lt_range(peersMacArrayStr[i],Detection_time,lt_range);
+
                         }
                         else
                         {
-                            Log.d("Device=", "khabissa");
+                            Log.d("Device=", "Khabissa");
                         }
 
 
