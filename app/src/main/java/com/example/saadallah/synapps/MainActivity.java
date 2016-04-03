@@ -12,6 +12,8 @@ import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -363,59 +365,80 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         startActivity(connectivityStateIntent);
     }
 
-    public String getDescriptionNamePopup(String MAC, String defaultDeviceName){
+    Handler myPopupNameHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
 
-        final RelativeLayout popupName = (RelativeLayout) findViewById(R.id.popup_name);
-        TextView MacAddressValuePopup = (TextView) findViewById(R.id.mac_address_value);
-        final EditText popupEditText = (EditText) findViewById(R.id.popup_editText);
-        Button popupOkButton = (Button) findViewById(R.id.popup_ok_button);
-        Button popupIgnoreButton = (Button) findViewById(R.id.popup_ignore_button);
-        final String[] thisDeviceName = new String[1]; // device name entered by user, in array since final, to be accessed in onClick
-        final boolean[] button_flag = {false}; // checks if a buttin has been clicked or not
+            String MAC = msg.getData().getString("MAC");
+            String defaultDeviceName = msg.getData().getString("defaultDeviceName");
 
-        String MacFormatted = MAC.substring(0,1) + ":" + MAC.substring(2,3) + ":" + MAC.substring(4,5) + ":" + MAC.substring(6,7) + ":" +
-                MAC.substring(8,9) + ":" + MAC.substring(10, 11); // puts back the MAC address into a standardized form
+            final RelativeLayout popupName = (RelativeLayout) findViewById(R.id.popup_name);
+            TextView MacAddressValuePopup = (TextView) findViewById(R.id.mac_address_value);
+            final EditText popupEditText = (EditText) findViewById(R.id.popup_editText);
+            Button popupOkButton = (Button) findViewById(R.id.popup_ok_button);
+            Button popupIgnoreButton = (Button) findViewById(R.id.popup_ignore_button);
+            final String[] thisDeviceName = new String[1]; // device name entered by user, in array since final, to be accessed in onClick
+            final boolean[] button_flag = {false}; // checks if a button has been clicked or not
 
-        MacAddressValuePopup.setText(MacFormatted);
-        popupEditText.setText(defaultDeviceName);
+            String MacFormatted = MAC.substring(0,1) + ":" + MAC.substring(2,3) + ":" + MAC.substring(4,5) + ":" + MAC.substring(6,7) + ":" +
+                    MAC.substring(8,9) + ":" + MAC.substring(10, 11); // puts back the MAC address into a standardized form
 
-        popupName.setVisibility(View.VISIBLE);
+            MacAddressValuePopup.setText(MacFormatted);
+            popupEditText.setText(defaultDeviceName);
 
-        // OK button click listener
-        View.OnClickListener onOKClickListener = new View.OnClickListener() {
+            popupName.setVisibility(View.VISIBLE);
 
-            @Override
-            public void onClick(View v) {
+            // OK button click listener
+            View.OnClickListener onOKClickListener = new View.OnClickListener() {
 
-                thisDeviceName[0] = String.valueOf(popupEditText.getText());
-                popupName.setVisibility(View.GONE);
-                button_flag[0] = true;
+                @Override
+                public void onClick(View v) {
+
+                    thisDeviceName[0] = String.valueOf(popupEditText.getText());
+                    popupName.setVisibility(View.GONE);
+                    button_flag[0] = true;
                 }
             };
-        popupOkButton.setOnClickListener(onOKClickListener);
+            popupOkButton.setOnClickListener(onOKClickListener);
 
-        // Ignore button click listener
+            // Ignore button click listener
 
-        View.OnClickListener onIgnoreClickListener = new View.OnClickListener() {
+            View.OnClickListener onIgnoreClickListener = new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
+                @Override
+                public void onClick(View v) {
 
-                popupName.setVisibility(View.GONE);
-                button_flag[0] = true;
+                    popupName.setVisibility(View.GONE);
+                    button_flag[0] = true;
+                }
+            };
+            popupIgnoreButton.setOnClickListener(onIgnoreClickListener);
+
+            while (!button_flag[0]){
+                // waiting for the user to click a button
             }
-        };
-        popupIgnoreButton.setOnClickListener(onIgnoreClickListener);
 
-        while (!button_flag[0]){
-            // waiting for the user to click a button
+            if (thisDeviceName[0] == ""){
+
+                msg.getData().putString("thisDeviceName", defaultDeviceName);
+            }
+
+            else {
+                msg.getData().putString("thisDeviceName", thisDeviceName[0]);
+            }
         }
+    };
 
-        if (thisDeviceName[0] == ""){
-            return defaultDeviceName;
-        }
+    public String getDescriptionNamePopup(String MAC, String defaultDeviceName){
 
-            return thisDeviceName[0];
+        Message msg = new Message();
+        Bundle args= new Bundle();
+        args.putString("MAC", MAC);
+        args.putString("defaultDeviceName", defaultDeviceName);
+        msg.setData(args);
+        myPopupNameHandler.sendMessage(msg);
+
+        return msg.getData().getString("thisDeviceName");
     }
 
     @Override
