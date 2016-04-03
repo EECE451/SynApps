@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    public static final String DB_Name = "devices2026.db";
+    public static final String DB_Name = "devices2027.db";
     public static final String TABLE_DEVICESS = "DevicesTable";
     public static final String COLUMN_DEVICESS_ID = "_Did";
     public static final String COLUMN_DEVICESS_MAC = "device_MAC";
@@ -30,9 +30,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_DEVICESS_MAC + " TEXT NOT NULL UNIQUE, "
             + COLUMN_DEVICESS_LAST_TIME_DETECTION + " NUMERIC, "
             + COLUMN_DEVICESS_LAST_TIME_INIT + " NUMERIC,"
-            + COLUMN_DEVICESS_LAST_TIME_RANGE + " REAL, "
+            + COLUMN_DEVICESS_LAST_TIME_RANGE + " NUMERIC, "
             + COLUMN_DEVICESS_DETECTION_FREQUENCY + " REAL, "
-            + COLUMN_DEVICESS_CUMULATIVE_DETECTION_DURATION + " REAL, "
+            + COLUMN_DEVICESS_CUMULATIVE_DETECTION_DURATION + " NUMERIC, "
             + COLUMN_DEVICESS_PHONE_NUMBER + " VARCHAR(50), "
             + COLUMN_DEVICESS_DESCRIPTIVE_NAME + " TEXT, "
             + COLUMN_DEVICESS_EXISTS + " INTEGER "
@@ -94,10 +94,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //to use this function, we must access the db first to get the detection frequency
 
     public boolean updateDetectionFrequency(String MAC, int detection_freq)
-    {  int detection_freq_updated = detection_freq +1;
+    {  int detection_freq_updated = detection_freq + 1;
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_DEVICESS_MAC, MAC);
         contentValues.put(COLUMN_DEVICESS_DETECTION_FREQUENCY, detection_freq_updated);
+        db.update(TABLE_DEVICESS, contentValues, "device_MAC =?", new String[]{ MAC });
+        return true;
+    }
+
+    public boolean updateCumulativeDetectionDuration(String MAC,long last_lt_range, long cumulative)
+    {   long cumulative_updated = cumulative + last_lt_range;
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_DEVICESS_MAC, MAC);
+        contentValues.put(COLUMN_DEVICESS_CUMULATIVE_DETECTION_DURATION, cumulative_updated);
         db.update(TABLE_DEVICESS, contentValues, "device_MAC =?", new String[]{ MAC });
         return true;
     }
@@ -148,6 +159,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     {
         SQLiteDatabase db =this.getWritableDatabase();
         Cursor result = db.rawQuery("select detectionfrequency from " + TABLE_DEVICESS + " where device_MAC = '" + MAC + "'", null);
+        return result;
+    }
+
+    public Cursor getCumulativeDuration(String MAC)
+    {
+        SQLiteDatabase db =this.getWritableDatabase();
+        Cursor result = db.rawQuery("select cumdetectionduration from " + TABLE_DEVICESS + " where device_MAC = '" + MAC + "'", null);
         return result;
     }
 

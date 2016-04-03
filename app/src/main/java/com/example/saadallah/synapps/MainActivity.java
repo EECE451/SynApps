@@ -209,7 +209,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         WifiP2pDevice targetDevice = PeerNames.get(i);
                         peersMacArrayStr[i] = targetDevice.deviceAddress;
                         WifiP2pDevice targetDevice2 = PeerNames.get(i);
-                        // retrieve Phone Name
 
 
                         // removing the columns from the strings in MAC addresses
@@ -224,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         {
                             Log.d("Device=", "New");
 
-                            myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 1, "", targetDevice2.deviceName, 1);
+                            myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 0, "No#yet", targetDevice2.deviceName, 1);
                             myDb.updateDescriptionName(peersMacArrayStr[i],"");// to connect to pop up function
 
                         }
@@ -232,40 +231,41 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         {
                             Log.d("Device=", "old");
                             String detected_frequency = "";
+                            String fetched_lt = "";
+                            String fetched_cumulative = "";
 
                             myDb.updateExistsStatus(peersMacArrayStr[i], 1);
                             Cursor result_Detection_Frequency = myDb.getDetectionFrequency(peersMacArrayStr[i]);
 
-                            if (result != null && result.getCount() > 0 ) {
-                                result.moveToFirst();
-                                detected_frequency = result.getString(0);
+                            if (result_Detection_Frequency != null && result_Detection_Frequency.getCount() > 0 ) {
+                                result_Detection_Frequency.moveToFirst();
+                                detected_frequency = result_Detection_Frequency.getString(0);
                             }
                             int detected_frequency_int = 0;
                             detected_frequency_int = Integer.parseInt(detected_frequency);
 
                               myDb.updateDetectionFrequency(peersMacArrayStr[i], detected_frequency_int);
-//                              Cursor result_lt_init = myDb.getlttimeinit(peersMacArrayStr[i]);
-//
-//                            long fetched_lt_init = Long.valueOf(result_lt_init.getString(0)).longValue();
-//                            long lt_range = Detection_time - fetched_lt_init;
-//                            myDb.update_lt_detection_lt_range(peersMacArrayStr[i],Detection_time,lt_range);
+
+                            Cursor result_lt_init = myDb.getlttimeinit(peersMacArrayStr[i]);
+
+                            if (result_lt_init != null && result_lt_init.getCount() > 0 ) {
+                                result_lt_init.moveToFirst();
+                                fetched_lt = result_lt_init.getString(0);
+                            }
+                            long fetched_lt_init_long = Long.valueOf(fetched_lt);
+                            long lt_range = Detection_time - fetched_lt_init_long;
+                            myDb.update_lt_detection_lt_range(peersMacArrayStr[i], Detection_time, lt_range);
+
+                            Cursor result_cum_result = myDb.getCumulativeDuration(peersMacArrayStr[i]);
+
+                            if (result_cum_result != null && result_cum_result.getCount() > 0 ) {
+                                result_cum_result.moveToFirst();
+                                fetched_cumulative = result_cum_result.getString(0);
+                            }
+                            long fetched_cumulative_long = Long.valueOf(fetched_cumulative);
+                            myDb.updateCumulativeDetectionDuration(peersMacArrayStr[i],lt_range,fetched_cumulative_long);
 
                         }
-                        else
-                        {
-                            Log.d("Device=", "Khabissa");
-                        }
-
-
-
-
-
-
-
-
-
-
-
                         // connect to all the devices
                         connect(i);
                     }

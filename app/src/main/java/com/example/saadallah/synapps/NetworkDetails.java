@@ -51,7 +51,7 @@ public class NetworkDetails extends AppCompatActivity {
         String Detection_time = String.format("%tc", date);
 
         //Dummy Filling
-        myDb.insertData("0153456787ae",111111,111111,0,5,4,"03649774","1",1);
+          myDb.insertData("0153456787ae",111111,111111,0,5,4,"03649774","1",1);
 //        myDb.insertData("0124456789ac",111111,111111,1,9,4,"03649674","1",1);
 //        myDb.insertData("0126456789ae",111111,111111,3,2,4,"03549774","1",1);
 //        myDb.insertData("0124456789af",111111,111111,5,2,4,"01642774","1",1);
@@ -208,17 +208,14 @@ public class NetworkDetails extends AppCompatActivity {
     public void onbtnclickdelete(View view) {
        // myDb.deleteData(t2.getText().toString());
 
-        Cursor result = myDb.getDetectionFrequency("0153456787ae");
+        Cursor result = myDb.getDetectionFrequency("226432b98ea0");
 
         if (result != null && result.getCount() > 0 ) {
             result.moveToFirst();
             String lightRowId = result.getString(0);
             t2.setText(lightRowId);
-            int lightRowId2 = result.getInt(0);
-            t2.setText(lightRowId2);
-
-
         }
+        myDb.updateDetectionFrequency("2264323ad46a",0);
 
 
         //  int testing = result_Detection_Frequency.getCount();
