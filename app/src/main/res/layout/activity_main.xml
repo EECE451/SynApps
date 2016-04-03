@@ -174,8 +174,7 @@
             android:layout_marginLeft="50dp"
             android:layout_marginRight="50dp"
             android:layout_marginTop="150dp"
-            android:layout_marginBottom="150dp"
-            android:visibility="gone">
+            android:layout_marginBottom="150dp">
 
             <TextView
                 android:layout_width="wrap_content"
