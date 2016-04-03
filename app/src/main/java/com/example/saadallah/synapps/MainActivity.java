@@ -21,8 +21,12 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -196,7 +200,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                 //Up here, we are feeling the MAC array string: the thread takes MAC address from devices that are discovered
                 //It only discovers devices
                     peersMacArrayStr = new String[PeerNames.size()];
-                    peersMacArrayStr = new String[PeerNames.size()];
                     timeDiscovered = new java.util.Date[PeerNames.size()];
 
                     for (int i = 0; i < PeerNames.size(); i++) {
@@ -208,7 +211,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         // retrieve MAC Address of device i
                         WifiP2pDevice targetDevice = PeerNames.get(i);
                         peersMacArrayStr[i] = targetDevice.deviceAddress;
-                        WifiP2pDevice targetDevice2 = PeerNames.get(i);
 
 
                         // removing the columns from the strings in MAC addresses
@@ -223,8 +225,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         {
                             Log.d("Device=", "New");
 
-                            myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 0, "No#yet", targetDevice2.deviceName, 1);
-                            myDb.updateDescriptionName(peersMacArrayStr[i],"");// to connect to pop up function
+                            myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 0, "No#yet", targetDevice.deviceName, 1);
+                            myDb.updateDescriptionName(peersMacArrayStr[i],getDescriptionNamePopup(peersMacArrayStr[i], targetDevice.deviceName));// to connect to pop up function
 
                         }
                         else if(result.getCount()==1)   //Its an old device:  if the MAC appears here, it means that its still connected
@@ -359,6 +361,61 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
         connectivityStateIntent.putExtra("phone_number", phoneNumber); // attach the phone number to the intent
         startActivity(connectivityStateIntent);
+    }
+
+    public String getDescriptionNamePopup(String MAC, String defaultDeviceName){
+
+        final RelativeLayout popupName = (RelativeLayout) findViewById(R.id.popup_name);
+        TextView MacAddressValuePopup = (TextView) findViewById(R.id.mac_address_value);
+        final EditText popupEditText = (EditText) findViewById(R.id.popup_editText);
+        Button popupOkButton = (Button) findViewById(R.id.popup_ok_button);
+        Button popupIgnoreButton = (Button) findViewById(R.id.popup_ignore_button);
+        final String[] thisDeviceName = new String[1]; // device name entered by user, in array since final, to be accessed in onClick
+        final boolean[] button_flag = {false}; // checks if a buttin has been clicked or not
+
+        String MacFormatted = MAC.substring(0,1) + ":" + MAC.substring(2,3) + ":" + MAC.substring(4,5) + ":" + MAC.substring(6,7) + ":" +
+                MAC.substring(8,9) + ":" + MAC.substring(10, 11); // puts back the MAC address into a standardized form
+
+        MacAddressValuePopup.setText(MacFormatted);
+        popupEditText.setText(defaultDeviceName);
+
+        popupName.setVisibility(View.VISIBLE);
+
+        // OK button click listener
+        View.OnClickListener onOKClickListener = new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                thisDeviceName[0] = String.valueOf(popupEditText.getText());
+                popupName.setVisibility(View.GONE);
+                button_flag[0] = true;
+                }
+            };
+        popupOkButton.setOnClickListener(onOKClickListener);
+
+        // Ignore button click listener
+
+        View.OnClickListener onIgnoreClickListener = new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                popupName.setVisibility(View.GONE);
+                button_flag[0] = true;
+            }
+        };
+        popupIgnoreButton.setOnClickListener(onIgnoreClickListener);
+
+        while (!button_flag[0]){
+            // waiting for the user to click a button
+        }
+
+        if (thisDeviceName[0] == ""){
+            return defaultDeviceName;
+        }
+
+            return thisDeviceName[0];
     }
 
     @Override

@@ -13,7 +13,8 @@
     <string name="clear_data">Clear Data</string>
     <string name="network_details">Network Details</string>
     <string name="generate_graph">Generate Graph</string>
-    <string name="popup_name_text">A device having the following MAC address has been detected. Do you wish to name it?\nMAC Address: 01:23:45:67:89:AB</string>
+    <string name="popup_name_text">A device having the following MAC address has been detected. Do you wish to name it?\n</string>
+    <string name="mac_address">MAC Address: </string>
     <string name="name_optionnal">Name (optionnal)</string>
     <string name="ok">OK</string>
     <string name="ignore">Ignore</string>
