@@ -210,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
                     int peersnamesize = PeerNames.size();
                     for (int i = 0; i < peersnamesize; i++) {
+
                         //saves the time at which the device got connected/discovered
                         timeDiscovered[i] = new java.util.Date();
                         long Detection_time = System.currentTimeMillis();
@@ -294,7 +295,10 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         DeviceNameFromUser = "";
                     }
 
+                PeerNames.clear();
+
                 }
+
         };
 
         Thread myThread = new Thread(myRunnable);
@@ -407,6 +411,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
                 MacAddressValuePopup.setText(MacFormatted);
                 popupEditText.setText(defaultDeviceName);
+
+
 
                 popupName.setVisibility(View.VISIBLE);
 

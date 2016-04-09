@@ -206,16 +206,16 @@ public class NetworkDetails extends AppCompatActivity {
     }
 
     public void onbtnclickdelete(View view) {
-       // myDb.deleteData(t2.getText().toString());
+        myDb.deleteData(t2.getText().toString());
 
-        Cursor result = myDb.getDetectionFrequency("226432b98ea0");
-
-        if (result != null && result.getCount() > 0 ) {
-            result.moveToFirst();
-            String lightRowId = result.getString(0);
-            t2.setText(lightRowId);
-        }
-        myDb.updateDetectionFrequency("2264323ad46a",0);
+//        Cursor result = myDb.getDetectionFrequency("226432b98ea0");
+//
+//        if (result != null && result.getCount() > 0 ) {
+//            result.moveToFirst();
+//            String lightRowId = result.getString(0);
+//            t2.setText(lightRowId);
+//        }
+//        myDb.updateDetectionFrequency("2264323ad46a",0);
 
 
         //  int testing = result_Detection_Frequency.getCount();
