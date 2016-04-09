@@ -150,8 +150,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
         //----------------------------------------------------------------------------------
         //Cellular Network
-        teleMan =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        phoneNumber = teleMan.getSimSerialNumber(); // get the phone number
+//        teleMan =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+//        phoneNumber = teleMan.getSimSerialNumber(); // get the phone number
 
         //-----------------------------------------------------------------------------------
         // WiFi p2p status checking
@@ -208,7 +208,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                     peersMacArrayStr = new String[PeerNames.size()];
                     timeDiscovered = new java.util.Date[PeerNames.size()];
 
-                    for (int i = 0; i < PeerNames.size(); i++) {
+                    int peersnamesize = PeerNames.size();
+                    for (int i = 0; i < peersnamesize; i++) {
                         //saves the time at which the device got connected/discovered
                         timeDiscovered[i] = new java.util.Date();
                         long Detection_time = System.currentTimeMillis();
@@ -246,9 +247,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
                             myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 0, "No#yet", targetDevice.deviceName, 1);
                             myDb.updateDescriptionName(peersMacArrayStr[i], DeviceNameFromUser);// to connect to pop up function
-
-                            popupNameButtonFlag = false; // resetting the flags
-                            DeviceNameFromUser = "";
 
                         } else if (result.getCount() == 1)   //Its an old device:  if the MAC appears here, it means that its still connected
                         {
@@ -291,6 +289,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         }
                         // connect to all the devices
                         connect(i);
+
+                        popupNameButtonFlag = false; // resetting the flags
+                        DeviceNameFromUser = "";
                     }
 
                 }
@@ -443,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
 
     myRunnableClass myUIRunnable = new myRunnableClass(MAC, defaultDeviceName);
-    runOnUiThread(myUIRunnable);
+        runOnUiThread(myUIRunnable);
     }
 
     @Override
