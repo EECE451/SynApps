@@ -62,6 +62,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     public boolean insertData(String MAC, long lt_detection, long lt_init, long lt_range, int detection_frequency,long cum_detection_duration,String phone_number, String description_name, int device_exists) {
+
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 

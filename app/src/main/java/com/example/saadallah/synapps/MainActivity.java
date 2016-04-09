@@ -65,6 +65,10 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     // Time discovered = connected Device List
     private Date[] timeDiscovered;
 
+    // popup name
+    boolean popupNameButtonFlag = false; // flag on click
+    String DeviceNameFromUser ="";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -186,21 +190,21 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
             @Override
             public void run() {
 
-                synchronized (this) {
-                    try {
-                        wait(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    synchronized (this) {
+                        try {
+                            wait(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
 
-                // Thread calling connect
-                Log.d("Thread=","entered");
+                    // Thread calling connect
+                    Log.d("Thread=", "entered");
 
-                myDb.resetFlags();
-                PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
-                //Up here, we are feeling the MAC array string: the thread takes MAC address from devices that are discovered
-                //It only discovers devices
+                    myDb.resetFlags();
+                    PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
+                    //Up here, we are feeling the MAC array string: the thread takes MAC address from devices that are discovered
+                    //It only discovers devices
                     peersMacArrayStr = new String[PeerNames.size()];
                     timeDiscovered = new java.util.Date[PeerNames.size()];
 
@@ -217,21 +221,36 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
                         // removing the columns from the strings in MAC addresses
                         String[] macAddressParts = peersMacArrayStr[i].split(":");
-                        peersMacArrayStr[i]= macAddressParts[0]+macAddressParts[1]+macAddressParts[2]+macAddressParts[3]+macAddressParts[4]+macAddressParts[5];
+                        peersMacArrayStr[i] = macAddressParts[0] + macAddressParts[1] + macAddressParts[2] + macAddressParts[3] + macAddressParts[4] + macAddressParts[5];
 
 
                         //Checking if its a new device
                         Cursor result = myDb.getDatabyMAC(peersMacArrayStr[i]);
 
-                        if (result.getCount() == 0)
-                        {
+                        if (result.getCount() == 0) {
                             Log.d("Device=", "New");
 
-                            myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 0, "No#yet", targetDevice.deviceName, 1);
-                            myDb.updateDescriptionName(peersMacArrayStr[i],getDescriptionNamePopup(peersMacArrayStr[i], targetDevice.deviceName));// to connect to pop up function
+                            String descriptionNamePopup = null;
 
-                        }
-                        else if(result.getCount()==1)   //Its an old device:  if the MAC appears here, it means that its still connected
+                            openDescriptionNamePopup(peersMacArrayStr[i], targetDevice.deviceName);
+
+                            // NEED TO INSERT A WHILE LOOP AROUND HERE!!!!!
+
+                            while (!popupNameButtonFlag) ; // wait until a button is pressed
+
+                            Log.d("popup", "New device detected called: " + descriptionNamePopup);
+
+                            if (DeviceNameFromUser == "") {
+                                DeviceNameFromUser = targetDevice.deviceName;
+                            }
+
+                            myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 0, "No#yet", targetDevice.deviceName, 1);
+                            myDb.updateDescriptionName(peersMacArrayStr[i], DeviceNameFromUser);// to connect to pop up function
+
+                            popupNameButtonFlag = false; // resetting the flags
+                            DeviceNameFromUser = "";
+
+                        } else if (result.getCount() == 1)   //Its an old device:  if the MAC appears here, it means that its still connected
                         {
                             Log.d("Device=", "old");
                             String detected_frequency = "";
@@ -241,18 +260,18 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                             myDb.updateExistsStatus(peersMacArrayStr[i], 1);
                             Cursor result_Detection_Frequency = myDb.getDetectionFrequency(peersMacArrayStr[i]);
 
-                            if (result_Detection_Frequency != null && result_Detection_Frequency.getCount() > 0 ) {
+                            if (result_Detection_Frequency != null && result_Detection_Frequency.getCount() > 0) {
                                 result_Detection_Frequency.moveToFirst();
                                 detected_frequency = result_Detection_Frequency.getString(0);
                             }
                             int detected_frequency_int = 0;
                             detected_frequency_int = Integer.parseInt(detected_frequency);
 
-                              myDb.updateDetectionFrequency(peersMacArrayStr[i], detected_frequency_int);
+                            myDb.updateDetectionFrequency(peersMacArrayStr[i], detected_frequency_int);
 
                             Cursor result_lt_init = myDb.getlttimeinit(peersMacArrayStr[i]);
 
-                            if (result_lt_init != null && result_lt_init.getCount() > 0 ) {
+                            if (result_lt_init != null && result_lt_init.getCount() > 0) {
                                 result_lt_init.moveToFirst();
                                 fetched_lt = result_lt_init.getString(0);
                             }
@@ -262,19 +281,19 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
                             Cursor result_cum_result = myDb.getCumulativeDuration(peersMacArrayStr[i]);
 
-                            if (result_cum_result != null && result_cum_result.getCount() > 0 ) {
+                            if (result_cum_result != null && result_cum_result.getCount() > 0) {
                                 result_cum_result.moveToFirst();
                                 fetched_cumulative = result_cum_result.getString(0);
                             }
                             long fetched_cumulative_long = Long.valueOf(fetched_cumulative);
-                            myDb.updateCumulativeDetectionDuration(peersMacArrayStr[i],lt_range,fetched_cumulative_long);
+                            myDb.updateCumulativeDetectionDuration(peersMacArrayStr[i], lt_range, fetched_cumulative_long);
 
                         }
                         // connect to all the devices
                         connect(i);
                     }
 
-            }
+                }
         };
 
         Thread myThread = new Thread(myRunnable);
@@ -343,12 +362,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         startActivity(networkDetailsIntent);
     }
 
-    public void onClickOk(View view) { //Don't forget to implement this method!
-    }
-
-    public void onClickIgnore(View view) { //Don't forget to implement this method!
-    }
-
     public void onClickYes(View view) { //Don't forget to implement this method!
     }
 
@@ -365,80 +378,72 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         startActivity(connectivityStateIntent);
     }
 
-    Handler myPopupNameHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
+    public void openDescriptionNamePopup(String MAC, String defaultDeviceName){
 
-            String MAC = msg.getData().getString("MAC");
-            String defaultDeviceName = msg.getData().getString("defaultDeviceName");
+        class myRunnableClass implements Runnable{
+            String MAC;
+            String defaultDeviceName;
+            String DeviceName;
 
-            final RelativeLayout popupName = (RelativeLayout) findViewById(R.id.popup_name);
-            TextView MacAddressValuePopup = (TextView) findViewById(R.id.mac_address_value);
-            final EditText popupEditText = (EditText) findViewById(R.id.popup_editText);
-            Button popupOkButton = (Button) findViewById(R.id.popup_ok_button);
-            Button popupIgnoreButton = (Button) findViewById(R.id.popup_ignore_button);
-            final String[] thisDeviceName = new String[1]; // device name entered by user, in array since final, to be accessed in onClick
-            final boolean[] button_flag = {false}; // checks if a button has been clicked or not
-
-            String MacFormatted = MAC.substring(0,1) + ":" + MAC.substring(2,3) + ":" + MAC.substring(4,5) + ":" + MAC.substring(6,7) + ":" +
-                    MAC.substring(8,9) + ":" + MAC.substring(10, 11); // puts back the MAC address into a standardized form
-
-            MacAddressValuePopup.setText(MacFormatted);
-            popupEditText.setText(defaultDeviceName);
-
-            popupName.setVisibility(View.VISIBLE);
-
-            // OK button click listener
-            View.OnClickListener onOKClickListener = new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-
-                    thisDeviceName[0] = String.valueOf(popupEditText.getText());
-                    popupName.setVisibility(View.GONE);
-                    button_flag[0] = true;
-                }
-            };
-            popupOkButton.setOnClickListener(onOKClickListener);
-
-            // Ignore button click listener
-
-            View.OnClickListener onIgnoreClickListener = new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-
-                    popupName.setVisibility(View.GONE);
-                    button_flag[0] = true;
-                }
-            };
-            popupIgnoreButton.setOnClickListener(onIgnoreClickListener);
-
-            while (!button_flag[0]){
-                // waiting for the user to click a button
+            public myRunnableClass(String MAC, String defaultDeviceName){
+                this.MAC = MAC;
+                this.defaultDeviceName = defaultDeviceName;
             }
 
-            if (thisDeviceName[0] == ""){
-
-                msg.getData().putString("thisDeviceName", defaultDeviceName);
+            public String getDeviceName(){
+                return DeviceName;
             }
 
-            else {
-                msg.getData().putString("thisDeviceName", thisDeviceName[0]);
-            }
-        }
-    };
+            public void run() {
+                final RelativeLayout popupName = (RelativeLayout) findViewById(R.id.popup_name);
+                TextView MacAddressValuePopup = (TextView) findViewById(R.id.mac_address_value);
+                final EditText popupEditText = (EditText) findViewById(R.id.popup_editText);
+                Button popupOkButton = (Button) findViewById(R.id.popup_ok_button);
+                Button popupIgnoreButton = (Button) findViewById(R.id.popup_ignore_button);
 
-    public String getDescriptionNamePopup(String MAC, String defaultDeviceName){
+                String MacFormatted = MAC.substring(0,2) + ":" + MAC.substring(2,4) + ":" + MAC.substring(4,6) + ":" + MAC.substring(6,8) + ":" +
+                        MAC.substring(8,10) + ":" + MAC.substring(10, 12); // puts back the MAC address into a standardized form
 
-        Message msg = new Message();
-        Bundle args= new Bundle();
-        args.putString("MAC", MAC);
-        args.putString("defaultDeviceName", defaultDeviceName);
-        msg.setData(args);
-        myPopupNameHandler.sendMessage(msg);
+                MacAddressValuePopup.setText(MacFormatted);
+                popupEditText.setText(defaultDeviceName);
 
-        return msg.getData().getString("thisDeviceName");
+                popupName.setVisibility(View.VISIBLE);
+
+                // OK button click listener
+                View.OnClickListener onOKClickListener = new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+
+                        DeviceNameFromUser = String.valueOf(popupEditText.getText());
+                        popupName.setVisibility(View.GONE);
+                        popupNameButtonFlag = true;
+                    }
+                };
+                popupOkButton.setOnClickListener(onOKClickListener);
+
+                // Ignore button click listener
+
+                View.OnClickListener onIgnoreClickListener = new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+
+                        DeviceNameFromUser = defaultDeviceName;
+                        popupName.setVisibility(View.GONE);
+                        popupNameButtonFlag = true;
+                    }
+                };
+                popupIgnoreButton.setOnClickListener(onIgnoreClickListener);
+
+            } // end run
+        } // end class
+
+
+
+
+    myRunnableClass myUIRunnable = new myRunnableClass(MAC, defaultDeviceName);
+    runOnUiThread(myUIRunnable);
     }
 
     @Override
@@ -509,7 +514,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
             }
         });
     }
-
 
 }
 
