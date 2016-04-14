@@ -79,6 +79,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     boolean popupNameButtonFlag = false; // flag on click
     String DeviceNameFromUser = "";
 
+    // flags
+    boolean running = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -192,132 +195,142 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         //-------------------------------------------------------------------------------------------------------------
         // WiFi p2p discovering peers and connecting to them
 
-        // discovering peers
-
-        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() { // starts discovering peers
-            @Override
-            public void onSuccess() {
-                Log.d("p2p Notification", "Starting Discovery");
-                Toast.makeText(getApplicationContext(), "Starting Discovery", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure(int reason) {
-                Toast.makeText(MainActivity.this, "Could not initiate peer discovery", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
         Runnable myRunnable = new Runnable() {
 
             @Override
             public void run() {
 
-                synchronized (this) {
-                    try {
-                        wait(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    // discovering peers
+
+                    mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() { // starts discovering peers
+                        @Override
+                        public void onSuccess() {
+                            Log.d("p2p Notification", "Starting Discovery");
+                            Toast.makeText(getApplicationContext(), "Starting Discovery", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(int reason) {
+                            Toast.makeText(MainActivity.this, "Could not initiate peer discovery", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    synchronized (this) {
+                        try {
+                            wait(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-
-                // Thread calling connect
-                Log.d("Thread=", "entered");
-
-                myDb.resetFlags();
-                PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
-                //Up here, we are feeling the MAC array string: the thread takes MAC address from devices that are discovered
-                //It only discovers devices
-                peersMacArrayStr = new String[PeerNames.size()];
-                timeDiscovered = new java.util.Date[PeerNames.size()];
-
-                int peersnamesize = PeerNames.size();
-                for (int i = 0; i < peersnamesize; i++) {
-                    //saves the time at which the device got connected/discovered
-                    timeDiscovered[i] = new java.util.Date();
-                    long Detection_time = System.currentTimeMillis();
 
 
-                    // retrieve MAC Address of device i
-                    WifiP2pDevice targetDevice = PeerNames.get(i);
-                    peersMacArrayStr[i] = targetDevice.deviceAddress;
+                while (running) {
+
+                    // Thread calling connect
+                    Log.d("Thread", "entered");
+
+                    boolean deviceDetectedFlag = mReceiver.isBroadcastFlag(); // THIS IS ZE FLAG... HAPPY NOW??
+
+                    myDb.resetFlags();
+                    PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
+                    //Up here, we are feeling the MAC array string: the thread takes MAC address from devices that are discovered
+                    //It only discovers devices
+                    peersMacArrayStr = new String[PeerNames.size()];
+                    timeDiscovered = new java.util.Date[PeerNames.size()];
+
+                    int peersnamesize = PeerNames.size();
+                    for (int i = 0; i < peersnamesize; i++) {
+                        //saves the time at which the device got connected/discovered
+                        timeDiscovered[i] = new java.util.Date();
+                        long Detection_time = System.currentTimeMillis();
 
 
-                    // removing the columns from the strings in MAC addresses
-                    String[] macAddressParts = peersMacArrayStr[i].split(":");
-                    peersMacArrayStr[i] = macAddressParts[0] + macAddressParts[1] + macAddressParts[2] + macAddressParts[3] + macAddressParts[4] + macAddressParts[5];
+                        // retrieve MAC Address of device i
+                        WifiP2pDevice targetDevice = PeerNames.get(i);
+                        peersMacArrayStr[i] = targetDevice.deviceAddress;
 
 
-                    //Checking if its a new device
-                    Cursor result = myDb.getDatabyMAC(peersMacArrayStr[i]);
+                        // removing the columns from the strings in MAC addresses
+                        String[] macAddressParts = peersMacArrayStr[i].split(":");
+                        peersMacArrayStr[i] = macAddressParts[0] + macAddressParts[1] + macAddressParts[2] + macAddressParts[3] + macAddressParts[4] + macAddressParts[5];
 
-                    if (result.getCount() == 0) {
-                        Log.d("Device=", "New");
 
-                        String descriptionNamePopup = null;
+                        //Checking if its a new device
+                        Cursor result = myDb.getDatabyMAC(peersMacArrayStr[i]);
 
-                        openDescriptionNamePopup(peersMacArrayStr[i], targetDevice.deviceName);
+                        if (result.getCount() == 0) {
+                            Log.d("Device=", "New");
 
-                        // NEED TO INSERT A WHILE LOOP AROUND HERE!!!!!
+                            String descriptionNamePopup = null;
 
-                        while (!popupNameButtonFlag) ; // wait until a button is pressed
+                            openDescriptionNamePopup(peersMacArrayStr[i], targetDevice.deviceName);
 
-                        Log.d("popup", "New device detected called: " + descriptionNamePopup);
+                            // NEED TO INSERT A WHILE LOOP AROUND HERE!!!!!
 
-                        if (DeviceNameFromUser == "") {
-                            DeviceNameFromUser = targetDevice.deviceName;
+                            while (!popupNameButtonFlag) ; // wait until a button is pressed
+
+                            Log.d("popup", "New device detected called: " + descriptionNamePopup);
+
+                            if (DeviceNameFromUser == "") {
+                                DeviceNameFromUser = targetDevice.deviceName;
+                            }
+
+                            myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 0, "No#yet", targetDevice.deviceName, 1);
+                            myDb.updateDescriptionName(peersMacArrayStr[i], DeviceNameFromUser);// to connect to pop up function
+
+                        } else if (result.getCount() == 1)   //Its an old device:  if the MAC appears here, it means that its still connected
+                        {
+                            Log.d("Device=", "old");
+                            String detected_frequency = "";
+                            String fetched_lt = "";
+                            String fetched_cumulative = "";
+
+                            myDb.updateExistsStatus(peersMacArrayStr[i], 1);
+                            Cursor result_Detection_Frequency = myDb.getDetectionFrequency(peersMacArrayStr[i]);
+
+                            if (result_Detection_Frequency != null && result_Detection_Frequency.getCount() > 0) {
+                                result_Detection_Frequency.moveToFirst();
+                                detected_frequency = result_Detection_Frequency.getString(0);
+                            }
+                            int detected_frequency_int = 0;
+                            detected_frequency_int = Integer.parseInt(detected_frequency);
+
+                            myDb.updateDetectionFrequency(peersMacArrayStr[i], detected_frequency_int);
+
+                            Cursor result_lt_init = myDb.getlttimeinit(peersMacArrayStr[i]);
+
+                            if (result_lt_init != null && result_lt_init.getCount() > 0) {
+                                result_lt_init.moveToFirst();
+                                fetched_lt = result_lt_init.getString(0);
+                            }
+                            long fetched_lt_init_long = Long.valueOf(fetched_lt);
+                            long lt_range = Detection_time - fetched_lt_init_long;
+                            myDb.update_lt_detection_lt_range(peersMacArrayStr[i], Detection_time, lt_range);
+
+                            Cursor result_cum_result = myDb.getCumulativeDuration(peersMacArrayStr[i]);
+
+                            if (result_cum_result != null && result_cum_result.getCount() > 0) {
+                                result_cum_result.moveToFirst();
+                                fetched_cumulative = result_cum_result.getString(0);
+                            }
+                            long fetched_cumulative_long = Long.valueOf(fetched_cumulative);
+                            myDb.updateCumulativeDetectionDuration(peersMacArrayStr[i], lt_range, fetched_cumulative_long);
+
                         }
+                        // connect to all the devices
+                        // connect(i);
 
-                        myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 0, "No#yet", targetDevice.deviceName, 1);
-                        myDb.updateDescriptionName(peersMacArrayStr[i], DeviceNameFromUser);// to connect to pop up function
-
-                    } else if (result.getCount() == 1)   //Its an old device:  if the MAC appears here, it means that its still connected
-                    {
-                        Log.d("Device=", "old");
-                        String detected_frequency = "";
-                        String fetched_lt = "";
-                        String fetched_cumulative = "";
-
-                        myDb.updateExistsStatus(peersMacArrayStr[i], 1);
-                        Cursor result_Detection_Frequency = myDb.getDetectionFrequency(peersMacArrayStr[i]);
-
-                        if (result_Detection_Frequency != null && result_Detection_Frequency.getCount() > 0) {
-                            result_Detection_Frequency.moveToFirst();
-                            detected_frequency = result_Detection_Frequency.getString(0);
-                        }
-                        int detected_frequency_int = 0;
-                        detected_frequency_int = Integer.parseInt(detected_frequency);
-
-                        myDb.updateDetectionFrequency(peersMacArrayStr[i], detected_frequency_int);
-
-                        Cursor result_lt_init = myDb.getlttimeinit(peersMacArrayStr[i]);
-
-                        if (result_lt_init != null && result_lt_init.getCount() > 0) {
-                            result_lt_init.moveToFirst();
-                            fetched_lt = result_lt_init.getString(0);
-                        }
-                        long fetched_lt_init_long = Long.valueOf(fetched_lt);
-                        long lt_range = Detection_time - fetched_lt_init_long;
-                        myDb.update_lt_detection_lt_range(peersMacArrayStr[i], Detection_time, lt_range);
-
-                        Cursor result_cum_result = myDb.getCumulativeDuration(peersMacArrayStr[i]);
-
-                        if (result_cum_result != null && result_cum_result.getCount() > 0) {
-                            result_cum_result.moveToFirst();
-                            fetched_cumulative = result_cum_result.getString(0);
-                        }
-                        long fetched_cumulative_long = Long.valueOf(fetched_cumulative);
-                        myDb.updateCumulativeDetectionDuration(peersMacArrayStr[i], lt_range, fetched_cumulative_long);
-
+                        popupNameButtonFlag = false; // resetting the flags
+                        DeviceNameFromUser = "";
                     }
-                    // connect to all the devices
-                    connect(i);
 
-                    popupNameButtonFlag = false; // resetting the flags
-                    DeviceNameFromUser = "";
+                    PeerNames.clear();
+
+                    mReceiver.setBroadcastFlag(false);
+                    Log.d("device detected flag", "false");
+
+                    while(!mReceiver.isBroadcastFlag()){} // waits for the flag Broadcast flag to turn true
                 }
-
-                PeerNames.clear();
             }
         };
 
@@ -540,5 +553,11 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         });
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        running = false;
+    }
 }
 

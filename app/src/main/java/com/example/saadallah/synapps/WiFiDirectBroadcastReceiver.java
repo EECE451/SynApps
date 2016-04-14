@@ -23,6 +23,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private WifiP2pManager mManager;
     private WifiP2pManager.Channel mChannel;
     private Activity mActivity;
+    private boolean broadcastFlag = false;
 
     private ArrayList<WifiP2pDevice> PeerNames= new ArrayList<WifiP2pDevice>();
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager, WifiP2pManager.Channel channel, Activity activity) {
@@ -48,6 +49,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         }
         else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             if (mManager != null) {
+                broadcastFlag = true;
+                Log.d("device detected flag", "true");
                 mManager.requestPeers(mChannel, new WifiP2pManager.PeerListListener() {
 
                     @Override
@@ -79,6 +82,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                         "device[" + i + "]:" + PeerNames.get(i).deviceAddress +" deviceName:"+ PeerNames.get(i).deviceName);
             }
             Log.d("P2P Notification", "print devices end====>");
+
+            //broadcastFlag = false;
 
 
         }
@@ -128,4 +133,12 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
     public ArrayList getPeerNames() { return PeerNames; }
 
+    public boolean isBroadcastFlag() {
+
+        return broadcastFlag;
+    }
+
+    public void setBroadcastFlag(boolean broadcastFlag) {
+        this.broadcastFlag = broadcastFlag;
+    }
 }
