@@ -25,6 +25,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private Activity mActivity;
     private boolean broadcastFlag = false;
 
+    private String thisDeviceMac = "";
+
     private ArrayList<WifiP2pDevice> PeerNames= new ArrayList<WifiP2pDevice>();
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager, WifiP2pManager.Channel channel, Activity activity) {
         super();
@@ -39,6 +41,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         String action = intent.getAction();
 
         if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
+
             int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
             if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
                 Log.d("p2pIsEnabled=", "true");
@@ -48,6 +51,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             }
         }
         else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
+
             if (mManager != null) {
                 broadcastFlag = true;
                 Log.d("device detected flag", "true");

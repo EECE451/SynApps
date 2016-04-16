@@ -82,6 +82,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     // flags
     boolean running = true;
 
+    // Device Mac
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -174,6 +177,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
             Log.d("location", "No location available");
         }
 
+        // Device Mac
+
         //----------------------------------------------------------------------------------
         //Cellular Network
 //        teleMan =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
@@ -201,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
             public void run() {
 
                     // discovering peers
+                while (running) {
 
                     mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() { // starts discovering peers
                         @Override
@@ -215,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         }
                     });
 
+
                     synchronized (this) {
                         try {
                             wait(5000);
@@ -222,9 +229,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                             e.printStackTrace();
                         }
                     }
-
-
-                while (running) {
 
                     // Thread calling connect
                     Log.d("Thread", "entered");
@@ -329,7 +333,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                     mReceiver.setBroadcastFlag(false);
                     Log.d("device detected flag", "false");
 
-                    while(!mReceiver.isBroadcastFlag()){} // waits for the flag Broadcast flag to turn true
+ //                   while(!mReceiver.isBroadcastFlag()){} // waits for the flag Broadcast flag to turn true
                 }
             }
         };
@@ -392,6 +396,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     }
 
     public void onGenerateGraphClick(View view) { //Don't forget to implement this method!
+
+        Graph myDevicesGraph = new Graph();
     }
 
     public void onNetworkDetailsClick(View view) {
@@ -411,7 +417,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         Intent connectivityStateIntent = new Intent(MainActivity.this, Connectivity_State.class);
         connectivityStateIntent.putExtra("bluetooth_state", mBluetoothAdapter.isEnabled());
         connectivityStateIntent.putExtra("wifi_state", wifiManager.isWifiEnabled());
-        connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
+ //       connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
         connectivityStateIntent.putExtra("phone_number", phoneNumber); // attach the phone number to the intent
         startActivity(connectivityStateIntent);
     }
