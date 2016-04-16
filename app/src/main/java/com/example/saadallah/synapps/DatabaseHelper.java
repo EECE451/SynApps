@@ -24,6 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DEVICESS_DESCRIPTIVE_NAME = "descriptionname";
     public static final String COLUMN_DEVICESS_EXISTS = "deviceexists";
 
+
     //---------------------------------------------------------------------------------------------
     private static final String SQL_CREATE_TABLE_DEVICESS = "CREATE TABLE " + TABLE_DEVICESS + "("
             + COLUMN_DEVICESS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -58,8 +59,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("drop table DevicesTable");
 
     }
-
-
 
     public boolean insertData(String MAC, long lt_detection, long lt_init, long lt_range, int detection_frequency,long cum_detection_duration,String phone_number, String description_name, int device_exists) {
 
@@ -148,6 +147,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+
     public Cursor getAllData()
     {
         SQLiteDatabase db =this.getWritableDatabase();
@@ -160,6 +160,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     {
         SQLiteDatabase db =this.getWritableDatabase();
         Cursor result = db.rawQuery("select detectionfrequency from " + TABLE_DEVICESS + " where device_MAC = '" + MAC + "'", null);
+        return result;
+    }
+
+    public Cursor getltrange(String MAC)
+    {
+        SQLiteDatabase db =this.getWritableDatabase();
+        Cursor result = db.rawQuery("select ltdetection from " + TABLE_DEVICESS + " where device_MAC = '" + MAC + "'", null);
         return result;
     }
 
@@ -197,6 +204,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor result = db.rawQuery("select _Did, device_MAC from " + TABLE_DEVICESS, null);
         return result;
+
+    }
+
+    public int ClearTable()
+    {   SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete("DevicesTable", null, null);
 
     }
     //reset flags function
