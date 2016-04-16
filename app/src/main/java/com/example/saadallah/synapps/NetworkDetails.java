@@ -67,7 +67,7 @@ public class NetworkDetails extends AppCompatActivity {
 //        myDb.insertData("017777678911",111111,111111,5,2,4,"01642774","1",1);
 //        myDb.insertData("0121156789af",111111,111111,5,2,4,"01642774","1",1);
 
-        t1 = (android.widget.EditText)findViewById(R.id.input1);
+
         t2 = (android.widget.EditText)findViewById(R.id.t2);
 
         //---DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area---
@@ -236,6 +236,10 @@ public class NetworkDetails extends AppCompatActivity {
 
     public void onbtnclickresetflags(View view) {
         myDb.resetFlags();
+    }
+
+    public void onbtnclickclear(View view) {
+        myDb.ClearTable();
     }
 }
 

@@ -16,7 +16,6 @@
         android:text="Read All Data"
         android:id="@+id/Btn_ReadAll"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentStart="true"
         android:onClick="onbtnclick" />
 
@@ -27,8 +26,9 @@
         android:text="All Database"
         android:id="@+id/txt_ReadAllData"
         android:textSize="12dp"
-        android:layout_below="@+id/btnupdate"
-        android:layout_centerHorizontal="true" />
+        android:layout_below="@+id/Btn_DropTable"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -36,95 +36,52 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Specific Device"
         android:id="@+id/txt_ReadSpecific"
-        android:layout_marginBottom="91dp"
+        android:layout_marginBottom="95dp"
         android:textSize="12dp"
         android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/btnupdate"
-        android:layout_toStartOf="@+id/btnupdate" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Read MAC"
-        android:id="@+id/Btn_ReadSpecific"
-        android:layout_above="@+id/txt_ReadSpecific"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="32dp"
-        android:onClick="onbtnclick2" />
+        android:layout_alignRight="@+id/Btn_DropTable"
+        android:layout_alignEnd="@+id/Btn_DropTable" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Delete by MAC"
         android:id="@+id/Btn_DropTable"
-        android:layout_alignParentTop="true"
+        android:onClick="onbtnclickdelete"
+        android:layout_below="@+id/onclickclear"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:onClick="onbtnclickdelete" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/input1"
-        android:layout_toRightOf="@+id/Btn_ReadSpecific"
-        android:layout_toStartOf="@+id/Btn_DropTable"
-        android:layout_alignBottom="@+id/ReadbyID"
-        android:layout_alignRight="@+id/Btn_ReadAll"
-        android:layout_alignEnd="@+id/Btn_ReadAll" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="READ ID"
-        android:id="@+id/ReadbyID"
-        android:onClick="onclickbtnreadID"
-        android:layout_above="@+id/Btn_ReadSpecific"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Update by MAC"
-        android:id="@+id/btnupdate"
-        android:layout_below="@+id/Btn_DropTable"
-        android:layout_alignRight="@+id/Btn_DropTable"
-        android:layout_alignEnd="@+id/Btn_DropTable"
-        android:layout_alignLeft="@+id/Btn_DropTable"
-        android:layout_alignStart="@+id/Btn_DropTable"
-        android:onClick="onbtnclickupdatemac" />
+        android:layout_alignParentEnd="true" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/t2"
-        android:layout_alignTop="@+id/btnupdate"
-        android:layout_alignLeft="@+id/txt_ReadAllData"
-        android:layout_alignStart="@+id/txt_ReadAllData"
-        android:layout_toLeftOf="@+id/btnupdate"
-        android:layout_toStartOf="@+id/btnupdate" />
+        android:layout_below="@+id/Btn_ReadAll"
+        android:layout_toLeftOf="@+id/Btn_DropTable"
+        android:layout_toRightOf="@+id/Btn_ReadAll"
+        android:layout_toEndOf="@+id/Btn_ReadAll" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Drop Table"
         android:id="@+id/btn_DropTable"
-        android:layout_marginTop="31dp"
-        android:layout_below="@+id/txt_ReadAllData"
-        android:layout_alignLeft="@+id/txt_ReadAllData"
-        android:layout_alignStart="@+id/txt_ReadAllData"
-        android:onClick="onbtnclickdroptable" />
+        android:onClick="onbtnclickdroptable"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/Btn_DropTable"
+        android:layout_toStartOf="@+id/Btn_DropTable" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Reset all flags"
-        android:id="@+id/btn_resetFlags"
-        android:layout_below="@+id/btn_DropTable"
-        android:layout_alignRight="@+id/btn_DropTable"
-        android:layout_alignEnd="@+id/btn_DropTable"
-        android:onClick="onbtnclickresetflags" />
+        android:text="Clear Table"
+        android:id="@+id/onclickclear"
+        android:onClick="onbtnclickclear"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/Btn_DropTable"
+        android:layout_alignEnd="@+id/Btn_DropTable"
+        android:layout_toRightOf="@+id/t2"
+        android:layout_toEndOf="@+id/t2" />
     android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Drop Table"
