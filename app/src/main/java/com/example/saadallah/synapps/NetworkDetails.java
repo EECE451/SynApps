@@ -51,7 +51,7 @@ public class NetworkDetails extends AppCompatActivity {
         String Detection_time = String.format("%tc", date);
 
         //Dummy Filling
-          myDb.insertData("0153456787ae",111111,111111,0,5,4,"03649774","1",1);
+          myDb.insertData("0153456787ae",111111,111111,0,5,4,"03649774","1",0,1);
 //        myDb.insertData("0124456789ac",111111,111111,1,9,4,"03649674","1",1);
 //        myDb.insertData("0126456789ae",111111,111111,3,2,4,"03549774","1",1);
 //        myDb.insertData("0124456789af",111111,111111,5,2,4,"01642774","1",1);
@@ -160,7 +160,7 @@ public class NetworkDetails extends AppCompatActivity {
 
         StringBuffer buffer = new StringBuffer();
         while (result.moveToNext()) {
-            buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+  " " + result.getString(8)+  " " + result.getString(9) + "\n");
+            buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+  " " + result.getString(8)+  " " + result.getString(9) + " " + result.getString(10) + "\n");
 
         }
         txt_ReadAllData.setText(buffer.toString());

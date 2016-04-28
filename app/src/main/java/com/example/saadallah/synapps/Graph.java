@@ -1,224 +1,191 @@
 package com.example.saadallah.synapps;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.TreeSet;
+import java.util.*;
 
+/**
+ * This class models a simple, undirected graph using an
+ * incidence list representation. Vertices are identified
+ * uniquely by their labels, and only unique vertices are allowed.
+ * At most one Edge per vertex pair is allowed in this Graph.
+ *
+ * Note that the Graph is designed to manage the Edges. You
+ * should not attempt to manually add Edges yourself.
+ *
+ */
 public class Graph {
-    private HashMap<Vertex, TreeSet<Vertex>> myAdjList;
-    private HashMap<String, Vertex> myVertices;
-    private static final TreeSet<Vertex> EMPTY_SET = new TreeSet<Vertex>();
-    private int myNumVertices;
-    private int myNumEdges;
+
+    private HashMap<String, Vertex> vertices;
+    private HashMap<Integer, Edge> edges;
+
+    public Graph(){
+        this.vertices = new HashMap<String, Vertex>();
+        this.edges = new HashMap<Integer, Edge>();
+    }
 
     /**
-     * Construct empty Graph
+     * This constructor accepts an ArrayList<Vertex> and populates
+     * this.vertices. If multiple Vertex objects have the same label,
+     * then the last Vertex with the given label is used.
+     *
+     * @param vertices The initial Vertices to populate this Graph
      */
-    public Graph() {
-        myAdjList = new HashMap<Vertex, TreeSet<Vertex>>();
-        myVertices = new HashMap<String, Vertex>();
-        myNumVertices = myNumEdges = 0;
+    public Graph(ArrayList<Vertex> vertices){
+        this.vertices = new HashMap<String, Vertex>();
+        this.edges = new HashMap<Integer, Edge>();
+
+        for(Vertex v: vertices){
+            this.vertices.put(v.getLabel(), v);
+        }
 
     }
 
     /**
-     * Add a new vertex name with no neighbors (if vertex does not yet exist)
+     * This method adds am edge between Vertices one and two
+     * of weight 1, if no Edge between these Vertices already
+     * exists in the Graph.
      *
-     * @param name vertex to be added
+     * @param one The first vertex to add
+     * @param two The second vertex to add
+     * @return true iff no Edge relating one and two exists in the Graph
      */
-    public Vertex addVertex(String name) {
-        Vertex v;
-        v = myVertices.get(name);
-        if (v == null) {
-            v = new Vertex(name);
-            myVertices.put(name, v);
-            myAdjList.put(v, new TreeSet<Vertex>());
-            myNumVertices += 1;
+    public boolean addEdge(Vertex one, Vertex two){
+        return addEdge(one, two, 1);
+    }
+
+
+    /**
+     * Accepts two vertices and a weight, and adds the edge
+     * ({one, two}, weight) iff no Edge relating one and two
+     * exists in the Graph.
+     *
+     * @param one The first Vertex of the Edge
+     * @param two The second Vertex of the Edge
+     * @param weight The weight of the Edge
+     * @return true iff no Edge already exists in the Graph
+     */
+    public boolean addEdge(Vertex one, Vertex two, int weight){
+        if(one.equals(two)){
+            return false;
         }
+
+        //ensures the Edge is not in the Graph
+        Edge e = new Edge(one, two, weight);
+        if(edges.containsKey(e.hashCode())){
+            return false;
+        }
+
+        //and that the Edge isn't already incident to one of the vertices
+        else if(one.containsNeighbor(e) || two.containsNeighbor(e)){
+            return false;
+        }
+
+        edges.put(e.hashCode(), e);
+        one.addNeighbor(e);
+        two.addNeighbor(e);
+        return true;
+    }
+
+    /**
+     *
+     * @param e The Edge to look up
+     * @return true iff this Graph contains the Edge e
+     */
+    public boolean containsEdge(Edge e){
+        if(e.getOne() == null || e.getTwo() == null){
+            return false;
+        }
+
+        return this.edges.containsKey(e.hashCode());
+    }
+
+
+    /**
+     * This method removes the specified Edge from the Graph,
+     * including as each vertex's incidence neighborhood.
+     *
+     * @param e The Edge to remove from the Graph
+     * @return Edge The Edge removed from the Graph
+     */
+    public Edge removeEdge(Edge e){
+        e.getOne().removeNeighbor(e);
+        e.getTwo().removeNeighbor(e);
+        return this.edges.remove(e.hashCode());
+    }
+
+    /**
+     *
+     * @param vertex The Vertex to look up
+     * @return true iff this Graph contains vertex
+     */
+    public boolean containsVertex(Vertex vertex){
+        return this.vertices.get(vertex.getLabel()) != null;
+    }
+
+    /**
+     *
+     * @param label The specified Vertex label
+     * @return Vertex The Vertex with the specified label
+     */
+    public Vertex getVertex(String label){
+        return vertices.get(label);
+    }
+
+    /**
+     * This method adds a Vertex to the graph. If a Vertex with the same label
+     * as the parameter exists in the Graph, the existing Vertex is overwritten
+     * only if overwriteExisting is true. If the existing Vertex is overwritten,
+     * the Edges incident to it are all removed from the Graph.
+     *
+     * @param vertex
+     * @param overwriteExisting
+     * @return true iff vertex was added to the Graph
+     */
+    public boolean addVertex(Vertex vertex, boolean overwriteExisting){
+        Vertex current = this.vertices.get(vertex.getLabel());
+        if(current != null){
+            if(!overwriteExisting){
+                return false;
+            }
+
+            while(current.getNeighborCount() > 0){
+                this.removeEdge(current.getNeighbor(0));
+            }
+        }
+
+
+        vertices.put(vertex.getLabel(), vertex);
+        return true;
+    }
+
+    /**
+     *
+     * @param label The label of the Vertex to remove
+     * @return Vertex The removed Vertex object
+     */
+    public Vertex removeVertex(String label){
+        Vertex v = vertices.remove(label);
+
+        while(v.getNeighborCount() > 0){
+            this.removeEdge(v.getNeighbor((0)));
+        }
+
         return v;
     }
 
     /**
-     * Returns the Vertex matching v
      *
-     * @param name a String name of a Vertex that may be in
-     *             this Graph
-     * @return the Vertex with a name that matches v or null
-     * if no such Vertex exists in this Graph
+     * @return Set<String> The unique labels of the Graph's Vertex objects
      */
-    public Vertex getVertex(String name) {
-        return myVertices.get(name);
+    public Set<String> vertexKeys(){
+        return this.vertices.keySet();
     }
 
     /**
-     * Returns true iff v is in this Graph, false otherwise
      *
-     * @param name a String name of a Vertex that may be in
-     *             this Graph
-     * @return true iff v is in this Graph
+     * @return Set<Edge> The Edges of this graph
      */
-    public boolean hasVertex(String name) {
-        return myVertices.containsKey(name);
+    public Set<Edge> getEdges(){
+        return new HashSet<Edge>(this.edges.values());
     }
 
-    /**
-     * Is from-to, an edge in this Graph. The graph is
-     * undirected so the order of from and to does not
-     * matter.
-     *
-     * @param from the name of the first Vertex
-     * @param to   the name of the second Vertex
-     * @return true iff from-to exists in this Graph
-     */
-    public boolean hasEdge(String from, String to) {
-
-        if (!hasVertex(from) || !hasVertex(to))
-            return false;
-        return myAdjList.get(myVertices.get(from)).contains(myVertices.get(to));
-    }
-
-    /**
-     * Add to to from's set of neighbors, and add from to to's
-     * set of neighbors. Does not add an edge if another edge
-     * already exists
-     *
-     * @param from the name of the first Vertex
-     * @param to   the name of the second Vertex
-     */
-    public void addEdge(String from, String to) {
-        Vertex v, w;
-        if (hasEdge(from, to))
-            return;
-        myNumEdges += 1;
-        if ((v = getVertex(from)) == null)
-            v = addVertex(from);
-        if ((w = getVertex(to)) == null)
-            w = addVertex(to);
-        myAdjList.get(v).add(w);
-        myAdjList.get(w).add(v);
-    }
-
-    /**
-     * Return an iterator over the neighbors of Vertex named v
-     *
-     * @param name the String name of a Vertex
-     * @return an Iterator over Vertices that are adjacent
-     * to the Vertex named v, empty set if v is not in graph
-     */
-    public Iterable<Vertex> adjacentTo(String name) {
-        if (!hasVertex(name))
-            return EMPTY_SET;
-        return myAdjList.get(getVertex(name));
-    }
-
-    /**
-     * Return an iterator over the neighbors of Vertex v
-     *
-     * @param v the Vertex
-     * @return an Iterator over Vertices that are adjacent
-     * to the Vertex v, empty set if v is not in graph
-     */
-    public Iterable<Vertex> adjacentTo(Vertex v) {
-        if (!myAdjList.containsKey(v))
-            return EMPTY_SET;
-        return myAdjList.get(v);
-    }
-
-    /**
-     * Returns an Iterator over all Vertices in this Graph
-     *
-     * @return an Iterator over all Vertices in this Graph
-     */
-    public Iterable<Vertex> getVertices() {
-        return myVertices.values();
-    }
-
-    public int numVertices() {
-        return myNumVertices;
-    }
-
-    public int numEdges() {
-        return myNumEdges;
-    }
-
-    /**
-     * Sets each Vertices' centrality field to
-     * the degree of each Vertex (i.e. the number of
-     * adjacent Vertices)
-     */
-    public void degreeCentrality() {
-        // TODO: complete degreeCentrality
-    }
-
-    /**
-     * Sets each Vertices' centrality field to
-     * the average distance to every Vertex
-     */
-    public void closenessCentrality() {
-        // TODO: complete closenessCentrality
-    }
-
-    /**
-     * Sets each Vertices' centrality field to
-     * the proportion of geodesics (shortest paths) that
-     * this Vertex is on
-     */
-    public void betweennessCentrality() {
-        // TODO: complete betweennessCentrality
-    }
-
-    /*
-     * Returns adjacency-list representation of graph
-     */
-    public String toString() {
-        String s = "";
-        for (Vertex v : myVertices.values()) {
-            s += v + ": ";
-            for (Vertex w : myAdjList.get(v)) {
-                s += w + " ";
-            }
-            s += "\n";
-        }
-        return s;
-    }
-
-    private String escapedVersion(String s) {
-        return "\'" + s + "\'";
-
-    }
-
-    public void outputGDF(String fileName) {
-        HashMap<Vertex, String> idToName = new HashMap<Vertex, String>();
-        try {
-            FileWriter out = new FileWriter(fileName);
-            int count = 0;
-            out.write("nodedef> name,label,style,distance INTEGER\n");
-            // write vertices
-            for (Vertex v : myVertices.values()) {
-                String id = "v" + count++;
-                idToName.put(v, id);
-                out.write(id + "," + escapedVersion(v.name));
-                out.write(",6," + v.distance + "\n");
-            }
-            out.write("edgedef> node1,node2,color\n");
-            // write edges
-            for (Vertex v : myVertices.values())
-                for (Vertex w : myAdjList.get(v))
-                    if (v.compareTo(w) < 0) {
-                        out.write(idToName.get(v) + "," +
-                                idToName.get(w) + ",");
-                        if (v.predecessor == w ||
-                                w.predecessor == v)
-                            out.write("blue");
-                        else
-                            out.write("gray");
-                        out.write("\n");
-                    }
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
 }

@@ -15,7 +15,8 @@
     <string name="generate_graph">Generate Graph</string>
     <string name="popup_name_text">A device having the following MAC address has been detected. Do you wish to name it?\n</string>
     <string name="mac_address">MAC Address: </string>
-    <string name="name_optionnal">Name (optionnal)</string>
+    <string name="name_optionnal">Name (optional)</string>
+    <string name="phone_optionnal">Phone Number (optional)</string>
     <string name="ok">OK</string>
     <string name="ignore">Ignore</string>
     <string name="popup_clear_data">Are you sure you want to clear all the network data on this device?</string>

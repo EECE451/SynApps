@@ -173,9 +173,10 @@
             android:background="#DDDDDD"
             android:layout_marginLeft="50dp"
             android:layout_marginRight="50dp"
-            android:layout_marginTop="150dp"
-            android:layout_marginBottom="150dp"
-            android:visibility="gone">
+            android:layout_marginTop="120dp"
+            android:layout_marginBottom="120dp"
+            android:visibility="gone"
+            android:transitionGroup="true">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -198,9 +199,21 @@
                 android:layout_below="@+id/mac_address_textview"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
                 android:layout_marginRight="30dp"
                 android:layout_marginLeft="30dp" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText_phone"
+                android:hint="@string/phone_optionnal"
+                android:layout_below="@+id/popup_editText"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="30dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="10dp"
+                android:inputType="phone" />
 
             <TextView
                 android:layout_width="wrap_content"
