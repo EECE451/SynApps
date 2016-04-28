@@ -1,18 +1,26 @@
 package com.example.saadallah.synapps;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -73,6 +81,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
     // flags
     boolean running = true;
+
+    // Device Mac
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,6 +177,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
             Log.d("location", "No location available");
         }
 
+        // Device Mac
+
         //----------------------------------------------------------------------------------
         //Cellular Network
 //        teleMan =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
@@ -192,7 +205,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
             @Override
             public void run() {
 
-                    // discovering peers
+                // discovering peers
+                while (running) {
 
                     mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() { // starts discovering peers
                         @Override
@@ -207,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         }
                     });
 
+
                     synchronized (this) {
                         try {
                             wait(5000);
@@ -214,9 +229,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                             e.printStackTrace();
                         }
                     }
-
-
-                while (running) {
 
                     // Thread calling connect
                     Log.d("Thread", "entered");
@@ -279,8 +291,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
                             myDb.updateExistsStatus(peersMacArrayStr[i], 1);
 
-
-                            Cursor result_lt_init = myDb.getlttimeinit(peersMacArrayStr[i]);    //fetching the old time stamp stored already in the db
+                            Cursor result_lt_init = myDb.getlttimeinit(peersMacArrayStr[i]); //fetching the old time stamp stored already in the db
 
                             if (result_lt_init != null && result_lt_init.getCount() > 0) {
                                 result_lt_init.moveToFirst();
@@ -289,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                             long fetched_lt_init_long = Long.valueOf(fetched_lt);
                             long lt_range = Detection_time - fetched_lt_init_long;
 
-                            //---------------------------------------Updated 17/4/2016
+//---------------------------------------Updated 17/4/2016
 
                             if(lt_range>=50000)         // update the frequency of detection only if its an old device reconnecting
                             {
@@ -309,8 +320,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
                             //---------------------------------------
 
-                            myDb.update_lt_detection_lt_range(peersMacArrayStr[i], Detection_time, lt_range); // anyways update the ltrange since it always must be up to date
-
+                            myDb.update_lt_detection_lt_range(peersMacArrayStr[i], Detection_time, lt_range);// anyways update the ltrange since it always must be up to date
 
                             Cursor result_cum_result = myDb.getCumulativeDuration(peersMacArrayStr[i]);
 
@@ -334,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                     mReceiver.setBroadcastFlag(false);
                     Log.d("device detected flag", "false");
 
-                    while(!mReceiver.isBroadcastFlag()){} // waits for the flag Broadcast flag to turn true
+                    //                   while(!mReceiver.isBroadcastFlag()){} // waits for the flag Broadcast flag to turn true
                 }
             }
         };
@@ -395,12 +405,12 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
     public void onClickClearData(View view) { //Don't forget to implement this method!
     }
-    //---------------------------------------Updated 17/4/2016
-    public void onGenerateGraphClick(View view) {
-        Intent generategraphIntent = new Intent(MainActivity.this, Server.class);
-        startActivity(generategraphIntent);
+
+    public void onGenerateGraphClick(View view) { //Don't forget to implement this method!
+
+        Graph myDevicesGraph = new Graph();
     }
-    //---------------------------------------
+
     public void onNetworkDetailsClick(View view) {
         Intent networkDetailsIntent = new Intent(MainActivity.this, NetworkDetails.class);
         networkDetailsIntent.putExtra("MacArray", peersMacArrayStr);
@@ -418,7 +428,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         Intent connectivityStateIntent = new Intent(MainActivity.this, Connectivity_State.class);
         connectivityStateIntent.putExtra("bluetooth_state", mBluetoothAdapter.isEnabled());
         connectivityStateIntent.putExtra("wifi_state", wifiManager.isWifiEnabled());
-        connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
+        //       connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
         connectivityStateIntent.putExtra("phone_number", phoneNumber); // attach the phone number to the intent
         startActivity(connectivityStateIntent);
     }
@@ -561,10 +571,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
 
         running = false;
     }
 }
-

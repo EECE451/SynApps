@@ -25,8 +25,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private Activity mActivity;
     private boolean broadcastFlag = false;
 
-    private String thisDeviceMac = "";
-
     private ArrayList<WifiP2pDevice> PeerNames= new ArrayList<WifiP2pDevice>();
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager, WifiP2pManager.Channel channel, Activity activity) {
         super();
@@ -87,9 +85,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             }
             Log.d("P2P Notification", "print devices end====>");
 
-            //broadcastFlag = false;
-
-
         }
         else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
 
@@ -130,6 +125,14 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
             } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
                 // Respond to this device's wifi state changing
+
+                WifiP2pDevice device = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
+                String myMac = device.deviceAddress;
+
+                Log.d("mac address", "Device WiFi P2p MAC Address: " + myMac);
+
+
+
             }
         }
 
