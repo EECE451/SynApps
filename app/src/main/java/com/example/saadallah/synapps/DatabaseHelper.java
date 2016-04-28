@@ -238,6 +238,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.update(TABLE_DEVICESS, contentValues,"device_MAC =?",new String[] { MAC });
         return true;
     }
+    public boolean update_lt_detection(String MAC, long lt_detection)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_DEVICESS_LAST_TIME_DETECTION, lt_detection);
+        db.update(TABLE_DEVICESS, contentValues,"device_MAC =?",new String[] { MAC });
+        return true;
+    }
+    public Cursor getLastDetection(String MAC)
+    {
+        SQLiteDatabase db =this.getWritableDatabase();
+        Cursor result = db.rawQuery("select ltdetection from " + TABLE_DEVICESS + " where device_MAC = '" + MAC + "'", null);
+        return result;
+    }
 
 
 }
