@@ -282,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
                     synchronized (this) {
                         try {
-                            wait(5000);
+                            wait(10000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -298,6 +298,11 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                     //It only discovers devices
                     peersMacArrayStr = new String[PeerNames.size()];
                     timeDiscovered = new java.util.Date[PeerNames.size()];
+
+                    myDb.updateOldExistsFlag(); // shifts new to old all rows
+                    myDb.resetFlags(); // reset the flags to zeros
+
+
 
                     for (int i = 0; i < PeerNames.size(); i++) {
                         //saves the time at which the device got connected/discovered
@@ -347,8 +352,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
 
 
-                            myDb.updateOldExistsFlag();
-                            myDb.resetFlags(); // reset the flags
                             // updating for new logic
 
 
