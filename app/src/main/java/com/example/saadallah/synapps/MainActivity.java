@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     // Device Mac
     String deviceP2pMac;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -462,7 +461,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
     public void onGenerateGraphClick(View view) { //Don't forget to implement this method!
 
-        Graph myDevicesGraph = new Graph();
+        /*Graph myDevicesGraph = new Graph();
 
         int graphSize = 5; // enter the size here
 
@@ -489,7 +488,12 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
             }
 
             System.out.println();
-        }
+        }*/
+
+        Intent serverIntent = new Intent(MainActivity.this, Server.class);
+        serverIntent.putExtra("MAC", deviceP2pMac);
+        startActivity(serverIntent);
+
 
     }
 

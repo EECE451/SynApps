@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.jadhosn.databasehelper452.Main22Activity">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="insert all"
+        android:id="@+id/btninsertall"
+        android:layout_centerHorizontal="true"
+        android:onClick="onbtnclickinsertall" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Specific"
+        android:id="@+id/btnshowspecific"
+        android:onClick="onbtnclickshowspecific"
+        android:layout_below="@+id/btninsertall"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="display data"
+        android:id="@+id/textViewdisplaydata"
+        android:textSize="12dp"
+        android:layout_below="@+id/btnshowspecific"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show all"
+        android:id="@+id/btnshowall"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/btninsertall"
+        android:layout_alignEnd="@+id/btninsertall"
+        android:onClick="onbtnclickshowall" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/plaintxtmacconnected"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/btnshowall"
+        android:text="MAC Slave"
+        android:layout_toLeftOf="@+id/btnshowall" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/plaintxtmacmaster"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/btninsertall"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:text="MAC Master" />
+</RelativeLayout>

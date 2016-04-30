@@ -33,4 +33,7 @@
 
 
     <string name="title_activity_connectivity__state">Connectivity State</string>
+    <string name="title_activity_server">Server</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>

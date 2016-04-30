@@ -12,7 +12,7 @@ import android.util.Log;
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    public static final String DB_Name = "devices2028.db";
+    public static final String DB_Name = "devices2029.db";
     public static final String TABLE_DEVICESS = "DevicesTable";
     public static final String COLUMN_DEVICESS_ID = "_Did";
     public static final String COLUMN_DEVICESS_MAC = "device_MAC";
@@ -101,6 +101,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    public Cursor getAllDatabyDid(int id)
+    {
+        SQLiteDatabase db =this.getWritableDatabase();
+        Cursor result = db.rawQuery("select device_MAC, descriptionname, ltdetection, detectionfrequency, cumdetectionduration from " + TABLE_DEVICESS +
+                " where _Did = "+id,null);
+        return result;
+    }
+
     public Cursor getExists(String MAC)
     {
         SQLiteDatabase db =this.getWritableDatabase();
@@ -155,6 +163,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor result = db.rawQuery("select _Did, device_MAC from " + TABLE_DEVICESS, null);
+        return result;
+    }
+
+    public Cursor getNumberofDevices()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor result = db.rawQuery("select count(_Did) from " + TABLE_DEVICESS, null);
         return result;
     }
 
