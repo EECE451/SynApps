@@ -43,6 +43,8 @@ public class Server extends AppCompatActivity {
     String showUrl = "http://192.168.210.1:80/DevicesServer/displayEntry.php";
     String showspecificUrl = "http://192.168.210.1:80/DevicesServer/displayspecific2.php";
     String showSpecificUrl2 = "http://192.168.210.1:80/DevicesServer/displayspecific4.php";
+    String fetchnumberurl =   "http://192.168.210.1:80/DevicesServer/fetchnumber.php";
+
 
 
     // String insertUrl = "http://10.168.46.13:80/DevicesServer/insertEntry.php";
@@ -336,7 +338,44 @@ public class Server extends AppCompatActivity {
 
     }
 
+    public void fetchnumber()
+    {
+        StringRequest request = new StringRequest(Request.Method.POST, fetchnumberurl, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
 
+                    System.out.println(response.toString());
+                    JSONObject jsonObject = new JSONObject(response);
+
+                    Log.d("number",jsonObject.getString("exists")); // Numbers are given here: total number connected to my Master MAC
+                    Log.d("number",jsonObject.getString("exists2")); // Total Number of MACs
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }){
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> parameters  = new HashMap<String, String>();
+                parameters.put("MACMasterDevice",MACMasterDevice);
+
+
+
+
+                return parameters;
+            }
+        };
+
+        requestQueue.add(request);
+    }
 
 
 
