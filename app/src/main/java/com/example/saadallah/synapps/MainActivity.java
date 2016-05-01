@@ -90,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     // Device Mac
     String deviceP2pMac;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -212,42 +214,201 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
         //-------------------------------------------------------------------------------------------------------------
 
-
+        running = true;
+        myThread.start();
 
     }
 
+    Runnable myRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+
+            // discovering peers
+            while (running) {
+
+                if (PeerNames != null)
+                    PeerNames.clear();
+
+                mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() { // starts discovering peers
+                    @Override
+                    public void onSuccess() {
+                        Log.d("p2p Notification", "Starting Discovery");
+                        Toast.makeText(getApplicationContext(), "Starting Discovery", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(int reason) {
+                        Toast.makeText(MainActivity.this, "Could not initiate peer discovery", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                synchronized (this) {
+                    try {
+                        wait(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                // Thread calling connect
+                Log.d("Thread", "entered");
+
+                boolean deviceDetectedFlag = mReceiver.isBroadcastFlag(); // THIS IS ZE FLAG... HAPPY NOW??
+
+                PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
+                //Up here, we are feeling the MAC array string: the thread takes MAC address from devices that are discovered
+                //It only discovers devices
+                peersMacArrayStr = new String[PeerNames.size()];
+                timeDiscovered = new java.util.Date[PeerNames.size()];
+
+                myDb.updateOldExistsFlag(); // shifts new to old all rows
+                myDb.resetFlags(); // reset the flags to zeros
 
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+                for (int i = 0; i < PeerNames.size(); i++) {
+                    //saves the time at which the device got connected/discovered
+                    timeDiscovered[i] = new java.util.Date();
+                    long Detection_time = System.currentTimeMillis();
 
-        if (!drawer.isDrawerOpen(Gravity.LEFT)){
-            drawer.openDrawer(Gravity.LEFT);
+
+                    // retrieve MAC Address of device i
+                    WifiP2pDevice targetDevice = PeerNames.get(i);
+                    peersMacArrayStr[i] = targetDevice.deviceAddress;
+
+
+                    // removing the columns from the strings in MAC addresses
+                    String[] macAddressParts = peersMacArrayStr[i].split(":");
+                    peersMacArrayStr[i] = macAddressParts[0] + macAddressParts[1] + macAddressParts[2] + macAddressParts[3] + macAddressParts[4] + macAddressParts[5];
+
+
+                    //Checking if its a new device
+                    Cursor result = myDb.getDatabyMAC(peersMacArrayStr[i]);
+
+                    if (result.getCount() == 0) {
+                        Log.d("Device=", "New");
+
+                        String descriptionNamePopup = null;
+
+                        openDescriptionNamePopup(peersMacArrayStr[i], targetDevice.deviceName);
+
+                        while (!popupNameButtonFlag) ; // wait until a button is pressed
+
+                        Log.d("popup", "New device detected called: " + descriptionNamePopup);
+
+                        if (DeviceNameFromUser == "") {
+                            DeviceNameFromUser = targetDevice.deviceName;
+                        }
+
+                        myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 0, PhoneNumberFromUser, DeviceNameFromUser, 0, 1);
+                        //myDb.updateDescriptionName(peersMacArrayStr[i], DeviceNameFromUser);// to connect to pop up function
+
+                    } else if (result.getCount() == 1)   //Its an old device:  if the MAC appears here, it means that its still connected
+                    {
+                        Log.d("Device=", "old");
+                        String detected_frequency = "";
+                        String fetched_lt = "";
+                        String fetched_cumulative = "";
+                        String fetched_getOldexistsFlag = "";
+                        String fetched_getexistsFlag = "";
+
+
+
+                        // updating for new logic
+
+
+
+                        myDb.updateExistsStatus(peersMacArrayStr[i], 1);
+
+                        // Get the already stored flag in database
+                        Cursor result_exist_flag = myDb.getExists(peersMacArrayStr[i]);
+
+                        if (result_exist_flag != null && result_exist_flag.getCount() > 0) {
+                            result_exist_flag.moveToFirst();
+                            fetched_getexistsFlag = result_exist_flag.getString(0);
+                        }
+                        long fetched_getexistsFlag_long = Long.valueOf(fetched_getexistsFlag);
+
+                        // store the new value of the flag in the old column
+//                            myDb.updateOldExistsFlag();
+//
+//
+//                            myDb.resetFlags(); // reset the flags
+
+
+
+
+                        // gets the old flag stored in a second column
+                        Cursor result_getOldexistsFlag = myDb.getOldExistsFlag(peersMacArrayStr[i]);
+                        if (result_getOldexistsFlag != null && result_getOldexistsFlag.getCount() > 0) {
+                            result_getOldexistsFlag.moveToFirst();
+                            fetched_getOldexistsFlag = result_getOldexistsFlag.getString(0);
+                        }
+                        long fetched_getOldexistsFlag_long = Long.valueOf(fetched_getOldexistsFlag); // this long returns the value of old flag
+
+
+                        Cursor result_lt_init = myDb.getlttimeinit(peersMacArrayStr[i]); //fetching the old time stamp stored already in the db
+
+                        if (result_lt_init != null && result_lt_init.getCount() > 0) {
+                            result_lt_init.moveToFirst();
+                            fetched_lt = result_lt_init.getString(0);
+                        }
+                        long fetched_lt_init_long = Long.valueOf(fetched_lt);
+                        long lt_range = Detection_time - fetched_lt_init_long;
+
+//---------------------------------------Updated 17/4/2016
+
+
+                        Log.d("Entered", "Frequency Update");
+                        Log.d("popup", "lt_range: " + lt_range);
+                        Cursor result_Detection_Frequency = myDb.getDetectionFrequency(peersMacArrayStr[i]);
+
+                        if (result_Detection_Frequency != null && result_Detection_Frequency.getCount() > 0) {
+                            result_Detection_Frequency.moveToFirst();
+                            detected_frequency = result_Detection_Frequency.getString(0);
+                        }
+                        int detected_frequency_int = 0;
+                        detected_frequency_int = Integer.parseInt(detected_frequency);
+
+                        myDb.updateDetectionFrequency(peersMacArrayStr[i], detected_frequency_int);
+
+
+                        //---------------------------------------
+
+                        myDb.update_lt_detection_lt_range(peersMacArrayStr[i], Detection_time, lt_range);// anyways update the ltrange since it always must be up to date
+
+                        Cursor result_cum_result = myDb.getCumulativeDuration(peersMacArrayStr[i]);
+
+                        if (result_cum_result != null && result_cum_result.getCount() > 0) {
+                            result_cum_result.moveToFirst();
+                            fetched_cumulative = result_cum_result.getString(0);
+                        }
+                        long fetched_cumulative_long = Long.valueOf(fetched_cumulative);
+                        myDb.updateCumulativeDetectionDuration(peersMacArrayStr[i], lt_range, fetched_cumulative_long);
+
+                    }
+                    // connect to all the devices
+                    // connect(i);
+
+                    popupNameButtonFlag = false; // resetting the flags
+                    DeviceNameFromUser = "";
+                }
+
+
+                PeerNames.clear();
+
+
+                mReceiver.setBroadcastFlag(false);
+                Log.d("device detected flag", "false");
+
+                //                   while(!mReceiver.isBroadcastFlag()){} // waits for the flag Broadcast flag to turn true
+            }
         }
-        else{
-            drawer.closeDrawer(Gravity.LEFT);
-        }
+    };
 
-        int id = item.getItemId();
+    // Thread definition
+    Thread myThread = new Thread(myRunnable);
 
-        if (id == R.id.action_connectivity_state) {
-
-            Intent connectivityStateIntent = new Intent(MainActivity.this, Connectivity_State.class);
-            connectivityStateIntent.putExtra("bluetooth_state", mBluetoothAdapter.isEnabled());
-            connectivityStateIntent.putExtra("wifi_state", wifiManager.isWifiEnabled());
-            connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
-            connectivityStateIntent.putExtra("phone_number", phoneNumber); // attach the phone number to the intent
-            startActivity(connectivityStateIntent);
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
     @Override
     protected void onResume() {
@@ -257,195 +418,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         // WiFi p2p discovering peers and connecting to them
 
         running = true;
-
-        Runnable myRunnable = new Runnable() {
-
-            @Override
-            public void run() {
-
-                // discovering peers
-                while (running) {
-
-                    mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() { // starts discovering peers
-                        @Override
-                        public void onSuccess() {
-                            Log.d("p2p Notification", "Starting Discovery");
-                            Toast.makeText(getApplicationContext(), "Starting Discovery", Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onFailure(int reason) {
-                            Toast.makeText(MainActivity.this, "Could not initiate peer discovery", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-
-                    synchronized (this) {
-                        try {
-                            wait(10000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    // Thread calling connect
-                    Log.d("Thread", "entered");
-
-                    boolean deviceDetectedFlag = mReceiver.isBroadcastFlag(); // THIS IS ZE FLAG... HAPPY NOW??
-
-                    PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
-                    //Up here, we are feeling the MAC array string: the thread takes MAC address from devices that are discovered
-                    //It only discovers devices
-                    peersMacArrayStr = new String[PeerNames.size()];
-                    timeDiscovered = new java.util.Date[PeerNames.size()];
-
-                    myDb.updateOldExistsFlag(); // shifts new to old all rows
-                    myDb.resetFlags(); // reset the flags to zeros
-
-
-
-                    for (int i = 0; i < PeerNames.size(); i++) {
-                        //saves the time at which the device got connected/discovered
-                        timeDiscovered[i] = new java.util.Date();
-                        long Detection_time = System.currentTimeMillis();
-
-
-                        // retrieve MAC Address of device i
-                        WifiP2pDevice targetDevice = PeerNames.get(i);
-                        peersMacArrayStr[i] = targetDevice.deviceAddress;
-
-
-                        // removing the columns from the strings in MAC addresses
-                        String[] macAddressParts = peersMacArrayStr[i].split(":");
-                        peersMacArrayStr[i] = macAddressParts[0] + macAddressParts[1] + macAddressParts[2] + macAddressParts[3] + macAddressParts[4] + macAddressParts[5];
-
-
-                        //Checking if its a new device
-                        Cursor result = myDb.getDatabyMAC(peersMacArrayStr[i]);
-
-                        if (result.getCount() == 0) {
-                            Log.d("Device=", "New");
-
-                            String descriptionNamePopup = null;
-
-                            openDescriptionNamePopup(peersMacArrayStr[i], targetDevice.deviceName);
-
-                            while (!popupNameButtonFlag) ; // wait until a button is pressed
-
-                            Log.d("popup", "New device detected called: " + descriptionNamePopup);
-
-                            if (DeviceNameFromUser == "") {
-                                DeviceNameFromUser = targetDevice.deviceName;
-                            }
-
-                            myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 0, PhoneNumberFromUser, DeviceNameFromUser, 0, 1);
-                            //myDb.updateDescriptionName(peersMacArrayStr[i], DeviceNameFromUser);// to connect to pop up function
-
-                        } else if (result.getCount() == 1)   //Its an old device:  if the MAC appears here, it means that its still connected
-                        {
-                            Log.d("Device=", "old");
-                            String detected_frequency = "";
-                            String fetched_lt = "";
-                            String fetched_cumulative = "";
-                            String fetched_getOldexistsFlag = "";
-                            String fetched_getexistsFlag = "";
-
-
-
-                            // updating for new logic
-
-
-
-                            myDb.updateExistsStatus(peersMacArrayStr[i], 1);
-
-                            // Get the already stored flag in database
-                            Cursor result_exist_flag = myDb.getExists(peersMacArrayStr[i]);
-
-                            if (result_exist_flag != null && result_exist_flag.getCount() > 0) {
-                                result_exist_flag.moveToFirst();
-                                fetched_getexistsFlag = result_exist_flag.getString(0);
-                            }
-                            long fetched_getexistsFlag_long = Long.valueOf(fetched_getexistsFlag);
-
-                            // store the new value of the flag in the old column
-//                            myDb.updateOldExistsFlag();
-//
-//
-//                            myDb.resetFlags(); // reset the flags
-
-
-
-
-                            // gets the old flag stored in a second column
-                            Cursor result_getOldexistsFlag = myDb.getOldExistsFlag(peersMacArrayStr[i]);
-                            if (result_getOldexistsFlag != null && result_getOldexistsFlag.getCount() > 0) {
-                                result_getOldexistsFlag.moveToFirst();
-                                fetched_getOldexistsFlag = result_getOldexistsFlag.getString(0);
-                            }
-                            long fetched_getOldexistsFlag_long = Long.valueOf(fetched_getOldexistsFlag); // this long returns the value of old flag
-
-
-                            Cursor result_lt_init = myDb.getlttimeinit(peersMacArrayStr[i]); //fetching the old time stamp stored already in the db
-
-                            if (result_lt_init != null && result_lt_init.getCount() > 0) {
-                                result_lt_init.moveToFirst();
-                                fetched_lt = result_lt_init.getString(0);
-                            }
-                            long fetched_lt_init_long = Long.valueOf(fetched_lt);
-                            long lt_range = Detection_time - fetched_lt_init_long;
-
-//---------------------------------------Updated 17/4/2016
-
-
-                            Log.d("Entered", "Frequency Update");
-                            Log.d("popup", "lt_range: " + lt_range);
-                            Cursor result_Detection_Frequency = myDb.getDetectionFrequency(peersMacArrayStr[i]);
-
-                            if (result_Detection_Frequency != null && result_Detection_Frequency.getCount() > 0) {
-                                result_Detection_Frequency.moveToFirst();
-                                detected_frequency = result_Detection_Frequency.getString(0);
-                            }
-                            int detected_frequency_int = 0;
-                            detected_frequency_int = Integer.parseInt(detected_frequency);
-
-                            myDb.updateDetectionFrequency(peersMacArrayStr[i], detected_frequency_int);
-
-
-                            //---------------------------------------
-
-                            myDb.update_lt_detection_lt_range(peersMacArrayStr[i], Detection_time, lt_range);// anyways update the ltrange since it always must be up to date
-
-                            Cursor result_cum_result = myDb.getCumulativeDuration(peersMacArrayStr[i]);
-
-                            if (result_cum_result != null && result_cum_result.getCount() > 0) {
-                                result_cum_result.moveToFirst();
-                                fetched_cumulative = result_cum_result.getString(0);
-                            }
-                            long fetched_cumulative_long = Long.valueOf(fetched_cumulative);
-                            myDb.updateCumulativeDetectionDuration(peersMacArrayStr[i], lt_range, fetched_cumulative_long);
-
-                        }
-                        // connect to all the devices
-                        // connect(i);
-
-                        popupNameButtonFlag = false; // resetting the flags
-                        DeviceNameFromUser = "";
-                    }
-
-
-
-                    PeerNames.clear();
-
-                    mReceiver.setBroadcastFlag(false);
-                    Log.d("device detected flag", "false");
-
-                    //                   while(!mReceiver.isBroadcastFlag()){} // waits for the flag Broadcast flag to turn true
-                }
-            }
-        };
-
-        Thread myThread = new Thread(myRunnable);
-        myThread.start();
 
         //------------------------------------------------------------------------------------------
 
@@ -521,6 +493,38 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         connectivityStateIntent.putExtra("phone_number", phoneNumber); // attach the phone number to the intent
         startActivity(connectivityStateIntent);
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (!drawer.isDrawerOpen(Gravity.LEFT)){
+            drawer.openDrawer(Gravity.LEFT);
+        }
+        else{
+            drawer.closeDrawer(Gravity.LEFT);
+        }
+
+        int id = item.getItemId();
+
+        if (id == R.id.action_connectivity_state) {
+
+            Intent connectivityStateIntent = new Intent(MainActivity.this, Connectivity_State.class);
+            connectivityStateIntent.putExtra("bluetooth_state", mBluetoothAdapter.isEnabled());
+            connectivityStateIntent.putExtra("wifi_state", wifiManager.isWifiEnabled());
+            connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
+            connectivityStateIntent.putExtra("phone_number", phoneNumber); // attach the phone number to the intent
+            startActivity(connectivityStateIntent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
 
     public void openDescriptionNamePopup(String MAC, String defaultDeviceName){
 
