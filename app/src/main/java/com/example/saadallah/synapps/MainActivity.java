@@ -292,12 +292,12 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                          long fetched_getexistsFlag_long = Long.parseLong(fetched_getexistsFlag);
 
                         Cursor result_getOldexistsFlag = myDb.getOldExistsFlag(peersMacArrayStr[i]);
-                        if (result_getOldexistsFlag != null && result_getOldexistsFlag.getCount() > 0) {
+                        if (result_getOldexistsFlag != null && result_getOldexistsFlag.getCount() > 0) { // NOT ENTERING THAT IF?????
                             result_getOldexistsFlag.moveToFirst();
                             fetched_getOldexistsFlag = result_getOldexistsFlag.getString(0);
                         }
 
-                            long fetched_getOldexistsFlag_long = Long.valueOf(fetched_getOldexistsFlag); // this long returns the value of old flag
+                            long fetched_getOldexistsFlag_long = Long.parseLong(fetched_getOldexistsFlag); // this long returns the value of old flag
 
 
 
@@ -333,29 +333,15 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                             myDb.insertData(peersMacArrayStr[i], Detection_time, Detection_time, 0, 1, 0, PhoneNumberFromUser, DeviceNameFromUser, 0, 1);
                             //myDb.updateDescriptionName(peersMacArrayStr[i], DeviceNameFromUser);// to connect to pop up function
 
-                        } else if (result.getCount() == 1)   //Its an old device:  if the MAC appears here, it means that its still connected
+                        }
+
+                        else if (result.getCount() == 1)   //Its an old device:  if the MAC appears here, it means that its still connected
                         {
                             Log.d("Device=", "old");
                             myDb.updateExistsStatus(peersMacArrayStr[i], 1);
 
 
-                            if(fetched_getexistsFlag_long == 1 && fetched_getOldexistsFlag_long == 0)
-                            {     myDb.update_lt_init(peersMacArrayStr[i], Detection_time);
-
-                                Cursor result_Detection_Frequency = myDb.getDetectionFrequency(peersMacArrayStr[i]);
-
-                                if (result_Detection_Frequency != null && result_Detection_Frequency.getCount() > 0) {
-                                    result_Detection_Frequency.moveToFirst();
-                                    detected_frequency = result_Detection_Frequency.getString(0);
-                                }
-                                int detected_frequency_int = 0;
-                                detected_frequency_int = Integer.parseInt(detected_frequency);
-
-                                myDb.updateDetectionFrequency(peersMacArrayStr[i], detected_frequency_int);
-
-                            }
-
-                            if((fetched_getexistsFlag_long == 1 && fetched_getOldexistsFlag_long == 0) || (fetched_getexistsFlag_long == 1 && fetched_getOldexistsFlag_long == 1))
+                            if(fetched_getexistsFlag_long == 1 && fetched_getOldexistsFlag_long == 1)
                             {
 
 
