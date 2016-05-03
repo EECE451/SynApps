@@ -46,24 +46,4 @@
         android:layout_alignEnd="@+id/btninsertall"
         android:onClick="onbtnclickshowall" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/plaintxtmacconnected"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/btnshowall"
-        android:text="MAC Slave"
-        android:layout_toLeftOf="@+id/btnshowall" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/plaintxtmacmaster"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/btninsertall"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:text="MAC Master" />
 </RelativeLayout>

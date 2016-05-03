@@ -91,6 +91,15 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     // Device Mac
     String deviceP2pMac;
 
+    // Database flags
+
+    String detected_frequency = null;
+    String fetched_lt = null;
+    String fetched_cumulative = null;
+    String fetched_getOldexistsFlag = "0";
+    String fetched_getexistsFlag = "1";
+
+
 
 
     @Override
@@ -149,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
         //WiFi MAC Address retrieval
         WifiInfo wInfo = wifiManager.getConnectionInfo();
+
         String WiFiMacAddress = getWifiMacAddress();
         Log.d("Device MAC = ", WiFiMacAddress);
 
@@ -266,8 +276,30 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
                     for (int i = 0; i < PeerNames.size(); i++) {
                         //saves the time at which the device got connected/discovered
-                        timeDiscovered[i] = new java.util.Date();
                         long Detection_time = System.currentTimeMillis();
+
+
+                        timeDiscovered[i] = new java.util.Date();
+
+                        Cursor result_exist_flag = myDb.getExists(peersMacArrayStr[i]);
+
+                        if (result_exist_flag != null && result_exist_flag.getCount() > 0) {
+                            result_exist_flag.moveToFirst();
+                            fetched_getexistsFlag = result_exist_flag.getString(0);
+                        }
+
+
+                         long fetched_getexistsFlag_long = Long.parseLong(fetched_getexistsFlag);
+
+                        Cursor result_getOldexistsFlag = myDb.getOldExistsFlag(peersMacArrayStr[i]);
+                        if (result_getOldexistsFlag != null && result_getOldexistsFlag.getCount() > 0) {
+                            result_getOldexistsFlag.moveToFirst();
+                            fetched_getOldexistsFlag = result_getOldexistsFlag.getString(0);
+                        }
+
+                            long fetched_getOldexistsFlag_long = Long.valueOf(fetched_getOldexistsFlag); // this long returns the value of old flag
+
+
 
 
                         // retrieve MAC Address of device i
@@ -304,81 +336,61 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         } else if (result.getCount() == 1)   //Its an old device:  if the MAC appears here, it means that its still connected
                         {
                             Log.d("Device=", "old");
-                            String detected_frequency = "";
-                            String fetched_lt = "";
-                            String fetched_cumulative = "";
-                            String fetched_getOldexistsFlag = "";
-                            String fetched_getexistsFlag = "";
-
-
-                            // updating for new logic
-
-
                             myDb.updateExistsStatus(peersMacArrayStr[i], 1);
 
-                            // Get the already stored flag in database
-                            Cursor result_exist_flag = myDb.getExists(peersMacArrayStr[i]);
 
-                            if (result_exist_flag != null && result_exist_flag.getCount() > 0) {
-                                result_exist_flag.moveToFirst();
-                                fetched_getexistsFlag = result_exist_flag.getString(0);
+                            if(fetched_getexistsFlag_long == 1 && fetched_getOldexistsFlag_long == 0)
+                            {     myDb.update_lt_init(peersMacArrayStr[i], Detection_time);
+
+                                Cursor result_Detection_Frequency = myDb.getDetectionFrequency(peersMacArrayStr[i]);
+
+                                if (result_Detection_Frequency != null && result_Detection_Frequency.getCount() > 0) {
+                                    result_Detection_Frequency.moveToFirst();
+                                    detected_frequency = result_Detection_Frequency.getString(0);
+                                }
+                                int detected_frequency_int = 0;
+                                detected_frequency_int = Integer.parseInt(detected_frequency);
+
+                                myDb.updateDetectionFrequency(peersMacArrayStr[i], detected_frequency_int);
+
                             }
-                            long fetched_getexistsFlag_long = Long.valueOf(fetched_getexistsFlag);
 
-                            // store the new value of the flag in the old column
-//                            myDb.updateOldExistsFlag();
-//
-//
-//                            myDb.resetFlags(); // reset the flags
+                            if((fetched_getexistsFlag_long == 1 && fetched_getOldexistsFlag_long == 0) || (fetched_getexistsFlag_long == 1 && fetched_getOldexistsFlag_long == 1))
+                            {
 
 
-                            // gets the old flag stored in a second column
-                            Cursor result_getOldexistsFlag = myDb.getOldExistsFlag(peersMacArrayStr[i]);
-                            if (result_getOldexistsFlag != null && result_getOldexistsFlag.getCount() > 0) {
-                                result_getOldexistsFlag.moveToFirst();
-                                fetched_getOldexistsFlag = result_getOldexistsFlag.getString(0);
+                                Cursor result_lt_init = myDb.getlttimeinit(peersMacArrayStr[i]); //fetching the old time stamp stored already in the db
+
+                                if (result_lt_init != null && result_lt_init.getCount() > 0) {
+                                    result_lt_init.moveToFirst();
+                                    fetched_lt = result_lt_init.getString(0);
+                                }
+                                long fetched_lt_init_long = Long.valueOf(fetched_lt);
+                                long lt_range = Detection_time - fetched_lt_init_long;
+
+
+                                Cursor result_cum_result = myDb.getCumulativeDuration(peersMacArrayStr[i]);
+
+                                if (result_cum_result != null && result_cum_result.getCount() > 0) {
+                                    result_cum_result.moveToFirst();
+                                    fetched_cumulative = result_cum_result.getString(0);
+                                }
+                                long fetched_cumulative_long = Long.valueOf(fetched_cumulative);
+                                myDb.updateCumulativeDetectionDuration(peersMacArrayStr[i], lt_range, fetched_cumulative_long);
+
+                                myDb.update_lt_detection_lt_range(peersMacArrayStr[i], Detection_time, lt_range);// anyways update the ltrange since it always must be up to date
+
+
                             }
-                            long fetched_getOldexistsFlag_long = Long.valueOf(fetched_getOldexistsFlag); // this long returns the value of old flag
 
 
-                            Cursor result_lt_init = myDb.getlttimeinit(peersMacArrayStr[i]); //fetching the old time stamp stored already in the db
-
-                            if (result_lt_init != null && result_lt_init.getCount() > 0) {
-                                result_lt_init.moveToFirst();
-                                fetched_lt = result_lt_init.getString(0);
-                            }
-                            long fetched_lt_init_long = Long.valueOf(fetched_lt);
-                            long lt_range = Detection_time - fetched_lt_init_long;
-
-//---------------------------------------Updated 17/4/2016
 
 
-                            Log.d("Entered", "Frequency Update");
-                            Log.d("popup", "lt_range: " + lt_range);
-                            Cursor result_Detection_Frequency = myDb.getDetectionFrequency(peersMacArrayStr[i]);
-
-                            if (result_Detection_Frequency != null && result_Detection_Frequency.getCount() > 0) {
-                                result_Detection_Frequency.moveToFirst();
-                                detected_frequency = result_Detection_Frequency.getString(0);
-                            }
-                            int detected_frequency_int = 0;
-                            detected_frequency_int = Integer.parseInt(detected_frequency);
-
-                            myDb.updateDetectionFrequency(peersMacArrayStr[i], detected_frequency_int);
 
 
-                            //---------------------------------------
 
-                            myDb.update_lt_detection_lt_range(peersMacArrayStr[i], Detection_time, lt_range);// anyways update the ltrange since it always must be up to date
 
-                            Cursor result_cum_result = myDb.getCumulativeDuration(peersMacArrayStr[i]);
 
-                            if (result_cum_result != null && result_cum_result.getCount() > 0) {
-                                result_cum_result.moveToFirst();
-                                fetched_cumulative = result_cum_result.getString(0);
-                            }
-                            long fetched_cumulative_long = Long.valueOf(fetched_cumulative);
-                            myDb.updateCumulativeDetectionDuration(peersMacArrayStr[i], lt_range, fetched_cumulative_long);
 
                         }
                         // connect to all the devices
@@ -420,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         //------------------------------------------------------------------------------------------
 
     }
-    /* unregister the broadcast receiver */
+
     @Override
     protected void onPause() {
         super.onPause();

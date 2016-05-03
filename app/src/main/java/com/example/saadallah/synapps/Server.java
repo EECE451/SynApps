@@ -50,18 +50,12 @@ public class Server extends AppCompatActivity {
     // String insertUrl = "http://10.168.46.13:80/DevicesServer/insertEntry.php";
     // String showUrl = "http://10.168.46.13:80/DevicesServer/displayEntry.php";
 
-    EditText plaintxtmacmaster,plaintxtmacconnected;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-
-        plaintxtmacconnected = (EditText) findViewById(R.id.plaintxtmacconnected);
-        plaintxtmacmaster = (EditText) findViewById(R.id.plaintxtmacmaster);
-
 
         textViewdisplaydata =(TextView)findViewById(R.id.textViewdisplaydata);
 
@@ -75,11 +69,8 @@ public class Server extends AppCompatActivity {
         String[] macAddressParts = deviceMAC.split(":");
         MACMasterDevice = macAddressParts[0] + macAddressParts[1] + macAddressParts[2] + macAddressParts[3] + macAddressParts[4] + macAddressParts[5];
 
-    }
-    String Result = "";
-    String Result2 = "";
+        // show all logic
 
-    public void onbtnclickshowall(View view) {
         Result = "";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, showUrl, new Response.Listener<JSONObject>()
         {
@@ -122,6 +113,12 @@ public class Server extends AppCompatActivity {
         });
         requestQueue.add(jsonObjectRequest);
     }
+    String Result = "";
+    String Result2 = "";
+
+//    public void onbtnclickshowall(View view) {
+//
+//    }
 
 //    public void onbtnclickinsertall(View view) {
 //

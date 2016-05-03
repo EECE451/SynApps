@@ -204,6 +204,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
+    public boolean update_lt_init(String MAC, long lt_init)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_DEVICESS_LAST_TIME_INIT, lt_init);
+
+        db.update(TABLE_DEVICESS, contentValues,"device_MAC =?",new String[] { MAC });
+        return true;
+    }
+
     public boolean updateExistsStatus(String MAC, long device_exists)
     {
         SQLiteDatabase db = this.getWritableDatabase();
