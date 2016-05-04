@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
                     synchronized (this) {
                         try {
-                            wait(5000);
+                            wait(65000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -266,8 +266,12 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                     peersMacArrayStr = new String[PeerNames.size()];
                     timeDiscovered = new java.util.Date[PeerNames.size()];
 
-                    myDb.updateOldExistsFlag(); // shifts new to old all rows
-                    myDb.resetFlags(); // reset the flags to zeros
+
+                        myDb.updateOldExistsFlag(); // shifts new to old all rows
+                        myDb.resetFlags(); // reset the flags to zeros
+
+
+
 
 
                     for (int i = 0; i < PeerNames.size(); i++) {
@@ -304,8 +308,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
 
 
-
-
                         //Checking if its a new device
                         Cursor result = myDb.getDatabyMAC(peersMacArrayStr[i]);
 
@@ -333,7 +335,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         {
 //-----------------------------------------------------------check here for the states only
                             Log.d("Device=", "old");
+
                             myDb.updateExistsStatus(peersMacArrayStr[i], 1);
+
 
                             Cursor result_exist_flag = myDb.getExists(peersMacArrayStr[i]);
 
@@ -343,19 +347,52 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                                 fetched_getexistsFlag_long = Long.parseLong(fetched_getexistsFlag);
                             }
 
-                            if(fetched_getexistsFlag_long == 1 && fetched_getOldexistsFlag_long == 1)
+                            Log.d("fetched_getOldexists_Flag1", peersMacArrayStr[i]);
+                            Log.d("fetched_getOldexists_Flag2", String.valueOf(fetched_getOldexistsFlag_long));
+                            Log.d("fetched_getexists_Flag3", String.valueOf(fetched_getexistsFlag_long));
+
+
+
+                            Cursor result_lt_init = myDb.getlttimeinit(peersMacArrayStr[i]); //fetching the old time stamp stored already in the db
+
+                            if (result_lt_init != null && result_lt_init.getCount() > 0) {
+                                result_lt_init.moveToFirst();
+                                fetched_lt = result_lt_init.getString(0);
+                            }
+                            long fetched_lt_init_long = Long.valueOf(fetched_lt);
+                            long lt_range = Detection_time - fetched_lt_init_long;
+
+
+
+                            if(fetched_getexistsFlag_long == 1 && fetched_getOldexistsFlag_long == 0)
                             {
 
+                                Cursor result_Detection_Frequency = myDb.getDetectionFrequency(peersMacArrayStr[i]);
 
-                                Cursor result_lt_init = myDb.getlttimeinit(peersMacArrayStr[i]); //fetching the old time stamp stored already in the db
 
-                                if (result_lt_init != null && result_lt_init.getCount() > 0) {
-                                    result_lt_init.moveToFirst();
-                                    fetched_lt = result_lt_init.getString(0);
+                                if (result_Detection_Frequency != null && result_Detection_Frequency.getCount() > 0) {
+                                    result_Detection_Frequency.moveToFirst();
+                                    detected_frequency = result_Detection_Frequency.getString(0);
                                 }
-                                long fetched_lt_init_long = Long.valueOf(fetched_lt);
-                                long lt_range = Detection_time - fetched_lt_init_long;
+                                int detected_frequency_int = 0;
+                                detected_frequency_int = Integer.parseInt(detected_frequency);
 
+                                myDb.updateDetectionFrequency(peersMacArrayStr[i], detected_frequency_int);
+
+                                myDb.update_lt_init(peersMacArrayStr[i], Detection_time);
+
+
+
+                            }
+                            if((fetched_getexistsFlag_long == 1 && fetched_getOldexistsFlag_long == 0)||(fetched_getexistsFlag_long == 1 && fetched_getOldexistsFlag_long == 1))
+                                    {
+                                        myDb.update_lt_detection_lt_range(peersMacArrayStr[i], Detection_time, lt_range);// anyways update the ltrange since it always must be up to date
+                                    }
+
+
+
+
+                            if(fetched_getexistsFlag_long == 1 && fetched_getOldexistsFlag_long == 1) {
 
                                 Cursor result_cum_result = myDb.getCumulativeDuration(peersMacArrayStr[i]);
 
@@ -366,10 +403,10 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                                 long fetched_cumulative_long = Long.valueOf(fetched_cumulative);
                                 myDb.updateCumulativeDetectionDuration(peersMacArrayStr[i], lt_range, fetched_cumulative_long);
 
-                                myDb.update_lt_detection_lt_range(peersMacArrayStr[i], Detection_time, lt_range);// anyways update the ltrange since it always must be up to date
-                                myDb.update_lt_init(peersMacArrayStr[i],Detection_time); // this wasnt supposed to update every single time: the states?
 
                             }
+
+
 
 //-------------------------------------------------------------Check above here
 

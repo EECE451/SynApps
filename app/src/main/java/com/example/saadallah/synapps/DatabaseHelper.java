@@ -104,7 +104,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getAllDatabyDid(int id)
     {
         SQLiteDatabase db =this.getWritableDatabase();
-        Cursor result = db.rawQuery("select device_MAC, descriptionname, ltdetection, detectionfrequency, cumdetectionduration from " + TABLE_DEVICESS +
+        Cursor result = db.rawQuery("select device_MAC, descriptionname, ltdetection, detectionfrequency, cumdetectionduration, phonenumber from " + TABLE_DEVICESS +
                 " where _Did = "+id,null);
         return result;
     }

@@ -8,7 +8,6 @@ import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -204,6 +203,7 @@ public class Server extends AppCompatActivity {
         String DateLastDetection = "";
         String FrequencyDetection = "";
         String CumulativeDetection = "";
+        String phonenumber = "";
 
 
         if (result_NumberofDevices != null && result_NumberofDevices.getCount() > 0) {
@@ -223,6 +223,8 @@ public class Server extends AppCompatActivity {
                 DateLastDetection = result_getalldata.getString(2);
                 FrequencyDetection = result_getalldata.getString(3);
                 CumulativeDetection = result_getalldata.getString(4);
+                phonenumber = result_getalldata.getString(5);
+
 
             }
             final String finalDateLastDetection = DateLastDetection;
@@ -230,6 +232,7 @@ public class Server extends AppCompatActivity {
             final String finalMACConnected = MACConnected;
             final String finalFrequencyDetection = FrequencyDetection;
             final String finalCumulativeDetection = CumulativeDetection;
+            final String finalPhonenumber = phonenumber;
 
             StringRequest request = new StringRequest(Request.Method.POST, showspecificUrl, new Response.Listener<String>() {
                 @Override
@@ -240,7 +243,7 @@ public class Server extends AppCompatActivity {
                         JSONObject jsonObject = new JSONObject(response);
                         if (Integer.parseInt(jsonObject.getString("exists")) == 1) {
                             Log.d("batata", "batata");
-                            onbtnspecific(finalMACConnected,finalDeviceName,finalDateLastDetection,finalFrequencyDetection,finalCumulativeDetection);
+                            onbtnspecific(finalMACConnected,finalDeviceName,finalDateLastDetection,finalFrequencyDetection,finalCumulativeDetection, finalPhonenumber);
                         } else {
                             Log.d("batata", "Mech batata");
 
@@ -266,7 +269,7 @@ public class Server extends AppCompatActivity {
                     parameters.put("DateLastDetection", finalDateLastDetection);
                     parameters.put("FrequencyDetection", finalFrequencyDetection);
                     parameters.put("CumulativeDetection", finalCumulativeDetection);
-                    parameters.put("MasterName", "");
+                    parameters.put("MasterName", finalPhonenumber);
 
 
                     return parameters;
@@ -277,7 +280,7 @@ public class Server extends AppCompatActivity {
         }
     }
 
-    public void onbtnspecific(final String s1, final String s2, final String s3, final String s4, final String s5) {
+    public void onbtnspecific(final String s1, final String s2, final String s3, final String s4, final String s5, final String s6) {
 
 
         StringRequest request = new StringRequest(Request.Method.POST, showSpecificUrl2, new Response.Listener<String>() {
