@@ -101,6 +101,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    public Cursor getAllData_ascen_descriptionname()
+    {
+        SQLiteDatabase db =this.getWritableDatabase();
+        Cursor result = db.rawQuery("select * from " + TABLE_DEVICESS + " order by descriptionname ", null);
+        return result;
+    }
+
+    public Cursor getAllData_ascen_detectionFrequency()
+    {
+        SQLiteDatabase db =this.getWritableDatabase();
+        Cursor result = db.rawQuery("select * from " + TABLE_DEVICESS + " order by detectionfrequency ", null);
+        return result;
+    }
+
+    public Cursor getAllData_ascen_ltdetection()
+    {
+        SQLiteDatabase db =this.getWritableDatabase();
+        Cursor result = db.rawQuery("select * from " + TABLE_DEVICESS + " order by ltdetection ", null);
+        return result;
+    }
+
+    public Cursor getAllData_ascen_cumulativedetection()
+    {
+        SQLiteDatabase db =this.getWritableDatabase();
+        Cursor result = db.rawQuery("select * from " + TABLE_DEVICESS + " order by cumdetectionduration ", null);
+        return result;
+    }
+
+    public Cursor getAllData_ascen_ltrange()
+    {
+        SQLiteDatabase db =this.getWritableDatabase();
+        Cursor result = db.rawQuery("select * from " + TABLE_DEVICESS + " order by ltrange ", null);
+        return result;
+    }
+
     public Cursor getAllDatabyDid(int id)
     {
         SQLiteDatabase db =this.getWritableDatabase();
@@ -261,7 +296,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
         Cursor result = db.rawQuery("select _Did from " + TABLE_DEVICESS, null);
-        for(int i = 1;i<=result.getCount();i++)
+      for(int i = 1;i<=result.getCount();i++)
         {
             Cursor result2 = db.rawQuery("select deviceexists from " + TABLE_DEVICESS + " where _Did = '" + i + "'", null);
             String exists_flag = "";

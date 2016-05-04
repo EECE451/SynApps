@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,7 +52,9 @@ public class NetworkDetails extends AppCompatActivity {
         String Detection_time = String.format("%tc", date);
 
         //Dummy Filling
-         // myDb.insertData("12AB25CF57CE",123456,1234567,12345678,5,4,"03649774","Test Device",0,1);
+//        myDb.insertData("12AB25CF57CE",1234567,12367,1278,5,4999,"03649774","Arnabit",0,1);
+//        myDb.insertData("12AB25C234CE",123456,12567,5678,7,4775,"06849774","batata",0,1);
+//        myDb.insertData("124212312CEA",12345,127,45678,6,488,"03655674","Cauliflower",0,1);
 
 
 
@@ -92,27 +95,16 @@ public class NetworkDetails extends AppCompatActivity {
 
         Intent intent = getIntent();
         String[] mystringarray = intent.getStringArrayExtra("MacArray");
-//Testing
-        /*
-        String tempString = "";
-        for(int i=0;i<mystringarray.length;i++)
-        {
-            tempString = tempString + " " + mystringarray[i];
-        }
-        txt_ReadSpecific.setText(tempString);
-        String macAddress = tempString;
 
-        */
+        ///////////////
 
-            // commented out since we decided to do this in the main activity
-//        String[] macAddressParts = macAddress.split(":");
-//        String MACS= macAddressParts[0]+macAddressParts[1]+macAddressParts[2]+macAddressParts[3]+macAddressParts[4]+macAddressParts[5];
-//        txt_ReadAllData.setText(MACS);
-//        myDb.insertData(MACS, Detection_time, 0, 2, 4, "03649774", "1", 1);
+        Cursor result2 = myDb.getMAC_ID();
+        int devices_number =  result2.getCount(); // the total number of devices stored
+        Log.d("number", String.valueOf(devices_number));
 
+        //////////////// Don't touch me
 
-        // Dummy filling
-         //   myDb.insertData(macAddress,Detection_time,0,2,3,"03649774","1",1);
+        showall_orderOfAddition();
 
 
     }
@@ -141,9 +133,25 @@ public class NetworkDetails extends AppCompatActivity {
     }
 
 
-    public void onbtnclick(View view) {
+    public void showall_orderOfAddition() {
+
 
         Cursor result = myDb.getAllData();
+        StringBuffer buffer = new StringBuffer();
+        while (result.moveToNext()) {
+            buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+  " " + result.getString(8)+  " " + result.getString(9) + " " + result.getString(10) + "\n");
+
+        }
+        txt_ReadAllData.setText(buffer.toString());
+
+    }
+
+
+
+    public void getAllData_ascen_descriptionname() {
+
+
+        Cursor result = myDb.getAllData_ascen_descriptionname();
 
         StringBuffer buffer = new StringBuffer();
         while (result.moveToNext()) {
@@ -152,82 +160,73 @@ public class NetworkDetails extends AppCompatActivity {
         }
         txt_ReadAllData.setText(buffer.toString());
 
-        Cursor result2 = myDb.getMAC_ID();
-
-        StringBuffer buffer2 = new StringBuffer();
-        while (result2.moveToNext()) {
-            buffer2.append(result2.getString(0)+" "+result2.getString(1)+"\n");
-        }
-        txt_ReadSpecific.setText(buffer2.toString());
 
     }
 
-    public void onbtnclick2(View view) {
+    public void getAllData_ascen_detectionFrequency() {
 
 
-            Cursor result2 = myDb.getDatabyMAC("0153456787ae");
+        Cursor result = myDb.getAllData_ascen_detectionFrequency();
 
-        StringBuffer buffer = new StringBuffer();
-        while (result2.moveToNext()) {
-            buffer.append(result2.getString(0)+" "+result2.getString(1)+" "+result2.getString(2)+"\n");
-        }
-        txt_ReadSpecific.setText(buffer.toString());
-
-
-    }
-
-
-    public void onclickbtnreadID(View view) {
-
-        Cursor result = myDb.getDatabyID(t1.getText().toString());
         StringBuffer buffer = new StringBuffer();
         while (result.moveToNext()) {
-            buffer.append(result.getString(0)+" "+result.getString(1)+" "+result.getString(2)+"\n");
+            buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+  " " + result.getString(8)+  " " + result.getString(9) + " " + result.getString(10) + "\n");
+
         }
-        txt_ReadSpecific.setText(buffer.toString());
-    }
-
-    public void onbtnclickupdatemac(View view) {
-
-        myDb.updateDescriptionName("1124991199af",t2.getText().toString());
-    }
-
-    public void onbtnclickdelete(View view) {
-        myDb.deleteData(t2.getText().toString());
-
-//        Cursor result = myDb.getDetectionFrequency("226432b98ea0");
-//
-//        if (result != null && result.getCount() > 0 ) {
-//            result.moveToFirst();
-//            String lightRowId = result.getString(0);
-//            t2.setText(lightRowId);
-//        }
-//        myDb.updateDetectionFrequency("2264323ad46a",0);
-
-
-        //  int testing = result_Detection_Frequency.getCount();
-
-       // myDb.updateDetectionFrequency("2264323ad46a", result.getString(0));
-        Cursor result_lt_init = myDb.getlttimeinit("2264323ad46a");
-
-//        long fetched_lt_init = Long.valueOf(result_lt_init.getString(0)).longValue();
-//        long lt_range = Detection_time - fetched_lt_init;
-//        myDb.update_lt_detection_lt_range(peersMacArrayStr[i],Detection_time,lt_range);
+        txt_ReadAllData.setText(buffer.toString());
 
 
     }
 
-    public void onbtnclickdroptable(View view) {
-        myDb.onDropTable();
+
+    public void getAllData_ascen_ltdetection() {
+
+
+        Cursor result = myDb.getAllData_ascen_ltdetection();
+
+        StringBuffer buffer = new StringBuffer();
+        while (result.moveToNext()) {
+            buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+  " " + result.getString(8)+  " " + result.getString(9) + " " + result.getString(10) + "\n");
+
+        }
+        txt_ReadAllData.setText(buffer.toString());
+
+
     }
 
-    public void onbtnclickresetflags(View view) {
-        myDb.resetFlags();
+
+    public void getAllData_ascen_cumulativedetection() {
+
+
+        Cursor result = myDb.getAllData_ascen_cumulativedetection();
+
+        StringBuffer buffer = new StringBuffer();
+        while (result.moveToNext()) {
+            buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+  " " + result.getString(8)+  " " + result.getString(9) + " " + result.getString(10) + "\n");
+
+        }
+        txt_ReadAllData.setText(buffer.toString());
+
+
     }
 
-    public void onbtnclickclear(View view) {
-        myDb.ClearTable();
+
+    public void getAllData_ascen_ltrange() {
+
+
+        Cursor result = myDb.getAllData_ascen_ltrange();
+
+        StringBuffer buffer = new StringBuffer();
+        while (result.moveToNext()) {
+            buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+  " " + result.getString(8)+  " " + result.getString(9) + " " + result.getString(10) + "\n");
+
+        }
+        txt_ReadAllData.setText(buffer.toString());
+
+
     }
+
+
 }
 
 
