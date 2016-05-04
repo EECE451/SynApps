@@ -1,16 +1,12 @@
 package com.example.saadallah.synapps;
 
-import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
@@ -18,10 +14,6 @@ import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -90,14 +82,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
     // Device Mac
     String deviceP2pMac;
-
-    // Database flags
-
-    String detected_frequency = null;
-    String fetched_lt = null;
-    String fetched_cumulative = null;
-    String fetched_getOldexistsFlag = "0";
-    String fetched_getexistsFlag = "1";
 
 
 
@@ -262,6 +246,18 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                     // Thread calling connect
                     Log.d("Thread", "entered");
 
+                    // Database flags
+
+                    String detected_frequency = null;
+                    String fetched_lt = null;
+                    String fetched_cumulative = null;
+                    String fetched_getOldexistsFlag = null;
+                    String fetched_getexistsFlag = null;
+                    long fetched_getexistsFlag_long = 0;
+                    long fetched_getOldexistsFlag_long = 0;
+
+
+
                     boolean deviceDetectedFlag = mReceiver.isBroadcastFlag(); // THIS IS ZE FLAG... HAPPY NOW??
 
                     PeerNames = mReceiver.getPeerNames(); // Now that we have a list of peers, we try to connect to each of them
@@ -281,27 +277,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
                         timeDiscovered[i] = new java.util.Date();
 
-                        Cursor result_exist_flag = myDb.getExists(peersMacArrayStr[i]);
-
-                        if (result_exist_flag != null && result_exist_flag.getCount() > 0) {
-                            result_exist_flag.moveToFirst();
-                            fetched_getexistsFlag = result_exist_flag.getString(0);
-                        }
-
-
-                         long fetched_getexistsFlag_long = Long.parseLong(fetched_getexistsFlag);
-
-                        Cursor result_getOldexistsFlag = myDb.getOldExistsFlag(peersMacArrayStr[i]);
-                        if (result_getOldexistsFlag != null && result_getOldexistsFlag.getCount() > 0) { // NOT ENTERING THAT IF?????
-                            result_getOldexistsFlag.moveToFirst();
-                            fetched_getOldexistsFlag = result_getOldexistsFlag.getString(0);
-                        }
-
-                            long fetched_getOldexistsFlag_long = Long.parseLong(fetched_getOldexistsFlag); // this long returns the value of old flag
-
-
-
-
                         // retrieve MAC Address of device i
                         WifiP2pDevice targetDevice = PeerNames.get(i);
                         peersMacArrayStr[i] = targetDevice.deviceAddress;
@@ -310,6 +285,25 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         // removing the columns from the strings in MAC addresses
                         String[] macAddressParts = peersMacArrayStr[i].split(":");
                         peersMacArrayStr[i] = macAddressParts[0] + macAddressParts[1] + macAddressParts[2] + macAddressParts[3] + macAddressParts[4] + macAddressParts[5];
+
+
+
+
+
+                        Cursor result_getOldexistsFlag = myDb.getOldExistsFlag(peersMacArrayStr[i]);
+
+                        if (result_getOldexistsFlag != null && result_getOldexistsFlag.getCount() > 0) {
+                            result_getOldexistsFlag.moveToFirst();
+                            fetched_getOldexistsFlag = result_getOldexistsFlag.getString(0);
+                            fetched_getOldexistsFlag_long = Long.parseLong(fetched_getOldexistsFlag); // this long returns the value of old flag
+                        }
+
+
+
+
+
+
+
 
 
                         //Checking if its a new device
@@ -337,9 +331,17 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
                         else if (result.getCount() == 1)   //Its an old device:  if the MAC appears here, it means that its still connected
                         {
+//-----------------------------------------------------------check here for the states only
                             Log.d("Device=", "old");
                             myDb.updateExistsStatus(peersMacArrayStr[i], 1);
 
+                            Cursor result_exist_flag = myDb.getExists(peersMacArrayStr[i]);
+
+                            if (result_exist_flag != null && result_exist_flag.getCount() > 0) {
+                                result_exist_flag.moveToFirst();
+                                fetched_getexistsFlag = result_exist_flag.getString(0);
+                                fetched_getexistsFlag_long = Long.parseLong(fetched_getexistsFlag);
+                            }
 
                             if(fetched_getexistsFlag_long == 1 && fetched_getOldexistsFlag_long == 1)
                             {
@@ -365,11 +367,11 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                                 myDb.updateCumulativeDetectionDuration(peersMacArrayStr[i], lt_range, fetched_cumulative_long);
 
                                 myDb.update_lt_detection_lt_range(peersMacArrayStr[i], Detection_time, lt_range);// anyways update the ltrange since it always must be up to date
-
+                                myDb.update_lt_init(peersMacArrayStr[i],Detection_time); // this wasnt supposed to update every single time: the states?
 
                             }
 
-
+//-------------------------------------------------------------Check above here
 
 
 
