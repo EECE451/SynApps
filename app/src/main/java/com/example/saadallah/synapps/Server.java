@@ -235,10 +235,11 @@ public class Server extends AppCompatActivity {
                         String DateLastDetection = post.getString("DateLastDetection");
                         String FrequencyDetection = post.getString("FrequencyDetection");
                         String CumulativeDetection = post.getString("CumulativeDetection");
-                        String MasterName = post.getString("MasterName");
+                        String phoneNumber = post.getString("MasterName");  //Bassel use this for phone Number
+                        String flag = post.getString("flag");   // Bassel use this flag for sms
 
 
-                        Result = Result + "\n"+ MACConnected+ " " + DeviceName + " " + DateLastDetection+" "+FrequencyDetection+" "+ CumulativeDetection+" " + MACMasterDevice+" "+MasterName+" ";
+                        Result = Result + "\n"+ MACConnected+ " " + DeviceName + " " + DateLastDetection+" "+FrequencyDetection+" "+ CumulativeDetection+" " + MACMasterDevice+" "+phoneNumber+" "+flag+" ";
                         String result2 = Result;
                         textViewdisplaydata.setText(Result);
 
@@ -351,7 +352,7 @@ public class Server extends AppCompatActivity {
         String DateLastDetection = "";
         String FrequencyDetection = "";
         String CumulativeDetection = "";
-        String phonenumber = "";
+
 
 
         if (result_NumberofDevices != null && result_NumberofDevices.getCount() > 0) {
@@ -371,7 +372,7 @@ public class Server extends AppCompatActivity {
                 DateLastDetection = result_getalldata.getString(2);
                 FrequencyDetection = result_getalldata.getString(3);
                 CumulativeDetection = result_getalldata.getString(4);
-                phonenumber = result_getalldata.getString(5);
+
 
 
             }
@@ -380,7 +381,7 @@ public class Server extends AppCompatActivity {
             final String finalMACConnected = MACConnected;
             final String finalFrequencyDetection = FrequencyDetection;
             final String finalCumulativeDetection = CumulativeDetection;
-            final String finalPhonenumber = phonenumber;
+
 
             StringRequest request = new StringRequest(Request.Method.POST, showspecificUrl, new Response.Listener<String>() {
                 @Override
@@ -391,7 +392,7 @@ public class Server extends AppCompatActivity {
                         JSONObject jsonObject = new JSONObject(response);
                         if (Integer.parseInt(jsonObject.getString("exists")) == 1) {
                             Log.d("batata", "batata");
-                            onbtnspecific(finalMACConnected,finalDeviceName,finalDateLastDetection,finalFrequencyDetection,finalCumulativeDetection, finalPhonenumber);
+                            onbtnspecific(finalMACConnected,finalDeviceName,finalDateLastDetection,finalFrequencyDetection,finalCumulativeDetection);
                         } else {
                             Log.d("batata", "Mech batata");
 
@@ -417,7 +418,8 @@ public class Server extends AppCompatActivity {
                     parameters.put("DateLastDetection", finalDateLastDetection);
                     parameters.put("FrequencyDetection", finalFrequencyDetection);
                     parameters.put("CumulativeDetection", finalCumulativeDetection);
-                    parameters.put("MasterName", finalPhonenumber);
+                    parameters.put("MasterName", phoneNumber);
+                    parameters.put("flag", String.valueOf(notifsflag));
 
 
                     return parameters;
@@ -428,7 +430,7 @@ public class Server extends AppCompatActivity {
         }
     }
 
-    public void onbtnspecific(final String s1, final String s2, final String s3, final String s4, final String s5, final String s6) {
+    public void onbtnspecific(final String s1, final String s2, final String s3, final String s4, final String s5) {
 
 
         StringRequest request = new StringRequest(Request.Method.POST, showSpecificUrl2, new Response.Listener<String>() {
@@ -472,8 +474,9 @@ public class Server extends AppCompatActivity {
                 parameters.put("DeviceName",s2);
                 parameters.put("DateLastDetection",s3);
                 parameters.put("FrequencyDetection",s4);
-                parameters.put("CumulativeDetection",s5);
-                parameters.put("MasterName","");
+                parameters.put("CumulativeDetection", s5);
+                parameters.put("MasterName", phoneNumber);
+                parameters.put("flag", String.valueOf(notifsflag));
 
 
 
