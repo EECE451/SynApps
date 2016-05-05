@@ -254,6 +254,14 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         }
                     });
 
+                    synchronized (this) {
+                        try {
+                            wait(65000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                     // Thread calling connect
                     Log.d("Thread", "entered");
 
@@ -446,13 +454,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                     //                   while(!mReceiver.isBroadcastFlag()){} // waits for the flag Broadcast flag to turn true
 
 
-                    synchronized (this) {
-                        try {
-                            wait(65000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
 
                 }
             }
