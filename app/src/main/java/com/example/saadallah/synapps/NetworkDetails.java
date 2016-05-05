@@ -328,7 +328,7 @@ public class NetworkDetails extends AppCompatActivity {
             last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
 
 
-            if (phone_number_array[arrayIndex] == null || phone_number_array[arrayIndex] == "")
+            if (phone_number_array[arrayIndex].isEmpty())
                 phone_number_array[arrayIndex] = "Unknown";
 
             Date myDate = new Date(Long.parseLong(result.getString(2)));
@@ -361,7 +361,7 @@ public class NetworkDetails extends AppCompatActivity {
             cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
             last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
 
-            if (phone_number_array[arrayIndex] == null || phone_number_array[arrayIndex] == "")
+            if (phone_number_array[arrayIndex].isEmpty())
                 phone_number_array[arrayIndex] = "Unknown";
 
             Date myDate = new Date(Long.parseLong(result.getString(2)));
@@ -395,7 +395,7 @@ public class NetworkDetails extends AppCompatActivity {
             cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
             last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
 
-            if (phone_number_array[arrayIndex] == null || phone_number_array[arrayIndex] == "")
+            if (phone_number_array[arrayIndex].isEmpty())
                 phone_number_array[arrayIndex] = "Unknown";
 
             Date myDate = new Date(Long.parseLong(result.getString(2)));
@@ -429,7 +429,7 @@ public class NetworkDetails extends AppCompatActivity {
             cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
             last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
 
-            if (phone_number_array[arrayIndex] == null || phone_number_array[arrayIndex] == "")
+            if (phone_number_array[arrayIndex].isEmpty())
                 phone_number_array[arrayIndex] = "Unknown";
 
             Date myDate = new Date(Long.parseLong(result.getString(2)));
@@ -462,7 +462,7 @@ public class NetworkDetails extends AppCompatActivity {
             cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
             last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
 
-            if (phone_number_array[arrayIndex] == null || phone_number_array[arrayIndex] == "")
+            if (phone_number_array[arrayIndex].isEmpty())
                 phone_number_array[arrayIndex] = "Unknown";
 
             Date myDate = new Date(Long.parseLong(result.getString(2)));
@@ -495,7 +495,7 @@ public class NetworkDetails extends AppCompatActivity {
             cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
             last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
 
-            if (phone_number_array[arrayIndex] == null || phone_number_array[arrayIndex] == "")
+            if (phone_number_array[arrayIndex].isEmpty())
                 phone_number_array[arrayIndex] = "Unknown";
 
             Date myDate = new Date(Long.parseLong(result.getString(2)));
