@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         }
                     });
 
-                    synchronized (this) { // delay
+                    synchronized (this) { // delay 65s
                         try {
                             wait(65000);
                         } catch (InterruptedException e) {
