@@ -197,6 +197,9 @@ public class Server extends AppCompatActivity {
 
         phoneNumber = receivedIntent.getStringExtra("phoneNumber"); // sets phone number
 
+        if (phoneNumber == null)
+            phoneNumber = "";
+
         Log.d("phone and flag", phoneNumber);
         Log.d("phone and flag", String.valueOf(notifsflag));
 
