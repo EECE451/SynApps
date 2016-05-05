@@ -36,4 +36,19 @@
     <string name="title_activity_server">Server</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="detection_frequency">Detection Frequency:</string>
+    <string name="cumulative_time">Cumulative Time:</string>
+    <string name="last_time_detected">Last Time Detected:</string>
+    <string name="last_detection_range">Last Detection Duration:</string>
+    <string name="phone_number">Phone Number:</string>
+    <string name="sort_data_by">Sort Data By:</string>
+
+    <string-array name="spinner_sorting_choice">
+        <item>First Detection Time</item>
+        <item>Last Detection Time</item>
+        <item>Device Name</item>
+        <item>Detection Frequency</item>
+        <item>Cumulative Detection Time</item>
+        <item>Last Detection Duration</item>
+    </string-array>
 </resources>

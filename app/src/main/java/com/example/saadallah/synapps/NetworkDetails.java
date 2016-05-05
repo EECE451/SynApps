@@ -1,5 +1,6 @@
 package com.example.saadallah.synapps;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
@@ -12,8 +13,14 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
+
+import java.util.Date;
 
 
 public class NetworkDetails extends AppCompatActivity {
@@ -24,15 +31,25 @@ public class NetworkDetails extends AppCompatActivity {
 
     //---DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area---
     DatabaseHelper myDb;
-    private static Button Btn_ReadAll;
-    TextView txt_ReadAllData, txt_ReadSpecific;
-    android.widget.EditText t1,t2;
-
+    TextView txt_ReadAllData;
 
 
 
     //---DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area---
 
+
+    // Temp Arrays
+    int arrayIndex = 0;
+    String[] device_name_array;
+    String[] mac_address_array;
+    String[] phone_number_array;
+    String[] detection_frequency_array;
+    String[] cumulative_time_array;
+    String[] last_time_detected_array;
+    String[] last_detection_duration_array;
+
+    ListView myDataList;
+    Spinner dataSortingSpinner;
 
 
     @Override
@@ -40,13 +57,15 @@ public class NetworkDetails extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_network_details);
 
+        // ListView and Spinner
+        myDataList = (ListView) findViewById(R.id.mydatalist);
+        dataSortingSpinner = (Spinner) findViewById(R.id.data_sorting_spinner);
+
 
         //---DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area---
 
         myDb = new DatabaseHelper(this);
         txt_ReadAllData = (TextView)findViewById(R.id.txt_ReadAllData);
-        txt_ReadSpecific = (TextView)findViewById(R.id.txt_ReadSpecific);
-
         //Filling Date
         java.util.Date date = new java.util.Date();
         String Detection_time = String.format("%tc", date);
@@ -57,8 +76,6 @@ public class NetworkDetails extends AppCompatActivity {
 //        myDb.insertData("124212312CEA",12345,127,45678,6,488,"03655674","Cauliflower",0,1);
 
 
-
-        t2 = (android.widget.EditText)findViewById(R.id.t2);
 
         //---DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area------DB_Area---
 
@@ -104,10 +121,63 @@ public class NetworkDetails extends AppCompatActivity {
 
         //////////////// Don't touch me
 
+        device_name_array = new String[devices_number];
+        mac_address_array = new String[devices_number];
+        phone_number_array = new String[devices_number];
+        detection_frequency_array = new String[devices_number];
+        cumulative_time_array = new String[devices_number];
+        last_time_detected_array = new String[devices_number];
+        last_detection_duration_array = new String[devices_number];
+
         showall_orderOfAddition();
 
 
-    }
+        // Spinner Logic (Adapter)
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.spinner_sorting_choice, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dataSortingSpinner.setAdapter(spinnerAdapter);
+
+        dataSortingSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+
+                 switch (pos) {
+                     case 0:
+                        showall_orderOfAddition();
+                         break;
+
+                     case 1:
+                         getAllData_ascen_ltdetection();
+                         break;
+
+                     case 2:
+                         getAllData_ascen_descriptionname();
+                         break;
+
+                     case 3:
+                         getAllData_ascen_detectionFrequency();
+                         break;
+
+                     case 4:
+                         getAllData_ascen_cumulativedetection();
+                         break;
+
+                     case 5:
+                         getAllData_ascen_ltrange();
+                         break;
+
+                  }
+
+
+             }
+
+             public void onNothingSelected(AdapterView<?> parent) {
+             // Another interface callback
+             }
+         });
+
+
+
+    } //  end onCreate
 
 
 
@@ -141,9 +211,28 @@ public class NetworkDetails extends AppCompatActivity {
         while (result.moveToNext()) {
             buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+  " " + result.getString(8)+  " " + result.getString(9) + " " + result.getString(10) + "\n");
 
+            device_name_array[arrayIndex] = result.getString(8);
+            mac_address_array[arrayIndex] = macTranslation(result.getString(1).toUpperCase());
+            phone_number_array[arrayIndex] = result.getString(7);
+            detection_frequency_array[arrayIndex] = result.getString(5);
+            cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
+            last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
+
+            if (phone_number_array[arrayIndex] == "")
+                phone_number_array[arrayIndex] = "Unknown";
+
+            Date myDate = new Date(Long.parseLong(result.getString(2)));
+            last_time_detected_array[arrayIndex] = myDate.toString();
+
+            arrayIndex ++;
         }
         txt_ReadAllData.setText(buffer.toString());
+        arrayIndex = 0;
 
+        NetworkDetailsAdapter myAdapter = new NetworkDetailsAdapter(this, device_name_array, mac_address_array, phone_number_array,
+                detection_frequency_array, cumulative_time_array, last_time_detected_array, last_detection_duration_array);
+
+        myDataList.setAdapter(myAdapter);
     }
 
 
@@ -157,9 +246,28 @@ public class NetworkDetails extends AppCompatActivity {
         while (result.moveToNext()) {
             buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+  " " + result.getString(8)+  " " + result.getString(9) + " " + result.getString(10) + "\n");
 
+            device_name_array[arrayIndex] = result.getString(8);
+            mac_address_array[arrayIndex] = macTranslation(result.getString(1).toUpperCase());
+            phone_number_array[arrayIndex] = result.getString(7);
+            detection_frequency_array[arrayIndex] = result.getString(5);
+            cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
+            last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
+
+            if (phone_number_array[arrayIndex] == "")
+                phone_number_array[arrayIndex] = "Unknown";
+
+            Date myDate = new Date(Long.parseLong(result.getString(2)));
+            last_time_detected_array[arrayIndex] = myDate.toString();
+
+            arrayIndex ++;
         }
         txt_ReadAllData.setText(buffer.toString());
+        arrayIndex = 0;
 
+        NetworkDetailsAdapter myAdapter = new NetworkDetailsAdapter(this, device_name_array, mac_address_array, phone_number_array,
+                detection_frequency_array, cumulative_time_array, last_time_detected_array, last_detection_duration_array);
+
+        myDataList.setAdapter(myAdapter);
 
     }
 
@@ -172,9 +280,28 @@ public class NetworkDetails extends AppCompatActivity {
         while (result.moveToNext()) {
             buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+  " " + result.getString(8)+  " " + result.getString(9) + " " + result.getString(10) + "\n");
 
+            device_name_array[arrayIndex] = result.getString(8);
+            mac_address_array[arrayIndex] = macTranslation(result.getString(1).toUpperCase());
+            phone_number_array[arrayIndex] = result.getString(7);
+            detection_frequency_array[arrayIndex] = result.getString(5);
+            cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
+            last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
+
+            if (phone_number_array[arrayIndex] == "")
+                phone_number_array[arrayIndex] = "Unknown";
+
+            Date myDate = new Date(Long.parseLong(result.getString(2)));
+            last_time_detected_array[arrayIndex] = myDate.toString();
+
+            arrayIndex ++;
         }
         txt_ReadAllData.setText(buffer.toString());
+        arrayIndex = 0;
 
+        NetworkDetailsAdapter myAdapter = new NetworkDetailsAdapter(this, device_name_array, mac_address_array, phone_number_array,
+                detection_frequency_array, cumulative_time_array, last_time_detected_array, last_detection_duration_array);
+
+        myDataList.setAdapter(myAdapter);
 
     }
 
@@ -188,10 +315,28 @@ public class NetworkDetails extends AppCompatActivity {
         while (result.moveToNext()) {
             buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+  " " + result.getString(8)+  " " + result.getString(9) + " " + result.getString(10) + "\n");
 
+            device_name_array[arrayIndex] = result.getString(8);
+            mac_address_array[arrayIndex] = macTranslation(result.getString(1).toUpperCase());
+            phone_number_array[arrayIndex] = result.getString(7);
+            detection_frequency_array[arrayIndex] = result.getString(5);
+            cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
+            last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
+
+            if (phone_number_array[arrayIndex] == "")
+                phone_number_array[arrayIndex] = "Unknown";
+
+            Date myDate = new Date(Long.parseLong(result.getString(2)));
+            last_time_detected_array[arrayIndex] = myDate.toString();
+
+            arrayIndex ++;
         }
         txt_ReadAllData.setText(buffer.toString());
+        arrayIndex = 0;
 
+        NetworkDetailsAdapter myAdapter = new NetworkDetailsAdapter(this, device_name_array, mac_address_array, phone_number_array,
+                detection_frequency_array, cumulative_time_array, last_time_detected_array, last_detection_duration_array);
 
+        myDataList.setAdapter(myAdapter);
     }
 
 
@@ -204,10 +349,28 @@ public class NetworkDetails extends AppCompatActivity {
         while (result.moveToNext()) {
             buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+  " " + result.getString(8)+  " " + result.getString(9) + " " + result.getString(10) + "\n");
 
+            device_name_array[arrayIndex] = result.getString(8);
+            mac_address_array[arrayIndex] = macTranslation(result.getString(1).toUpperCase());
+            phone_number_array[arrayIndex] = result.getString(7);
+            detection_frequency_array[arrayIndex] = result.getString(5);
+            cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
+            last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
+
+            if (phone_number_array[arrayIndex] == "")
+                phone_number_array[arrayIndex] = "Unknown";
+
+            Date myDate = new Date(Long.parseLong(result.getString(2)));
+            last_time_detected_array[arrayIndex] = myDate.toString();
+
+            arrayIndex ++;
         }
         txt_ReadAllData.setText(buffer.toString());
+        arrayIndex = 0;
 
+        NetworkDetailsAdapter myAdapter = new NetworkDetailsAdapter(this, device_name_array, mac_address_array, phone_number_array,
+                detection_frequency_array, cumulative_time_array, last_time_detected_array, last_detection_duration_array);
 
+        myDataList.setAdapter(myAdapter);
     }
 
 
@@ -220,14 +383,58 @@ public class NetworkDetails extends AppCompatActivity {
         while (result.moveToNext()) {
             buffer.append(result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + " " + result.getString(3) + " " + result.getString(4) + " " + result.getString(5) + " " + result.getString(6) + " " + result.getString(7)+  " " + result.getString(8)+  " " + result.getString(9) + " " + result.getString(10) + "\n");
 
+            device_name_array[arrayIndex] = result.getString(8);
+            mac_address_array[arrayIndex] = macTranslation(result.getString(1).toUpperCase());
+            phone_number_array[arrayIndex] = result.getString(7);
+            detection_frequency_array[arrayIndex] = result.getString(5);
+            cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
+            last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
+
+            if (phone_number_array[arrayIndex] == "")
+                phone_number_array[arrayIndex] = "Unknown";
+
+            Date myDate = new Date(Long.parseLong(result.getString(2)));
+            last_time_detected_array[arrayIndex] = myDate.toString();
+
+            arrayIndex ++;
         }
         txt_ReadAllData.setText(buffer.toString());
+        arrayIndex = 0;
 
+        NetworkDetailsAdapter myAdapter = new NetworkDetailsAdapter(this, device_name_array, mac_address_array, phone_number_array,
+                detection_frequency_array, cumulative_time_array, last_time_detected_array, last_detection_duration_array);
+
+        myDataList.setAdapter(myAdapter);
 
     }
 
+    private String macTranslation(String MAC){
+
+        return MAC.substring(0,2) + ":" + MAC.substring(2,4) + ":" + MAC.substring(4,6) + ":" + MAC.substring(6,8) + ":" +
+                MAC.substring(8,10) + ":" + MAC.substring(10, 12); // puts back the MAC address into a standardized form
+    }
+
+    private String msToTime(String ms){
+
+        long m = Long.parseLong(ms);
+
+        String h = String.valueOf(m/(1000*3600));
+        m = m%(1000*3600);
+
+        String min = String.valueOf(m/(1000*60));
+        m = m%(1000*60);
+
+        String s = String.valueOf(m/1000);
+
+        if (Long.parseLong(h) > 0)
+            return h + " hours " + min + " min " + s + " seconds";
+
+        else if (Long.parseLong(min) > 0)
+            return min + " min " + s + " seconds";
+
+        else
+            return s + " seconds";
+
+    }
 
 }
-
-
-
