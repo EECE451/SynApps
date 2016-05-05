@@ -21,6 +21,8 @@ public class Edge implements Comparable<Edge> {
 
     private Vertex one, two;
     private int weight;
+    private String weight1;
+    private String weight2;
 
     /**
      *
@@ -41,6 +43,13 @@ public class Edge implements Comparable<Edge> {
         this.one = (one.getLabel().compareTo(two.getLabel()) <= 0) ? one : two;
         this.two = (this.one == one) ? two : one;
         this.weight = weight;
+    }
+
+    public Edge(Vertex one, Vertex two, String weight1, String weight2){
+        this.one = (one.getLabel().compareTo(two.getLabel()) <= 0) ? one : two;
+        this.two = (this.one == one) ? two : one;
+        this.weight1 = weight1;
+        this.weight2 = weight2;
     }
 
 
@@ -111,7 +120,7 @@ public class Edge implements Comparable<Edge> {
      * @return String A String representation of this Edge
      */
     public String toString(){
-        return "({" + one + ", " + two + "}, " + weight + ")";
+        return "({" + one + ", " + two + "}, {" + weight1 + ", " + weight2 + "})";
     }
 
     /**

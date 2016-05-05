@@ -85,6 +85,28 @@ public class Graph {
         return true;
     }
 
+    public boolean addEdge(Vertex one, Vertex two, String weight1, String weight2){
+        if(one.equals(two)){
+            return false;
+        }
+
+        //ensures the Edge is not in the Graph
+        Edge e = new Edge(one, two, weight1, weight2);
+        if(edges.containsKey(e.hashCode())){
+            return false;
+        }
+
+        //and that the Edge isn't already incident to one of the vertices
+        else if(one.containsNeighbor(e) || two.containsNeighbor(e)){
+            return false;
+        }
+
+        edges.put(e.hashCode(), e);
+        one.addNeighbor(e);
+        two.addNeighbor(e);
+        return true;
+    }
+
     /**
      *
      * @param e The Edge to look up

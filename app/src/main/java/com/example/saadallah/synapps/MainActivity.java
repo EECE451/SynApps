@@ -506,34 +506,52 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
     public void onGenerateGraphClick(View view) { //Don't forget to implement this method!
 
-        /*Graph myDevicesGraph = new Graph();
+        // GRAPH START----------------------------------------------------------------------------
+        // DUMMY DATA
+        String[] macAddressMaster = {"MAC1", "MAC2", "MAC3", "MAC1", "MAC1", "MAC4"};
+        String[] macAddressSlave = {"MAC3", "MAC3", "MAC1", "MAC5", "MAC2", "MAC6"};
+        String[] dummyFrequency = {"1","2","3","4","5","6"};
+        String[] dummyCumulativeDetection = {"120000","240000","360000","480000","590000","660000"};
 
-        int graphSize = 5; // enter the size here
+        Graph myDevicesGraph = new Graph();
+
+        int graphSize = 6; // enter the size here
 
         //initialize some vertices and add them to the graph
-        Vertex[] vertices = new Vertex[graphSize];
-        Integer[] weights = new Integer[graphSize -1]; // since star graph, we have n-1 edges (n vertices)
+        //Edge[] edges = new Edge[graphSize];
+        //Integer[] weights = new Integer[graphSize];
+        ArrayList<Vertex> vertices = new ArrayList<>();
 
         for(int i = 0; i < graphSize; i++){
-            vertices[i] = new Vertex("" + i); // instead of i: MacAddress[i]
-            myDevicesGraph.addVertex(vertices[i], true);
-        }
 
-        // building the edges between the vertices
-        for(int i = 1; i < graphSize; i++){ // i=0 is the root vertex
-                myDevicesGraph.addEdge(vertices[0], vertices[i], weights[i]);
+            if (isMacinList(vertices,macAddressMaster[i]) == -1) // if the master device vertex is not in the vertices list, add it at position 0
+            {
+                vertices.add(0, new Vertex(macAddressMaster[i]));
+                myDevicesGraph.addVertex(vertices.get(0), true); // and add it to the graph
+            }
+
+            if (isMacinList(vertices,macAddressSlave[i]) == -1) // if the slave device vertex is not in the vertices list, add it at position 0
+            {
+                vertices.add(0, new Vertex(macAddressSlave[i]));
+                myDevicesGraph.addVertex(vertices.get(0), true); // and add it to the graph
+            }
+
+            // adds an edge between the two vertices
+            myDevicesGraph.addEdge(vertices.get(isMacinList(vertices,macAddressMaster[i])), vertices.get(isMacinList(vertices,macAddressSlave[i])), dummyFrequency[i], dummyCumulativeDetection[i]);
         }
 
         //display the initial setup- all vertices adjacent to each other
         for(int i = 0; i < graphSize; i++){
-            System.out.println(vertices[i]);
+            System.out.println(vertices.get(i));
 
-            for(int j = 0; j < vertices[i].getNeighborCount(); j++){
-                System.out.println(vertices[i].getNeighbor(j));
+            for(int j = 0; j < vertices.get(i).getNeighborCount(); j++){
+                System.out.println(vertices.get(i).getNeighbor(j));
             }
 
             System.out.println();
-        }*/
+        }
+
+        // GRAPH END----------------------------------------------------------------------------
 
         Intent serverIntent = new Intent(MainActivity.this, Server.class);
         serverIntent.putExtra("MAC", deviceP2pMac);
@@ -795,5 +813,15 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
         return  p2pMac;
 
+    }
+
+    int isMacinList(ArrayList<Vertex> vertexArray, String mac){ // return the index of the vertex of label mac or returns -1 if not in the list
+
+        for (int i=0; i< vertexArray.size(); i++){
+            if (vertexArray.get(i).getLabel() == mac)
+                return i;
+        }
+
+        return -1;
     }
 }
