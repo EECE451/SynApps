@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -29,7 +30,8 @@ public class Connectivity_State extends AppCompatActivity {
     // Bluetooth stuff
     final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-    // Textviews References
+    // Notif Flag
+    boolean notifsflag;
 
 
     @Override
@@ -122,7 +124,32 @@ public class Connectivity_State extends AppCompatActivity {
         boolean bt_state_value = receivedIntent.getBooleanExtra("bluetooth_state", false);
         boolean wifi_state_value = receivedIntent.getBooleanExtra("wifi_state", false);
         int cell_network_type = receivedIntent.getIntExtra("network_type", 0);
-        String phone_number = receivedIntent.getStringExtra("phone_number");
+        String phone_number = receivedIntent.getStringExtra("phoneNumber");
+        notifsflag = receivedIntent.getBooleanExtra("notif", false);
+
+        // Notif Switch
+        Switch notifSwitch = (Switch) findViewById(R.id.notif_switch);
+
+        if(notifsflag) { // checks is Notification Switch is ON or OFF and sets the initial value of the toggle
+            notifSwitch.setChecked(true);
+
+        }
+        else {
+            notifSwitch.setChecked(false);
+        }
+
+        notifSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { // switches wifi
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) { // Enable/Disable notifs when switch event
+
+                if (isChecked) {
+                    notifsflag = true;
+
+                } else {
+                    notifsflag = false;
+
+                }
+            }
+        });
 
         TextView bt_value_textview = (TextView) findViewById(R.id.bt_value);
         if (bt_state_value)
@@ -190,8 +217,8 @@ public class Connectivity_State extends AppCompatActivity {
                 break;
         }
 
-        TextView phone_number_textview = (TextView) findViewById(R.id.phone_nb_value);
-        phone_number_textview.setText(phone_number);
+        EditText phone_number_edittext = (EditText) findViewById(R.id.phone_nb_value);
+        phone_number_edittext.setText(phone_number);
 
     }
 
@@ -223,5 +250,21 @@ public class Connectivity_State extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        Intent mainActIntent = new Intent(Connectivity_State.this, MainActivity.class);
+        mainActIntent.putExtra("notifFlag", notifsflag);
+
+        // get phone number entered by user
+        EditText phonefield = (EditText) findViewById(R.id.phone_nb_value);
+        String phonenb = String.valueOf(phonefield.getText());
+        mainActIntent.putExtra("phoneNumber", phonenb);
+
+        startActivity(mainActIntent);
+        finish();
+
     }
 }

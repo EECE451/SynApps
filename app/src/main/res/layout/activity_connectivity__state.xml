@@ -97,16 +97,17 @@ android:layout_height="match_parent">
     android:textColor="@color/myBlue"
     android:textStyle="bold" />
 
-<TextView
-    android:layout_width="wrap_content"
+<EditText
+    android:layout_width="180dp"
     android:layout_height="wrap_content"
     android:textAppearance="?android:attr/textAppearanceLarge"
     android:id="@+id/phone_nb_value"
     android:layout_toRightOf="@+id/phone_nb"
-    android:layout_alignBottom="@+id/phone_nb"
     android:layout_marginLeft="10dp"
-    android:text="@string/unknown"
-    android:textColor="@color/myBlue" />
+    android:textColor="@color/myBlue"
+    android:inputType="phone"
+    android:layout_below="@+id/cell_state"
+    android:layout_marginTop="10dp" />
 
 </RelativeLayout>
 

@@ -1,13 +1,17 @@
 package com.example.saadallah.synapps;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -16,8 +20,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.Date;
@@ -50,6 +57,18 @@ public class NetworkDetails extends AppCompatActivity {
 
     ListView myDataList;
     Spinner dataSortingSpinner;
+
+    WifiManager wifiManager;
+
+    // Bluetooth stuff
+    final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+    //Cellular Network
+    TelephonyManager teleMan;
+    String phoneNumber;
+
+    // Notifs SMS
+    boolean notifsflag = false;
 
 
     @Override
@@ -108,10 +127,85 @@ public class NetworkDetails extends AppCompatActivity {
 
         //---------------------------------------------------------------------------------
 
+        //Wifi
 
+        Switch wifiSwitch = (Switch) findViewById(R.id.wifi_switch);
+        wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
-        Intent intent = getIntent();
-        String[] mystringarray = intent.getStringArrayExtra("MacArray");
+        if (wifiManager.isWifiEnabled()) // checks is Wifi is ON or OFF and sets the initial value of the toggle
+            wifiSwitch.setChecked(true);
+        else
+            wifiSwitch.setChecked(false);
+
+        wifiSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { // switches wifi
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) { // Enable/Disable wifi when switch event
+                if (isChecked) {
+                    wifiManager.setWifiEnabled(true);
+                    Log.d("wifiIsEnabled=", "true");
+                } else {
+                    wifiManager.setWifiEnabled(false);
+                    Log.d("wifiIsEnabled=", "false");
+                }
+            }
+        });
+
+        //Cellular Network
+        teleMan =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        //phoneNumber = teleMan.getLine1Number(); // get the phone number
+
+        //Bluetooth
+        Switch bluetoothSwitch = (Switch) findViewById(R.id.bluetooth_switch);
+
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth, popup here??
+        }
+
+        if (mBluetoothAdapter.isEnabled()) // checks is Bluetooth is ON or OFF and sets the initial value of the toggle
+            bluetoothSwitch.setChecked(true);
+        else
+            bluetoothSwitch.setChecked(false);
+
+        bluetoothSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { // switches wifi
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) { // Enable/Disable wifi when switch event
+                if (isChecked) {
+                    mBluetoothAdapter.enable();
+                    Log.d("bluetoothIsEnabled=", "true");
+                } else {
+                    mBluetoothAdapter.disable();
+                    Log.d("bluetoothIsEnabled=", "false");
+                }
+            }
+        });
+
+        Intent receivedIntent = getIntent();
+        String[] mystringarray = receivedIntent.getStringArrayExtra("MacArray");
+
+        // Notification Switch
+        Switch notifSwitch = (Switch) findViewById(R.id.notif_switch);
+
+        notifsflag = receivedIntent.getBooleanExtra("notif", notifsflag); // setting initial value
+
+        if(notifsflag) { // checks is Notification Switch is ON or OFF and sets the initial value of the toggle
+            notifSwitch.setChecked(true);
+
+        }
+        else {
+            notifSwitch.setChecked(false);
+        }
+
+        notifSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { // switches notif
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) { // Enable/Disable notifs when switch event
+                if (isChecked) {
+                    notifsflag = true;
+
+                } else {
+                    notifsflag = false;
+
+                }
+            }
+        });
+
+        phoneNumber = receivedIntent.getStringExtra("phoneNumber"); // sets phone number
 
         ///////////////
 
@@ -182,6 +276,7 @@ public class NetworkDetails extends AppCompatActivity {
 
 
     //--------------------------------------------------------------------------------------------------
+
     //Settings option already implemented
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -191,6 +286,20 @@ public class NetworkDetails extends AppCompatActivity {
         }
         else{
             drawer.closeDrawer(Gravity.LEFT);
+        }
+
+        int id = item.getItemId();
+
+        if (id == R.id.action_connectivity_state) {
+
+            Intent connectivityStateIntent = new Intent(NetworkDetails.this, Connectivity_State.class);
+            connectivityStateIntent.putExtra("bluetooth_state", mBluetoothAdapter.isEnabled());
+            connectivityStateIntent.putExtra("wifi_state", wifiManager.isWifiEnabled());
+            connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
+            connectivityStateIntent.putExtra("phoneNumber", phoneNumber); // attach the phone number to the intent
+            connectivityStateIntent.putExtra("notif", notifsflag);
+            startActivity(connectivityStateIntent);
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -218,7 +327,7 @@ public class NetworkDetails extends AppCompatActivity {
             cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
             last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
 
-            if (phone_number_array[arrayIndex] == "")
+            if (phone_number_array[arrayIndex] == null)
                 phone_number_array[arrayIndex] = "Unknown";
 
             Date myDate = new Date(Long.parseLong(result.getString(2)));
@@ -234,8 +343,6 @@ public class NetworkDetails extends AppCompatActivity {
 
         myDataList.setAdapter(myAdapter);
     }
-
-
 
     public void getAllData_ascen_descriptionname() {
 
@@ -253,7 +360,7 @@ public class NetworkDetails extends AppCompatActivity {
             cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
             last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
 
-            if (phone_number_array[arrayIndex] == "")
+            if (phone_number_array[arrayIndex] == null)
                 phone_number_array[arrayIndex] = "Unknown";
 
             Date myDate = new Date(Long.parseLong(result.getString(2)));
@@ -287,7 +394,7 @@ public class NetworkDetails extends AppCompatActivity {
             cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
             last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
 
-            if (phone_number_array[arrayIndex] == "")
+            if (phone_number_array[arrayIndex] == null)
                 phone_number_array[arrayIndex] = "Unknown";
 
             Date myDate = new Date(Long.parseLong(result.getString(2)));
@@ -304,7 +411,6 @@ public class NetworkDetails extends AppCompatActivity {
         myDataList.setAdapter(myAdapter);
 
     }
-
 
     public void getAllData_ascen_ltdetection() {
 
@@ -322,7 +428,7 @@ public class NetworkDetails extends AppCompatActivity {
             cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
             last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
 
-            if (phone_number_array[arrayIndex] == "")
+            if (phone_number_array[arrayIndex] == null)
                 phone_number_array[arrayIndex] = "Unknown";
 
             Date myDate = new Date(Long.parseLong(result.getString(2)));
@@ -338,7 +444,6 @@ public class NetworkDetails extends AppCompatActivity {
 
         myDataList.setAdapter(myAdapter);
     }
-
 
     public void getAllData_ascen_cumulativedetection() {
 
@@ -356,7 +461,7 @@ public class NetworkDetails extends AppCompatActivity {
             cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
             last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
 
-            if (phone_number_array[arrayIndex] == "")
+            if (phone_number_array[arrayIndex] == null)
                 phone_number_array[arrayIndex] = "Unknown";
 
             Date myDate = new Date(Long.parseLong(result.getString(2)));
@@ -372,7 +477,6 @@ public class NetworkDetails extends AppCompatActivity {
 
         myDataList.setAdapter(myAdapter);
     }
-
 
     public void getAllData_ascen_ltrange() {
 
@@ -390,7 +494,7 @@ public class NetworkDetails extends AppCompatActivity {
             cumulative_time_array[arrayIndex] = msToTime(result.getString(6));
             last_detection_duration_array[arrayIndex] = msToTime(result.getString(4));
 
-            if (phone_number_array[arrayIndex] == "")
+            if (phone_number_array[arrayIndex] == null)
                 phone_number_array[arrayIndex] = "Unknown";
 
             Date myDate = new Date(Long.parseLong(result.getString(2)));
@@ -437,4 +541,15 @@ public class NetworkDetails extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+
+        Intent mainActIntent = new Intent(NetworkDetails.this, MainActivity.class);
+        mainActIntent.putExtra("notifFlag", notifsflag);
+        mainActIntent.putExtra("phoneNumber", phoneNumber); // resend the same that was received
+
+        startActivity(mainActIntent);
+        finish();
+
+    }
 }

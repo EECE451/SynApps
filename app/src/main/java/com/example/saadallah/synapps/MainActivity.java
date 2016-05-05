@@ -60,6 +60,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     TelephonyManager teleMan;
     String phoneNumber;
 
+    // Notifs SMS
+    boolean notifsflag = false;
+
     // Discovered Device List
     private String[] peersMacArrayStr;
     private String[] peersNameArrayStr;
@@ -173,6 +176,22 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
             }
         });
 
+        // Notification Switch
+        Switch notifSwitch = (Switch) findViewById(R.id.notif_switch);
+        notifSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { // switches wifi
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) { // Enable/Disable notifs when switch event
+                if (isChecked) {
+                    notifsflag = true;
+
+                } else {
+                    notifsflag = false;
+
+                }
+            }
+        });
+
+
+
         //Location
 
 
@@ -191,8 +210,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
         //----------------------------------------------------------------------------------
         //Cellular Network
-//        teleMan =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-//        phoneNumber = teleMan.getSimSerialNumber(); // get the phone number
+        teleMan =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        //phoneNumber = teleMan.getLine1Number(); // get the phone number
 
         //-----------------------------------------------------------------------------------
         // WiFi p2p status checking
@@ -234,14 +253,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                             Toast.makeText(MainActivity.this, "Could not initiate peer discovery", Toast.LENGTH_SHORT).show();
                         }
                     });
-
-                    synchronized (this) {
-                        try {
-                            wait(65000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
 
                     // Thread calling connect
                     Log.d("Thread", "entered");
@@ -435,8 +446,17 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                     //                   while(!mReceiver.isBroadcastFlag()){} // waits for the flag Broadcast flag to turn true
 
 
+                    synchronized (this) {
+                        try {
+                            wait(65000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                 }
             }
+
 
         }
     };
@@ -456,6 +476,20 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
         //------------------------------------------------------------------------------------------
 
+        // Notif Switch
+        Switch notifSwitch = (Switch) findViewById(R.id.notif_switch);
+
+        Intent receivedIntent = getIntent();
+        notifsflag = receivedIntent.getBooleanExtra("notifFlag", false);
+        phoneNumber = receivedIntent.getStringExtra("phoneNumber");
+
+        if(notifsflag) { // checks is Notification Switch is ON or OFF and sets the initial value of the toggle
+            notifSwitch.setChecked(true);
+
+        }
+        else {
+            notifSwitch.setChecked(false);
+        }
     }
 
     @Override
@@ -502,15 +536,19 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
         Intent serverIntent = new Intent(MainActivity.this, Server.class);
         serverIntent.putExtra("MAC", deviceP2pMac);
+        serverIntent.putExtra("phoneNumber", phoneNumber); // attach the phone number to the intent
+        serverIntent.putExtra("notif", notifsflag);
         startActivity(serverIntent);
-
-
+        finish();
     }
 
     public void onNetworkDetailsClick(View view) {
         Intent networkDetailsIntent = new Intent(MainActivity.this, NetworkDetails.class);
         networkDetailsIntent.putExtra("MacArray", peersMacArrayStr);
+        networkDetailsIntent.putExtra("phoneNumber", phoneNumber); // attach the phone number to the intent
+        networkDetailsIntent.putExtra("notif", notifsflag);
         startActivity(networkDetailsIntent);
+        finish();
     }
 
     public void onClickYes(View view) { //Don't forget to implement this method!
@@ -524,9 +562,11 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         Intent connectivityStateIntent = new Intent(MainActivity.this, Connectivity_State.class);
         connectivityStateIntent.putExtra("bluetooth_state", mBluetoothAdapter.isEnabled());
         connectivityStateIntent.putExtra("wifi_state", wifiManager.isWifiEnabled());
-        //       connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
-        connectivityStateIntent.putExtra("phone_number", phoneNumber); // attach the phone number to the intent
+        connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
+        connectivityStateIntent.putExtra("phoneNumber", phoneNumber); // attach the phone number to the intent
+        connectivityStateIntent.putExtra("notif", notifsflag);
         startActivity(connectivityStateIntent);
+        finish();
     }
 
     @Override
@@ -547,8 +587,10 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
             connectivityStateIntent.putExtra("bluetooth_state", mBluetoothAdapter.isEnabled());
             connectivityStateIntent.putExtra("wifi_state", wifiManager.isWifiEnabled());
             connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
-            connectivityStateIntent.putExtra("phone_number", phoneNumber); // attach the phone number to the intent
+            connectivityStateIntent.putExtra("phoneNumber", phoneNumber); // attach the phone number to the intent
+            connectivityStateIntent.putExtra("notif", notifsflag);
             startActivity(connectivityStateIntent);
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -602,6 +644,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         DeviceNameFromUser = String.valueOf(popupEditText.getText());
                         PhoneNumberFromUser = String.valueOf(EditTextPhone.getText());
                         popupName.setVisibility(View.GONE);
+                        EditTextPhone.setText("");
                         popupNameButtonFlag = true;
                     }
                 };
