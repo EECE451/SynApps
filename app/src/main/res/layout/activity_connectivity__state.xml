@@ -109,6 +109,74 @@ android:layout_height="match_parent">
     android:layout_below="@+id/cell_state"
     android:layout_marginTop="10dp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/longitude"
+        android:id="@+id/longitude"
+        android:textColor="@color/myBlue"
+        android:textStyle="bold"
+        android:layout_below="@+id/phone_nb"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Latitude:"
+        android:id="@+id/latitude"
+        android:textColor="@color/myBlue"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/longitude" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/battery_level"
+        android:id="@+id/battery_level"
+        android:textColor="@color/myBlue"
+        android:textStyle="bold"
+        android:layout_below="@+id/latitude"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/longitude_value"
+        android:textColor="@color/myBlue"
+        android:layout_alignBottom="@+id/longitude"
+        android:layout_toRightOf="@+id/longitude"
+        android:layout_marginLeft="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/latitude_value"
+        android:textColor="@color/myBlue"
+        android:layout_toRightOf="@+id/latitude"
+        android:layout_toEndOf="@+id/latitude"
+        android:layout_marginLeft="10dp"
+        android:layout_alignBottom="@+id/latitude" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/battery_level_value"
+        android:textColor="@color/myBlue"
+        android:layout_toRightOf="@+id/battery_level"
+        android:layout_toEndOf="@+id/battery_level"
+        android:layout_alignBottom="@+id/battery_level"
+        android:layout_marginLeft="10dp" />
+
 </RelativeLayout>
 
 

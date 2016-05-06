@@ -42,6 +42,8 @@
     <string name="last_detection_range">Last Detection Duration:</string>
     <string name="phone_number">Phone Number:</string>
     <string name="sort_data_by">Sort Data By:</string>
+    <string name="longitude">Longitude:</string>
+    <string name="battery_level">Battery Level:</string>
 
     <string-array name="spinner_sorting_choice">
         <item>First Detection Time</item>

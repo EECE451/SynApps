@@ -1,9 +1,11 @@
 package com.example.saadallah.synapps;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
@@ -13,7 +15,9 @@ import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.BatteryManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -72,7 +76,11 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     private Date[] timeDiscovered;
 
     // Location
-    //LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+    double Longitude;
+    double Latitude;
+
+    // Battery
+    int batteryPct;
 
     // popup name
     boolean popupNameButtonFlag = false; // flag on click
@@ -194,24 +202,56 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
         //Location
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-        GPSTracker myLocationListener = new GPSTracker(this);
-        Location myLocation = myLocationListener.getLocation();
 
-        if(myLocation != null) {
-            Log.d("location", "Longitude=" + myLocation.getLongitude());
-            Log.d("location", "Latitude=" + myLocation.getLatitude());
+        final String[] INITIAL_PERMS={
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        };
+
+            requestPermissions(INITIAL_PERMS, 1337);
         }
-        else {
-            Log.d("location", "No location available");
-        }
+            GPSTracker myLocationListener = new GPSTracker(this);
+            Location myLocation = myLocationListener.getLocation();
+
+            if (myLocation != null) {
+                Log.d("location", "Longitude=" + myLocation.getLongitude());
+                Log.d("location", "Latitude=" + myLocation.getLatitude());
+                Longitude = myLocation.getLongitude();
+                Latitude = myLocation.getLatitude();
+
+            } else {
+                Log.d("location", "No location available");
+                Longitude = -1;
+                Latitude = -1;
+            }
+
+        // Battery Level
+        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = this.registerReceiver(null, ifilter);
+
+        int batteryLevel = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int batteryScale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+        batteryPct = (int) (100*(batteryLevel / (double) batteryScale));
+        Log.d("BatteryPct", String.valueOf(batteryPct));
+
 
         // Device Mac
 
         //----------------------------------------------------------------------------------
         //Cellular Network
         teleMan =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        //phoneNumber = teleMan.getLine1Number(); // get the phone number
+
+
+//            final String[] INITIAL_PERMS2={Manifest.permission.READ_SMS,};
+//            requestPermissions(INITIAL_PERMS2, 1338);
+//            phoneNumber = teleMan.getLine1Number(); // get the phone number
+//            Log.d("PHONENUMBER", phoneNumber);
+
+
 
         //-----------------------------------------------------------------------------------
         // WiFi p2p status checking
@@ -584,6 +624,10 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
         connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
         connectivityStateIntent.putExtra("phoneNumber", phoneNumber); // attach the phone number to the intent
         connectivityStateIntent.putExtra("notif", notifsflag);
+        connectivityStateIntent.putExtra("Longitude", Longitude);
+        connectivityStateIntent.putExtra("Latitude", Latitude);
+        connectivityStateIntent.putExtra("battery", batteryPct);
+
         startActivity(connectivityStateIntent);
         finish();
     }
@@ -591,14 +635,16 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (!drawer.isDrawerOpen(Gravity.LEFT)){
-            drawer.openDrawer(Gravity.LEFT);
-        }
-        else{
-            drawer.closeDrawer(Gravity.LEFT);
-        }
-
         int id = item.getItemId();
+
+        if (id == R.id.action_settings){
+            if (!drawer.isDrawerOpen(Gravity.LEFT)){
+                drawer.openDrawer(Gravity.LEFT);
+            }
+            else{
+                drawer.closeDrawer(Gravity.LEFT);
+            }
+        }
 
         if (id == R.id.action_connectivity_state) {
 
@@ -608,6 +654,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
             connectivityStateIntent.putExtra("network_type", teleMan.getNetworkType());
             connectivityStateIntent.putExtra("phoneNumber", phoneNumber); // attach the phone number to the intent
             connectivityStateIntent.putExtra("notif", notifsflag);
+            connectivityStateIntent.putExtra("Longitude", Longitude);
+            connectivityStateIntent.putExtra("Latitude", Latitude);
+            connectivityStateIntent.putExtra("battery", batteryPct);
             startActivity(connectivityStateIntent);
             finish();
         }
@@ -824,4 +873,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
 
         return -1;
     }
+
+    boolean hasPermission(String perm) {
+        return(PackageManager.PERMISSION_GRANTED==checkSelfPermission(perm));
+    }
+
 }

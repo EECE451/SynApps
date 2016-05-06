@@ -126,6 +126,9 @@ public class Connectivity_State extends AppCompatActivity {
         int cell_network_type = receivedIntent.getIntExtra("network_type", 0);
         String phone_number = receivedIntent.getStringExtra("phoneNumber");
         notifsflag = receivedIntent.getBooleanExtra("notif", false);
+        double latitude = receivedIntent.getDoubleExtra("Latitude", -1);
+        double longitude = receivedIntent.getDoubleExtra("Longitude", -1);
+        int battery = receivedIntent.getIntExtra("battery", -1);
 
         // Notif Switch
         Switch notifSwitch = (Switch) findViewById(R.id.notif_switch);
@@ -219,6 +222,24 @@ public class Connectivity_State extends AppCompatActivity {
 
         EditText phone_number_edittext = (EditText) findViewById(R.id.phone_nb_value);
         phone_number_edittext.setText(phone_number);
+
+        TextView longitude_value_textview = (TextView) findViewById(R.id.longitude_value);
+        if (longitude > 0)
+            longitude_value_textview.setText("" + longitude+ " degrees");
+        else
+            longitude_value_textview.setText("Location Unavailable");
+
+        TextView latitude_value_textview = (TextView) findViewById(R.id.latitude_value);
+        if (latitude > 0)
+            latitude_value_textview.setText("" + latitude + " degrees");
+        else
+            latitude_value_textview.setText("Location Unavailable");
+
+        TextView battery_value_textview = (TextView) findViewById(R.id.battery_level_value);
+        if (battery > 0)
+            battery_value_textview.setText("" + battery + "%");
+        else
+            battery_value_textview.setText("Unavailable");
 
     }
 
