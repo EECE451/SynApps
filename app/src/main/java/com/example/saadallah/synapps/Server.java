@@ -2,8 +2,11 @@ package com.example.saadallah.synapps;
 
 
 import android.Manifest;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -19,14 +22,23 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
+import android.text.InputType;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -40,18 +52,29 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.SimpleTimeZone;
 
 /**
  * Created by Saadallah on 4/30/2016.
  */
 
-public class Server extends AppCompatActivity {
+public class Server extends AppCompatActivity implements View.OnClickListener {
 
     private android.support.v7.app.ActionBar bar; //ActionBar-Drawer
     private ActionBarDrawerToggle toggle; //ActionBar-Drawer
     private DrawerLayout drawer; //ActionBar-Drawer
+
+    // date pickers
+    private DatePickerDialog fromDatePickerDialog;
+    private DatePickerDialog toDatePickerDialog;
+    private TimePickerDialog fromTimePickerDialog;
+    private TimePickerDialog toTimePickerDialog;
 
     DatabaseHelper myDb = new DatabaseHelper(this);
     private String MACMasterDevice = "";
@@ -66,7 +89,6 @@ public class Server extends AppCompatActivity {
     String showspecificUrl = "http://192.168.210.1:80/DevicesServer/displayspecific2.php";
     String showSpecificUrl2 = "http://192.168.210.1:80/DevicesServer/displayspecific4.php";
     String fetchnumberurl =   "http://192.168.210.1:80/DevicesServer/fetchnumber.php";
-
 
 
     // String insertUrl = "http://10.168.46.13:80/DevicesServer/insertEntry.php";
@@ -92,6 +114,30 @@ public class Server extends AppCompatActivity {
     // Battery
     int batteryPct;
 
+    // Data Display
+    Spinner displayBySpinner;
+
+    // Date Display
+    EditText fromDayEdittext;
+    EditText toDayEdittext;
+    EditText fromTimeEdittext;
+    EditText toTimeEdittext;
+    SimpleDateFormat dateFormatter;
+    SimpleDateFormat timeFormatter;
+
+    Button generateButton;
+    Button generateButton2;
+
+    EditText batteryFrom;
+    EditText batteryTo;
+
+
+    // time
+    int year1, year2, month1, month2, day1, day2, hour1, hour2, minute1, minute2;
+
+    //Battery
+    int batt_from_level, batt_to_level;
+
 
 
     @Override
@@ -102,6 +148,7 @@ public class Server extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
 
         textViewdisplaydata =(TextView)findViewById(R.id.textViewdisplaydata);
+        displayBySpinner = (Spinner) findViewById(R.id.display_by_spinner);
 
 
         //-----------------------------------------------------------------------------------
@@ -254,6 +301,26 @@ public class Server extends AppCompatActivity {
         batteryPct = (int) (100*(batteryLevel / (double) batteryScale));
         Log.d("BatteryPct", String.valueOf(batteryPct));
 
+        // Views
+        fromDayEdittext = (EditText) findViewById(R.id.date1_edittext);
+        toDayEdittext = (EditText) findViewById(R.id.date2_edittext);
+        fromTimeEdittext = (EditText) findViewById(R.id.time1_edittext);
+        toTimeEdittext = (EditText) findViewById(R.id.time2_edittext);
+        generateButton = (Button) findViewById(R.id.generate_graph_button);
+        batteryFrom = (EditText) findViewById(R.id.battery_from_edittext);
+        batteryTo = (EditText) findViewById(R.id.battery_to_edittext);
+        generateButton2 = (Button) findViewById(R.id.generate_button_2);
+
+        fromDayEdittext.setInputType(InputType.TYPE_NULL);
+        toDayEdittext.setInputType(InputType.TYPE_NULL);
+        fromTimeEdittext.setInputType(InputType.TYPE_NULL);
+        toTimeEdittext.setInputType(InputType.TYPE_NULL);
+
+//        fromDayEdittext.setVisibility(View.GONE);
+//        toDayEdittext.setVisibility(View.GONE);
+//        fromTimeEdittext.setVisibility(View.GONE);
+//        toTimeEdittext.setVisibility(View.GONE);
+
 
         ///////////////
 
@@ -315,7 +382,175 @@ public class Server extends AppCompatActivity {
             }
         });
         requestQueue.add(jsonObjectRequest);
-    }
+
+
+
+        // Spinner -----------------------------------------------------------------------------------------------
+        // Spinner Logic (Adapter)
+
+        dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+        timeFormatter = new SimpleDateFormat("HH:mm a");
+
+        fromDayEdittext.setOnClickListener(this);
+        toDayEdittext.setOnClickListener(this);
+        fromTimeEdittext.setOnClickListener(this);
+        toTimeEdittext.setOnClickListener(this);
+
+        fromDayEdittext.setVisibility(View.GONE);
+        toDayEdittext.setVisibility(View.GONE);
+        fromTimeEdittext.setVisibility(View.GONE);
+        toTimeEdittext.setVisibility(View.GONE);
+        generateButton.setVisibility(View.GONE);
+        generateButton2.setVisibility(View.GONE);
+
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.spinner_display_choice, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        displayBySpinner.setAdapter(spinnerAdapter);
+
+         final TextView graphDescription = (TextView) findViewById(R.id.graph_description);
+
+        displayBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+
+                switch (pos) {
+                    case 0: // All
+                        graphDescription.setText("Displays all the devices connected");
+
+                        batteryFrom.setVisibility(View.GONE);
+                        batteryTo.setVisibility(View.GONE);
+
+                        fromDayEdittext.setVisibility(View.GONE);
+                        toDayEdittext.setVisibility(View.GONE);
+                        fromTimeEdittext.setVisibility(View.GONE);
+                        toTimeEdittext.setVisibility(View.GONE);
+                        generateButton.setVisibility(View.GONE);
+                        generateButton2.setVisibility(View.GONE);
+
+                        // Graph algorithm here
+                        break;
+
+                    case 1: // Time Range
+                        graphDescription.setText("Displays all the devices connected between");
+
+                        batteryFrom.setVisibility(View.GONE);
+                        batteryTo.setVisibility(View.GONE);
+                        generateButton2.setVisibility(View.GONE);
+
+                        fromDayEdittext.setVisibility(View.VISIBLE);
+                        toDayEdittext.setVisibility(View.VISIBLE);
+                        fromTimeEdittext.setVisibility(View.VISIBLE);
+                        toTimeEdittext.setVisibility(View.VISIBLE);
+                        generateButton.setVisibility(View.VISIBLE);
+
+                        Calendar newCalendar = Calendar.getInstance();
+
+                        // INITIALIZING VALUES
+                        year1 = newCalendar.get(Calendar.YEAR);
+                        month1 = newCalendar.get(Calendar.MONTH);
+                        day1 = newCalendar.get(Calendar.DAY_OF_MONTH);
+                        hour1 = newCalendar.get(Calendar.HOUR_OF_DAY);
+                        minute1 = newCalendar.get(Calendar.MINUTE);
+
+                        year2 = newCalendar.get(Calendar.YEAR);
+                        month2 = newCalendar.get(Calendar.MONTH);
+                        day2 = newCalendar.get(Calendar.DAY_OF_MONTH);
+                        hour2 = newCalendar.get(Calendar.HOUR_OF_DAY);
+                        minute2 = newCalendar.get(Calendar.MINUTE);
+
+                        fromDatePickerDialog = new DatePickerDialog(Server.this, new DatePickerDialog.OnDateSetListener() {
+
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                Calendar date1 = Calendar.getInstance();
+                                date1.set(year, monthOfYear, dayOfMonth);
+                                year1 = year; month1 = monthOfYear; day1 = dayOfMonth;
+                                fromDayEdittext.setText(dateFormatter.format(date1.getTime()));
+                            }
+
+                        },newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
+
+                        toDatePickerDialog = new DatePickerDialog(Server.this, new DatePickerDialog.OnDateSetListener() {
+
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                Calendar date2 = Calendar.getInstance();
+                                date2.set(year, monthOfYear, dayOfMonth);
+                                year2 = year; month2 = monthOfYear; day2 = dayOfMonth;
+
+                                toDayEdittext.setText(dateFormatter.format(date2.getTime()));
+                            }
+
+                        },newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
+
+                        fromTimePickerDialog = new TimePickerDialog(Server.this, new TimePickerDialog.OnTimeSetListener() {
+
+                            @Override
+                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                hour1 = hourOfDay;
+                                minute1 = minute;
+
+                                fromTimeEdittext.setText(hourOfDay + ":" + minute);
+
+
+                            }
+                        },hour1,minute1, true);
+
+                        toTimePickerDialog = new TimePickerDialog(Server.this, new TimePickerDialog.OnTimeSetListener() {
+
+                            @Override
+                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                                hour2 = hourOfDay;
+                                minute2 = minute;
+
+                                toTimeEdittext.setText(hourOfDay + ":" + minute);
+
+                            }
+                        },hour2,minute2,true);
+
+                        // THE REST IS IN ON CLICK GENERATE
+
+
+                        //getAllData_ascen_ltdetection();
+                        break;
+
+                    case 2:
+                        //getAllData_ascen_descriptionname();
+                        break;
+                     case 3:
+                         //getAllData_ascen_detectionFrequency();
+                         break;
+
+                    case 4:
+                        graphDescription.setText("Displays all the devices having a battery life between");
+
+                        fromDayEdittext.setVisibility(View.GONE);
+                        toDayEdittext.setVisibility(View.GONE);
+                        fromTimeEdittext.setVisibility(View.GONE);
+                        toTimeEdittext.setVisibility(View.GONE);
+                        generateButton.setVisibility(View.GONE);
+
+                        batteryFrom.setVisibility(View.VISIBLE);
+                        batteryTo.setVisibility(View.VISIBLE);
+                        generateButton.setVisibility(View.VISIBLE);
+
+                        // THE REST IS IN ON CLICK GENERATE
+
+
+
+                        //getAllData_ascen_ltrange();
+                        break;
+                 }
+
+
+            }
+
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Another interface callback
+            }
+        });
+
+    } // end onCreate
+
+
+
     String Result = "";
     String Result2 = "";
 
@@ -634,5 +869,32 @@ public class Server extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onClick(View v) {
+        if(v == fromDayEdittext) {
+            fromDatePickerDialog.show();
+        } else if(v == toDayEdittext) {
+            toDatePickerDialog.show();
+        } else if(v == fromTimeEdittext) {
+            fromTimePickerDialog.show();
+        } else if(v == toTimeEdittext) {
+            toTimePickerDialog.show();
+        }
+    }
 
+    public void onClickGenerate(View view) {
+
+        Calendar date1 = Calendar.getInstance();
+        date1.set(year1,month1,day1, hour1, minute1, 0);
+        long milli1 = date1.getTimeInMillis();
+
+        Calendar date2 = Calendar.getInstance();
+        date1.set(year2,month2,day2, hour2, minute2, 0);
+        long milli2 = date2.getTimeInMillis();
+    }
+
+    public void onClickGenerate2(View view) {
+        batt_from_level = Integer.valueOf(String.valueOf(batteryFrom.getText()));
+        batt_to_level = Integer.valueOf(String.valueOf(batteryTo.getText()));
+    }
 }

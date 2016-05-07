@@ -44,6 +44,11 @@
     <string name="sort_data_by">Sort Data By:</string>
     <string name="longitude">Longitude:</string>
     <string name="battery_level">Battery Level:</string>
+    <string name="to_date">To Date</string>
+    <string name="from_date">From Date</string>
+    <string name="from_time">From Time</string>
+    <string name="to_time">To Time</string>
+    <string name="generate">New Button</string>
 
     <string-array name="spinner_sorting_choice">
         <item>First Detection Time</item>
@@ -52,5 +57,13 @@
         <item>Detection Frequency</item>
         <item>Cumulative Detection Time</item>
         <item>Last Detection Duration</item>
+    </string-array>
+
+    <string-array name="spinner_display_choice">
+        <item>All</item>
+        <item>Date/Time Range</item>
+        <item>Device</item>
+        <item>Location</item>
+        <item>Battery Life</item>
     </string-array>
 </resources>
