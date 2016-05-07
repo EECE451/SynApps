@@ -51,6 +51,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -80,11 +81,17 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
     //   String insertUrl = "http://192.168.16.4:80/DevicesServer/insertEntry.php";  //in order to contain the url for our php files
     //   String showUrl = "http://192.168.16.4:80/DevicesServer/displayEntry.php";
 
-    String insertUrl = "http://192.168.210.1:80/DevicesServer/insertEntry.php";
-    String showUrl = "http://192.168.210.1:80/DevicesServer/displayEntry.php";
-    String showspecificUrl = "http://192.168.210.1:80/DevicesServer/displayspecific2.php";
-    String showSpecificUrl2 = "http://192.168.210.1:80/DevicesServer/displayspecific4.php";
-    String fetchnumberurl =   "http://192.168.210.1:80/DevicesServer/fetchnumber.php";
+//    String insertUrl = "http://192.168.210.1:80/DevicesServer/insertEntry.php";
+//    String showUrl = "http://192.168.210.1:80/DevicesServer/displayEntry.php";
+//    String showspecificUrl = "http://192.168.210.1:80/DevicesServer/displayspecific2.php";
+//    String showSpecificUrl2 = "http://192.168.210.1:80/DevicesServer/displayspecific4.php";
+//    String fetchnumberurl =   "http://192.168.210.1:80/DevicesServer/fetchnumber.php";
+
+    String insertUrl = "http://192.168.36.1:80/DevicesServer/insertEntry.php";
+    String showUrl = "http://192.168.36.1:80/DevicesServer/displayEntry.php";
+    String showspecificUrl = "http://192.36.210.1:80/DevicesServer/displayspecific2.php";
+    String showSpecificUrl2 = "http://192.168.36.1:80/DevicesServer/displayspecific4.php";
+    String fetchnumberurl =   "http://192.168.36.1:80/DevicesServer/fetchnumber.php";
 
 
     // String insertUrl = "http://10.168.46.13:80/DevicesServer/insertEntry.php";
@@ -145,6 +152,9 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
      //MAC
     int selectedMacPosition;
 
+    // Arrays
+    String[] slaveMACArray, slaveNamesArray, masterMACArray, phoneNumbersArray, notifFlagArray, LatArray, LongArray, frequencyArray, lastDetectionArray, cummulativeDetectionArray;
+    int arraySize;
 
 
     @Override
@@ -353,6 +363,19 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
             {
                 try {
                     JSONArray posts = response.getJSONArray("devices");
+
+                    arraySize = posts.length();
+                    slaveMACArray = new String[posts.length()];
+                    slaveNamesArray= new String[posts.length()];
+                    masterMACArray= new String[posts.length()];
+                    phoneNumbersArray= new String[posts.length()];
+                    notifFlagArray= new String[posts.length()];
+                    LatArray= new String[posts.length()];
+                    LongArray= new String[posts.length()];
+                    frequencyArray= new String[posts.length()];
+                    lastDetectionArray= new String[posts.length()];
+                    cummulativeDetectionArray = new String[posts.length()];
+
                     for (int i = 0; i < posts.length();i++) {
 
                         JSONObject post = posts.getJSONObject(i);
@@ -372,7 +395,18 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                         Result = Result + "\n"+ MACConnected+ " " + DeviceName + " " + DateLastDetection+" "+FrequencyDetection+" "+ CumulativeDetection+" " +
                                 MACMasterDevice+" "+phoneNumber+" "+flag+" "+longitude+" "+latitude+" ";
                         String result2 = Result;
-                        textViewdisplaydata.setText(Result);
+                        //textViewdisplaydata.setText(Result);
+
+                        slaveMACArray[i] = MACConnected;
+                        slaveNamesArray[i] = DeviceName;
+                        masterMACArray[i] = MACMasterDevice;
+                        phoneNumbersArray[i] = phoneNumber;
+                        notifFlagArray[i] = flag;
+                        LatArray[i] = latitude;
+                        LongArray[i] = longitude;
+                        frequencyArray[i] = FrequencyDetection;
+                        lastDetectionArray[i] = DateLastDetection;
+                        cummulativeDetectionArray[i] = CumulativeDetection;
 
                     }
 
@@ -441,6 +475,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                         mac_spinner.setVisibility(View.GONE);
 
                         // Graph algorithm here
+                        textViewdisplaydata.setText(generateGraph(masterMACArray, slaveNamesArray, frequencyArray, cummulativeDetectionArray, arraySize));
                         break;
 
                     case 1: // Time Range
@@ -614,85 +649,6 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
 
     String Result = "";
-    String Result2 = "";
-
-//    public void onbtnclickshowall(View view) {
-//
-//    }
-
-//    public void onbtnclickinsertall(View view) {
-//
-//        Cursor result_NumberofDevices = myDb.getNumberofDevices();
-//        String result_NumberofDevices_String = "";
-//        String MACConnected ="";
-//        String DeviceName = "";
-//        String DateLastDetection = "";
-//        String FrequencyDetection = "";
-//        String CumulativeDetection = "";
-//
-//
-//        if (result_NumberofDevices != null &&result_NumberofDevices.getCount() > 0) {
-//            result_NumberofDevices.moveToFirst();
-//            result_NumberofDevices_String = result_NumberofDevices.getString(0);
-//        }
-//        int result_NumberofDevices_String_int = Integer.parseInt(result_NumberofDevices_String);
-//
-//        for(int i=1;i<=result_NumberofDevices_String_int;i++)
-//        {   Log.d("Loop Flag", String.valueOf(i));
-//
-//            Cursor result_getalldata = myDb.getAllDatabyDid(i);
-//
-//            while (result_getalldata.moveToNext()) {
-//                MACConnected = result_getalldata.getString(0);
-//                DeviceName = result_getalldata.getString(1);
-//                DateLastDetection = result_getalldata.getString(2);
-//                FrequencyDetection = result_getalldata.getString(3);
-//                CumulativeDetection = result_getalldata.getString(4);
-//
-//            }
-//            final String finalDateLastDetection = DateLastDetection;
-//            final String finalDeviceName = DeviceName;
-//            final String finalMACConnected = MACConnected;
-//            final String finalFrequencyDetection = FrequencyDetection;
-//            final String finalCumulativeDetection = CumulativeDetection;
-//
-//            StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
-//                @Override
-//                public void onResponse(String response) {
-//
-//                    System.out.println(response.toString());
-//                }
-//            }, new Response.ErrorListener() {
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//
-//                }
-//            }) {
-//
-//                @Override
-//                protected Map<String, String> getParams() throws AuthFailureError {
-//                    Map<String,String> parameters  = new HashMap<String, String>();
-//                    parameters.put("MACConnected", finalMACConnected);
-//                    parameters.put("MACMasterDevice",MACMasterDevice);
-//                    parameters.put("DeviceName", finalDeviceName);
-//                    parameters.put("DateLastDetection", finalDateLastDetection);
-//                    parameters.put("FrequencyDetection", finalFrequencyDetection);
-//                    parameters.put("CumulativeDetection", finalCumulativeDetection);
-//                    parameters.put("MasterName","");
-//
-//
-//                    return parameters;
-//                }
-//            };
-//            requestQueue.add(request);
-//        }
-//
-//
-//
-//
-//    }
-
-
 
     public void onbtnclickinsertall(final View view) {
 
@@ -986,5 +942,70 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
     private void onMacPositionSelection(int pos){
 
+    }
+
+    private String generateGraph(String[] macAddressMaster, String[] macAddressSlave, String[] frequency, String[] CumulativeDetection, int size){
+
+        // GRAPH START----------------------------------------------------------------------------
+        // DUMMY DATA
+//        String[] macAddressMaster = {"MAC1", "MAC2", "MAC3", "MAC1", "MAC1", "MAC4"};
+//        String[] macAddressSlave = {"MAC3", "MAC3", "MAC1", "MAC5", "MAC2", "MAC6"};
+//        String[] dummyFrequency = {"1","2","3","4","5","6"};
+//        String[] dummyCumulativeDetection = {"120000","240000","360000","480000","590000","660000"};
+
+        String output = "";
+
+        Graph myDevicesGraph = new Graph();
+
+        int graphSize = size; // enter the size here
+
+        //initialize some vertices and add them to the graph
+        //Edge[] edges = new Edge[graphSize];
+        //Integer[] weights = new Integer[graphSize];
+        ArrayList<Vertex> vertices = new ArrayList<>();
+
+        for(int i = 0; i < graphSize; i++){
+
+            if (isMacinList(vertices,macAddressMaster[i]) == -1) // if the master device vertex is not in the vertices list, add it at position 0
+            {
+                vertices.add(0, new Vertex(macAddressMaster[i]));
+                myDevicesGraph.addVertex(vertices.get(0), true); // and add it to the graph
+            }
+
+            if (isMacinList(vertices,macAddressSlave[i]) == -1) // if the slave device vertex is not in the vertices list, add it at position 0
+            {
+                vertices.add(0, new Vertex(macAddressSlave[i]));
+                myDevicesGraph.addVertex(vertices.get(0), true); // and add it to the graph
+            }
+
+            // adds an edge between the two vertices
+            myDevicesGraph.addEdge(vertices.get(isMacinList(vertices,macAddressMaster[i])), vertices.get(isMacinList(vertices,macAddressSlave[i])), frequency[i], CumulativeDetection[i]);
+        }
+
+        //display the initial setup- all vertices adjacent to each other
+        for(int i = 0; i < graphSize; i++){
+            output = output + vertices.get(i) + "\n";
+
+            for(int j = 0; j < vertices.get(i).getNeighborCount(); j++){
+                output = output + vertices.get(i).getNeighbor(j) + "\n";
+            }
+
+            output = output + "\n";
+        }
+
+        // GRAPH END----------------------------------------------------------------------------
+
+        return output;
+
+    }
+
+    int isMacinList(ArrayList<Vertex> vertexArray, String mac){ // return the index of the vertex of label mac or returns -1 if not in the list
+
+        for (int i=0; i< vertexArray.size(); i++){
+            if (vertexArray.get(i).getLabel() == mac)
+                return i;
+        }
+
+        return -1;
     }
 }
