@@ -6,7 +6,6 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -23,7 +22,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -54,11 +52,9 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.SimpleTimeZone;
 
 /**
  * Created by Saadallah on 4/30/2016.
@@ -108,11 +104,11 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
     boolean notifsflag = false;
 
     // Location
-    double Longitude;
-    double Latitude;
+    double Longitude;   // to send to server
+    double Latitude;    // to send to server
 
     // Battery
-    int batteryPct;
+    int batteryPct;     // to send to server
 
     // Data Display
     Spinner displayBySpinner;
@@ -369,9 +365,12 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                         String CumulativeDetection = post.getString("CumulativeDetection");
                         String phoneNumber = post.getString("MasterName");  //Bassel use this for phone Number
                         String flag = post.getString("flag");   // Bassel use this flag for sms
+                        String longitude = post.getString("longitude");     // longitude fetched from server tied to MAC Master
+                        String latitude = post.getString("latitude");       // latitude fetched from server tied to MAC Master
 
 
-                        Result = Result + "\n"+ MACConnected+ " " + DeviceName + " " + DateLastDetection+" "+FrequencyDetection+" "+ CumulativeDetection+" " + MACMasterDevice+" "+phoneNumber+" "+flag+" ";
+                        Result = Result + "\n"+ MACConnected+ " " + DeviceName + " " + DateLastDetection+" "+FrequencyDetection+" "+ CumulativeDetection+" " +
+                                MACMasterDevice+" "+phoneNumber+" "+flag+" "+longitude+" "+latitude+" ";
                         String result2 = Result;
                         textViewdisplaydata.setText(Result);
 
@@ -773,6 +772,8 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                     parameters.put("CumulativeDetection", finalCumulativeDetection);
                     parameters.put("MasterName", phoneNumber);
                     parameters.put("flag", String.valueOf(notifsflag));
+                    parameters.put("longitude", String.valueOf(Longitude));
+                    parameters.put("latitude", String.valueOf(Latitude));
 
 
                     return parameters;
@@ -830,8 +831,8 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                 parameters.put("CumulativeDetection", s5);
                 parameters.put("MasterName", phoneNumber);
                 parameters.put("flag", String.valueOf(notifsflag));
-
-
+                parameters.put("longitude", String.valueOf(Longitude));
+                parameters.put("latitude", String.valueOf(Latitude));
 
 
                 return parameters;
