@@ -33,6 +33,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -155,6 +156,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
     // Arrays
     String[] slaveMACArray, slaveNamesArray, masterMACArray, phoneNumbersArray, notifFlagArray, LatArray, LongArray, frequencyArray, lastDetectionArray, cummulativeDetectionArray;
     int arraySize;
+    String[] myAllDeviceList;
 
 
     @Override
@@ -431,6 +433,8 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
         // Spinner -----------------------------------------------------------------------------------------------
         // Spinner Logic (Adapter)
 
+        final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView);
+
         dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
         timeFormatter = new SimpleDateFormat("HH:mm a");
 
@@ -474,12 +478,16 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                         generateButton3.setVisibility(View.GONE);
                         mac_spinner.setVisibility(View.GONE);
 
+                        textViewdisplaydata.setText("");
+
                         // Graph algorithm here
                         textViewdisplaydata.setText(generateGraph(masterMACArray, slaveNamesArray, frequencyArray, cummulativeDetectionArray, arraySize));
                         break;
 
                     case 1: // Time Range
                         graphDescription.setText("Displays all the devices connected between");
+
+                        textViewdisplaydata.setText("");
 
                         batteryFrom.setVisibility(View.GONE);
                         batteryTo.setVisibility(View.GONE);
@@ -558,10 +566,13 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                         },hour2,minute2,true);
 
                         // THE REST IS IN ON CLICK GENERATE
+
                         break;
 
                     case 2: // By MAC
                         graphDescription.setText("Displays all the devices that connected to a specific one");
+
+                        textViewdisplaydata.setText("");
 
                         batteryFrom.setVisibility(View.GONE);
                         batteryTo.setVisibility(View.GONE);
@@ -576,16 +587,32 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
                         mac_spinner.setVisibility(View.VISIBLE);
 
-                        String[] dummyMacArray = {"MAC1", "MAC2", "MAC3", "MAC4"};
+                        final ArrayList<String> allDevicesList = new ArrayList<String>();
 
-                        ArrayAdapter<String> spinnerAdapter2 = new ArrayAdapter<String>(Server.this, android.R.layout.simple_spinner_item, dummyMacArray);
+                        for (int i=0; i<arraySize; i++){
+
+                            if (isMacinList2(allDevicesList, masterMACArray[i]) == -1)
+                                allDevicesList.add(0, masterMACArray[i]);
+                        }
+
+                        for (int i=0; i<arraySize; i++){
+
+                            if (isMacinList2(allDevicesList,slaveMACArray[i]) == -1){
+                                allDevicesList.add(0, slaveNamesArray[i]);
+                            }
+                        }
+
+                        myAllDeviceList = new String[allDevicesList.size()];
+                        myAllDeviceList = allDevicesList.toArray(myAllDeviceList);
+
+                        ArrayAdapter<String> spinnerAdapter2 = new ArrayAdapter<String>(Server.this, android.R.layout.simple_spinner_item, myAllDeviceList);
                         spinnerAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         mac_spinner.setAdapter(spinnerAdapter2);
 
                         mac_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                                 selectedMacPosition = pos;
-                                onMacPositionSelection(pos); // IMPLEMENT THE METHOD!
+                                onMacPositionSelection(myAllDeviceList[pos]); // IMPLEMENT THE METHOD!
                             }
 
                             @Override
@@ -597,6 +624,8 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
                      case 3: // LOCATION
                          graphDescription.setText("Displays all the devices that were detected within a certain distance radius from the current location");
+
+                         textViewdisplaydata.setText("");
 
                          batteryFrom.setVisibility(View.GONE);
                          batteryTo.setVisibility(View.GONE);
@@ -617,6 +646,8 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
                     case 4: //BATTERY LIFE
                         graphDescription.setText("Displays all the devices having a battery life between");
+
+                        textViewdisplaydata.setText("");
 
                         fromDayEdittext.setVisibility(View.GONE);
                         toDayEdittext.setVisibility(View.GONE);
@@ -737,6 +768,11 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
             };
 
             requestQueue.add(request);
+        }
+
+        for (int i =0; i<arraySize; i++){
+            Log.d("phonenbavailable", phoneNumbersArray[i]);
+            Log.d("phonenbavailable", notifFlagArray[i]);
         }
     }
 
@@ -910,7 +946,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
     public static float distFrom(float lat1, float lng1, float lat2, float lng2) {
         double earthRadius = 6371000; //meters
         double dLat = Math.toRadians(lat2-lat1);
-        double dLng = Math.toRadians(lng2-lng1);
+        double dLng = Math.toRadians(lng2 - lng1);
         double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
                 Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
                         Math.sin(dLng/2) * Math.sin(dLng/2);
@@ -929,6 +965,34 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
         Calendar date2 = Calendar.getInstance();
         date1.set(year2,month2,day2, hour2, minute2, 0);
         long milli2 = date2.getTimeInMillis();
+
+        ArrayList<String> slaveList = new ArrayList<>();
+        ArrayList<String> masterList = new ArrayList<>();
+        ArrayList<String> frequenyList = new ArrayList<>();
+        ArrayList<String> CummulativeList = new ArrayList<>();
+
+        for (int i=0; i<arraySize; i++){
+
+            if(Long.parseLong(lastDetectionArray[i]) >= milli1 && Long.parseLong(lastDetectionArray[i]) <= milli2){
+                slaveList.add(0, slaveNamesArray[i]);
+                masterList.add(0, masterMACArray[i]);
+                frequenyList.add(0, frequencyArray[i]);
+                CummulativeList.add(0, cummulativeDetectionArray[i]);
+            }
+        }
+
+        String[] mySlaveList = new String[slaveList.size()];
+        String[] myMasterList = new String[masterList.size()];
+        String[] myFrequencyList = new String[frequenyList.size()];
+        String[] myCummulativeList = new String[CummulativeList.size()];
+
+        mySlaveList = slaveList.toArray(mySlaveList);
+        myMasterList = masterList.toArray(myMasterList);
+        myFrequencyList = frequenyList.toArray(myFrequencyList);
+        myCummulativeList = CummulativeList.toArray(myCummulativeList);
+
+        textViewdisplaydata.setText(generateGraph(myMasterList, mySlaveList, myFrequencyList, myCummulativeList, slaveList.size()));
+
     }
 
     public void onClickGenerate2(View view) {
@@ -937,11 +1001,73 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
     }
 
     public void onClickGenerate3(View view) {
+
+
         distance_radius = Integer.valueOf(String.valueOf(location_radius_edittext.getText()));
+
+        ArrayList<String> slaveList = new ArrayList<>();
+        ArrayList<String> masterList = new ArrayList<>();
+        ArrayList<String> frequenyList = new ArrayList<>();
+        ArrayList<String> CummulativeList = new ArrayList<>();
+
+        for (int i=0; i<arraySize; i++){
+
+            float arrayLongitude = Float.parseFloat(LongArray[i]);
+            float arrayLatitude =Float.parseFloat(LatArray[i]);
+
+            float deviceDistance = distFrom((float) Latitude, (float) Longitude, arrayLatitude, arrayLongitude);
+
+            if(deviceDistance < distance_radius){
+                slaveList.add(0, slaveNamesArray[i]);
+                masterList.add(0, masterMACArray[i]);
+                frequenyList.add(0, frequencyArray[i]);
+                CummulativeList.add(0, cummulativeDetectionArray[i]);
+            }
+        }
+
+        String[] mySlaveList = new String[slaveList.size()];
+        String[] myMasterList = new String[masterList.size()];
+        String[] myFrequencyList = new String[frequenyList.size()];
+        String[] myCummulativeList = new String[CummulativeList.size()];
+
+        mySlaveList = slaveList.toArray(mySlaveList);
+        myMasterList = masterList.toArray(myMasterList);
+        myFrequencyList = frequenyList.toArray(myFrequencyList);
+        myCummulativeList = CummulativeList.toArray(myCummulativeList);
+
+        textViewdisplaydata.setText(generateGraph(myMasterList, mySlaveList, myFrequencyList, myCummulativeList, slaveList.size()));
+
+
     }
 
-    private void onMacPositionSelection(int pos){
+    private void onMacPositionSelection(String mac){
 
+        ArrayList<String> slaveList = new ArrayList<>();
+        ArrayList<String> masterList = new ArrayList<>();
+        ArrayList<String> frequenyList = new ArrayList<>();
+        ArrayList<String> CummulativeList = new ArrayList<>();
+
+        for (int i=0; i<arraySize; i++){
+
+            if(masterMACArray[i].compareTo(mac) == 0 || slaveNamesArray[i].compareTo(mac) == 0){
+                slaveList.add(0, slaveNamesArray[i]);
+                masterList.add(0, masterMACArray[i]);
+                frequenyList.add(0, frequencyArray[i]);
+                CummulativeList.add(0, cummulativeDetectionArray[i]);
+            }
+        }
+
+        String[] mySlaveList = new String[slaveList.size()];
+        String[] myMasterList = new String[masterList.size()];
+        String[] myFrequencyList = new String[frequenyList.size()];
+        String[] myCummulativeList = new String[CummulativeList.size()];
+
+        mySlaveList = slaveList.toArray(mySlaveList);
+        myMasterList = masterList.toArray(myMasterList);
+        myFrequencyList = frequenyList.toArray(myFrequencyList);
+        myCummulativeList = CummulativeList.toArray(myCummulativeList);
+
+        textViewdisplaydata.setText(generateGraph(myMasterList, mySlaveList, myFrequencyList, myCummulativeList, slaveList.size()));
     }
 
     private String generateGraph(String[] macAddressMaster, String[] macAddressSlave, String[] frequency, String[] CumulativeDetection, int size){
@@ -983,7 +1109,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
         }
 
         //display the initial setup- all vertices adjacent to each other
-        for(int i = 0; i < graphSize; i++){
+        for(int i = 0; i < vertices.size(); i++){
             output = output + vertices.get(i) + "\n";
 
             for(int j = 0; j < vertices.get(i).getNeighborCount(); j++){
@@ -1002,8 +1128,21 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
     int isMacinList(ArrayList<Vertex> vertexArray, String mac){ // return the index of the vertex of label mac or returns -1 if not in the list
 
         for (int i=0; i< vertexArray.size(); i++){
-            if (vertexArray.get(i).getLabel() == mac)
+            Log.d("vertexArray", String.valueOf(vertexArray.get(i).getLabel().compareTo(mac)));
+            if (vertexArray.get(i).getLabel().compareTo(mac) == 0) {
                 return i;
+            }
+        }
+
+        return -1;
+    }
+
+    int isMacinList2(ArrayList<String> stringArray, String mac){ // return the index of the vertex of label mac or returns -1 if not in the list
+
+        for (int i=0; i< stringArray.size(); i++){
+            if (stringArray.get(i).compareTo(mac) == 0) {
+                return i;
+            }
         }
 
         return -1;
