@@ -14,12 +14,14 @@ import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.util.Log;
@@ -38,6 +40,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -78,6 +81,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
     private String MACMasterDevice = "";
     TextView textViewdisplaydata;
     com.android.volley.RequestQueue requestQueue;
+    public static final int REQUEST_SEND_SMS =0; //SMS permission
 
     //   String insertUrl = "http://192.168.16.4:80/DevicesServer/insertEntry.php";  //in order to contain the url for our php files
     //   String showUrl = "http://192.168.16.4:80/DevicesServer/displayEntry.php";
@@ -774,6 +778,74 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
             Log.d("phonenbavailable", phoneNumbersArray[i]);
             Log.d("phonenbavailable", notifFlagArray[i]);
         }
+
+        sendSMS(phoneNumbersArray, notifFlagArray);
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
+        if (requestCode==REQUEST_SEND_SMS){
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                // should do something
+                sendSMS(phoneNumbersArray, notifFlagArray);
+            }
+            else {
+                Toast.makeText(Server.this, "Permission was not granted", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else {
+            super.onRequestPermissionsResult(requestCode,permissions,grantResults);
+        }
+
+    }
+
+    public void sendSMS(String[] numbers, String[] flags){
+        if ((int) Build.VERSION.SDK_INT < 23)
+        {
+            try {
+                SmsManager smsManager = SmsManager.getDefault();
+
+                for (int i =0; i<numbers.length; i++){
+                    if (flags[i] != "0"){
+                    smsManager.sendTextMessage(numbers[i], null, "This is a test message sent from the app", null, null);
+                    Toast.makeText(getApplicationContext(), "SMS sent to "+numbers[i], Toast.LENGTH_LONG).show();
+                    }
+                }
+
+            } catch (Exception e) {
+                Log.d("SMS", "Failed to send sms");
+                Toast.makeText(getApplicationContext(), "SMS not sent.", Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+        }
+        else {
+
+            if (checkSelfPermission(Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED) {
+                try {
+                    SmsManager smsManager = SmsManager.getDefault();
+
+                    for (int i = 0; i < numbers.length; i++) {
+                        if (flags[i] !="0") {
+                            smsManager.sendTextMessage(numbers[i], null, "This is a test message sent from the app", null,
+                                    null);
+                            Toast.makeText(getApplicationContext(), "SMS sent to " + numbers[i], Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                } catch (Exception e) {
+                    Log.d("SMS", "Failed to send sms");
+                    Toast.makeText(getApplicationContext(), "SMS not sent.", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+            } else {
+                if (shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS))
+                    Toast.makeText(this, "SMS sending permission is required", Toast.LENGTH_SHORT).show();
+
+                requestPermissions(new String[]{Manifest.permission.SEND_SMS}, REQUEST_SEND_SMS);
+            }
+        }
+
     }
 
     public void onbtnspecific(final String s1, final String s2, final String s3, final String s4, final String s5) {
