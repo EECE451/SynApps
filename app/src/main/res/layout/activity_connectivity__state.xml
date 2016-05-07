@@ -254,30 +254,6 @@ android:layout_height="match_parent">
         android:layout_marginBottom="10dp"
         android:layout_below="@+id/wifi_switch" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/last_data_update"
-        android:id="@+id/last_data_update"
-        android:textColor="@color/myBlue"
-        android:layout_above="@+id/clear_data"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="15dp"
-        android:textSize="18dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/clear_data"
-        android:id="@+id/clear_data"
-        android:textColor="@color/myBlue"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="20dp"
-        android:textSize="18dp"
-        android:onClick="onClickClearData" />
 </RelativeLayout>
 
 </android.support.v4.widget.DrawerLayout>

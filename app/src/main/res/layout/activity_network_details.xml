@@ -136,90 +136,9 @@
         android:layout_marginTop="20dp"
         android:layout_marginBottom="10dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/last_data_update"
-        android:id="@+id/last_data_update"
-        android:textColor="@color/myBlue"
-        android:layout_above="@+id/clear_data"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="15dp"
-        android:textSize="18dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/clear_data"
-        android:id="@+id/clear_data"
-        android:textColor="@color/myBlue"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="20dp"
-        android:textSize="18dp"
-        android:onClick="onClickClearData" />
 </RelativeLayout>
 
 
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/popup_clear_data"
-    android:background="#DDDDDD"
-    android:layout_marginLeft="50dp"
-    android:layout_marginRight="50dp"
-    android:layout_marginTop="190dp"
-    android:layout_marginBottom="190dp"
-    android:visibility="gone" >
-
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:text="@string/yes"
-        android:id="@+id/popup_yes_button"
-        android:background="@color/myBlue"
-        android:textColor="@color/myWhite"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="50dp"
-        android:layout_alignParentLeft="true"
-        android:onClick="onClickYes"
-        android:layout_alignParentBottom="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/popup_clear_data"
-        android:id="@+id/popup_clear_data_textview"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:textColor="@color/myBlue"
-        android:textSize="15dp"
-        android:gravity="center|center_horizontal" />
-
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="80dp"
-        android:layout_height="40dp"
-        android:text="@string/no"
-        android:id="@+id/popup_no_button"
-        android:background="@color/myBlue"
-        android:textColor="@color/myWhite"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginBottom="10dp"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/popup_yes_button"
-        android:layout_marginRight="50dp"
-        android:onClick="onClickNo"
-        android:layout_alignParentBottom="true" />
-</RelativeLayout>
 </android.support.v4.widget.DrawerLayout>
 
 

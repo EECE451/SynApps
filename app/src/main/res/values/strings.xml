@@ -60,7 +60,7 @@
     </string-array>
 
     <string-array name="spinner_display_choice">
-        <item>All</item>
+        <item>Show All</item>
         <item>Date/Time Range</item>
         <item>Device</item>
         <item>Location</item>

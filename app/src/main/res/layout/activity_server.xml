@@ -54,18 +54,36 @@
                 android:layout_centerHorizontal="true" />
         </ScrollView>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Graph Constraint:"
+            android:id="@+id/graph_constraint_textView"
+            android:layout_marginLeft="20dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignBottom="@+id/display_by_spinner"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:layout_marginRight="15dp" />
+
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/display_by_spinner"
-            android:layout_below="@+id/btnshowspecific" />
+            android:layout_below="@+id/btnshowspecific"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/graph_constraint_textView"
+            android:layout_marginRight="10dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/graph_description"
             android:layout_below="@+id/display_by_spinner"
-            android:layout_marginLeft="20dp" />
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp" />
 
         <EditText
             android:layout_width="150dp"
@@ -155,10 +173,42 @@
             android:text="Generate!"
             android:id="@+id/generate_button_2"
             android:layout_alignBottom="@+id/battery_to_edittext"
-            android:layout_toRightOf="@+id/battery_to_edittext"
-            android:layout_marginLeft="30dp"
+            android:layout_marginLeft="40dp"
             android:onClick="onClickGenerate2"
+            android:layout_toRightOf="@+id/battery_to_edittext"
             android:visibility="gone" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/location_radius_edittext"
+            android:layout_below="@+id/graph_description"
+            android:layout_alignLeft="@+id/graph_description"
+            android:layout_alignStart="@+id/graph_description"
+            android:hint="Location Radius (meters)"
+            android:visibility="gone" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Generate!"
+            android:id="@+id/generate3_button"
+            android:layout_alignBottom="@+id/location_radius_edittext"
+            android:layout_toRightOf="@+id/location_radius_edittext"
+            android:onClick="onClickGenerate3"
+            android:layout_marginLeft="10dp"
+            android:visibility="gone" />
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/mac_spinner"
+            android:layout_below="@+id/graph_description"
+            android:layout_toRightOf="@+id/date1_edittext"
+            android:visibility="gone"
+            android:layout_centerHorizontal="true" />
 
 
     </RelativeLayout>
@@ -236,31 +286,6 @@
             android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"
             android:layout_below="@+id/wifi_switch" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/last_data_update"
-            android:id="@+id/last_data_update"
-            android:textColor="@color/myBlue"
-            android:layout_above="@+id/clear_data"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="15dp"
-            android:textSize="18dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/clear_data"
-            android:id="@+id/clear_data"
-            android:textColor="@color/myBlue"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="20dp"
-            android:textSize="18dp"
-            android:onClick="onClickClearData" />
 
     </RelativeLayout>
 

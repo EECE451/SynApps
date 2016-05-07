@@ -333,6 +333,13 @@ public class NetworkDetails extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        if (!drawer.isDrawerOpen(Gravity.LEFT)){
+            drawer.openDrawer(Gravity.LEFT);
+        }
+        else{
+            drawer.closeDrawer(Gravity.LEFT);
+        }
+
         int id = item.getItemId();
 
         if (id == R.id.action_settings){

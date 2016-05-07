@@ -127,9 +127,14 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
     Button generateButton;
     Button generateButton2;
+    Button generateButton3;
 
     EditText batteryFrom;
     EditText batteryTo;
+
+    EditText location_radius_edittext;
+
+    Spinner mac_spinner;
 
 
     // time
@@ -137,6 +142,12 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
     //Battery
     int batt_from_level, batt_to_level;
+
+    // Distance
+    int distance_radius;
+
+     //MAC
+    int selectedMacPosition;
 
 
 
@@ -310,16 +321,15 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
         batteryFrom = (EditText) findViewById(R.id.battery_from_edittext);
         batteryTo = (EditText) findViewById(R.id.battery_to_edittext);
         generateButton2 = (Button) findViewById(R.id.generate_button_2);
+        location_radius_edittext = (EditText) findViewById(R.id.location_radius_edittext);
+        generateButton3 = (Button) findViewById(R.id.generate3_button);
+        mac_spinner = (Spinner) findViewById(R.id.mac_spinner);
 
         fromDayEdittext.setInputType(InputType.TYPE_NULL);
         toDayEdittext.setInputType(InputType.TYPE_NULL);
         fromTimeEdittext.setInputType(InputType.TYPE_NULL);
         toTimeEdittext.setInputType(InputType.TYPE_NULL);
 
-//        fromDayEdittext.setVisibility(View.GONE);
-//        toDayEdittext.setVisibility(View.GONE);
-//        fromTimeEdittext.setVisibility(View.GONE);
-//        toTimeEdittext.setVisibility(View.GONE);
 
 
         ///////////////
@@ -402,6 +412,9 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
         toTimeEdittext.setVisibility(View.GONE);
         generateButton.setVisibility(View.GONE);
         generateButton2.setVisibility(View.GONE);
+        location_radius_edittext.setVisibility(View.GONE);
+        generateButton3.setVisibility(View.GONE);
+        mac_spinner.setVisibility(View.GONE);
 
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.spinner_display_choice, android.R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -418,13 +431,15 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
                         batteryFrom.setVisibility(View.GONE);
                         batteryTo.setVisibility(View.GONE);
-
                         fromDayEdittext.setVisibility(View.GONE);
                         toDayEdittext.setVisibility(View.GONE);
                         fromTimeEdittext.setVisibility(View.GONE);
                         toTimeEdittext.setVisibility(View.GONE);
                         generateButton.setVisibility(View.GONE);
                         generateButton2.setVisibility(View.GONE);
+                        location_radius_edittext.setVisibility(View.GONE);
+                        generateButton3.setVisibility(View.GONE);
+                        mac_spinner.setVisibility(View.GONE);
 
                         // Graph algorithm here
                         break;
@@ -435,6 +450,9 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                         batteryFrom.setVisibility(View.GONE);
                         batteryTo.setVisibility(View.GONE);
                         generateButton2.setVisibility(View.GONE);
+                        location_radius_edittext.setVisibility(View.GONE);
+                        generateButton3.setVisibility(View.GONE);
+                        mac_spinner.setVisibility(View.GONE);
 
                         fromDayEdittext.setVisibility(View.VISIBLE);
                         toDayEdittext.setVisibility(View.VISIBLE);
@@ -506,19 +524,64 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                         },hour2,minute2,true);
 
                         // THE REST IS IN ON CLICK GENERATE
-
-
-                        //getAllData_ascen_ltdetection();
                         break;
 
-                    case 2:
-                        //getAllData_ascen_descriptionname();
+                    case 2: // By MAC
+                        graphDescription.setText("Displays all the devices that connected to a specific one");
+
+                        batteryFrom.setVisibility(View.GONE);
+                        batteryTo.setVisibility(View.GONE);
+                        fromDayEdittext.setVisibility(View.GONE);
+                        toDayEdittext.setVisibility(View.GONE);
+                        fromTimeEdittext.setVisibility(View.GONE);
+                        toTimeEdittext.setVisibility(View.GONE);
+                        generateButton.setVisibility(View.GONE);
+                        generateButton2.setVisibility(View.GONE);
+                        location_radius_edittext.setVisibility(View.GONE);
+                        generateButton3.setVisibility(View.GONE);
+
+                        mac_spinner.setVisibility(View.VISIBLE);
+
+                        String[] dummyMacArray = {"MAC1", "MAC2", "MAC3", "MAC4"};
+
+                        ArrayAdapter<String> spinnerAdapter2 = new ArrayAdapter<String>(Server.this, android.R.layout.simple_spinner_item, dummyMacArray);
+                        spinnerAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        mac_spinner.setAdapter(spinnerAdapter2);
+
+                        mac_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                                selectedMacPosition = pos;
+                                onMacPositionSelection(pos); // IMPLEMENT THE METHOD!
+                            }
+
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) {
+
+                            }
+                        });
                         break;
-                     case 3:
-                         //getAllData_ascen_detectionFrequency();
+
+                     case 3: // LOCATION
+                         graphDescription.setText("Displays all the devices that were detected within a certain distance radius from the current location");
+
+                         batteryFrom.setVisibility(View.GONE);
+                         batteryTo.setVisibility(View.GONE);
+                         fromDayEdittext.setVisibility(View.GONE);
+                         toDayEdittext.setVisibility(View.GONE);
+                         fromTimeEdittext.setVisibility(View.GONE);
+                         toTimeEdittext.setVisibility(View.GONE);
+                         generateButton.setVisibility(View.GONE);
+                         generateButton2.setVisibility(View.GONE);
+                         mac_spinner.setVisibility(View.GONE);
+
+                         location_radius_edittext.setVisibility(View.VISIBLE);
+                         generateButton3.setVisibility(View.VISIBLE);
+
+                         // THE REST IS IN ON CLICK GENERATE
+
                          break;
 
-                    case 4:
+                    case 4: //BATTERY LIFE
                         graphDescription.setText("Displays all the devices having a battery life between");
 
                         fromDayEdittext.setVisibility(View.GONE);
@@ -526,16 +589,16 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                         fromTimeEdittext.setVisibility(View.GONE);
                         toTimeEdittext.setVisibility(View.GONE);
                         generateButton.setVisibility(View.GONE);
+                        location_radius_edittext.setVisibility(View.GONE);
+                        generateButton3.setVisibility(View.GONE);
+                        mac_spinner.setVisibility(View.GONE);
 
                         batteryFrom.setVisibility(View.VISIBLE);
                         batteryTo.setVisibility(View.VISIBLE);
-                        generateButton.setVisibility(View.VISIBLE);
+                        generateButton2.setVisibility(View.VISIBLE);
 
                         // THE REST IS IN ON CLICK GENERATE
 
-
-
-                        //getAllData_ascen_ltrange();
                         break;
                  }
 
@@ -809,8 +872,6 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                 parameters.put("MACMasterDevice",MACMasterDevice);
 
 
-
-
                 return parameters;
             }
         };
@@ -821,6 +882,13 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
     //Settings option already implemented
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (!drawer.isDrawerOpen(Gravity.LEFT)){
+            drawer.openDrawer(Gravity.LEFT);
+        }
+        else{
+            drawer.closeDrawer(Gravity.LEFT);
+        }
 
         int id = item.getItemId();
 
@@ -882,6 +950,19 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
+    public static float distFrom(float lat1, float lng1, float lat2, float lng2) {
+        double earthRadius = 6371000; //meters
+        double dLat = Math.toRadians(lat2-lat1);
+        double dLng = Math.toRadians(lng2-lng1);
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLng/2) * Math.sin(dLng/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        float dist = (float) (earthRadius * c);
+
+        return dist;
+    }
+
     public void onClickGenerate(View view) {
 
         Calendar date1 = Calendar.getInstance();
@@ -896,5 +977,13 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
     public void onClickGenerate2(View view) {
         batt_from_level = Integer.valueOf(String.valueOf(batteryFrom.getText()));
         batt_to_level = Integer.valueOf(String.valueOf(batteryTo.getText()));
+    }
+
+    public void onClickGenerate3(View view) {
+        distance_radius = Integer.valueOf(String.valueOf(location_radius_edittext.getText()));
+    }
+
+    private void onMacPositionSelection(int pos){
+
     }
 }
