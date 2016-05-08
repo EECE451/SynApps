@@ -820,7 +820,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                 SmsManager smsManager = SmsManager.getDefault();
 
                 for (int i =0; i<numbers.length; i++){
-                    if (flags[i].compareTo("0") != 0){
+                    if (flags[i].compareTo("1") == 0){
                     smsManager.sendTextMessage(numbers[i], null, "A new graph is now available on SynApps!", null, null);
                     Toast.makeText(getApplicationContext(), "SMS sent to "+numbers[i], Toast.LENGTH_LONG).show();
                     }
@@ -839,8 +839,8 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                     SmsManager smsManager = SmsManager.getDefault();
 
                     for (int i = 0; i < numbers.length; i++) {
-                        if (flags[i] !="0") {
-                            smsManager.sendTextMessage(numbers[i], null, "This is a test message sent from the app", null,
+                        if (flags[i].compareTo("1") == 0) {
+                            smsManager.sendTextMessage(numbers[i], null, "A new graph is now available on SynApps!", null,
                                     null);
                             Toast.makeText(getApplicationContext(), "SMS sent to " + numbers[i], Toast.LENGTH_LONG).show();
                         }
