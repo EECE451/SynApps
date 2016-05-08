@@ -86,17 +86,17 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
     //   String insertUrl = "http://192.168.16.4:80/DevicesServer/insertEntry.php";  //in order to contain the url for our php files
     //   String showUrl = "http://192.168.16.4:80/DevicesServer/displayEntry.php";
 
-//    String insertUrl = "http://192.168.210.1:80/DevicesServer/insertEntry.php";
-//    String showUrl = "http://192.168.210.1:80/DevicesServer/displayEntry.php";
-//    String showspecificUrl = "http://192.168.210.1:80/DevicesServer/displayspecific2.php";
-//    String showSpecificUrl2 = "http://192.168.210.1:80/DevicesServer/displayspecific4.php";
-//    String fetchnumberurl =   "http://192.168.210.1:80/DevicesServer/fetchnumber.php";
+    String insertUrl = "http://192.168.210.1:80/DevicesServer/insertEntry.php";
+    String showUrl = "http://192.168.210.1:80/DevicesServer/displayEntry.php";
+    String showspecificUrl = "http://192.168.210.1:80/DevicesServer/displayspecific2.php";
+    String showSpecificUrl2 = "http://192.168.210.1:80/DevicesServer/displayspecific4.php";
+    String fetchnumberurl =   "http://192.168.210.1:80/DevicesServer/fetchnumber.php";
 
-    String insertUrl = "http://192.168.36.1:80/DevicesServer/insertEntry.php";
-    String showUrl = "http://192.168.36.1:80/DevicesServer/displayEntry.php";
-    String showspecificUrl = "http://192.168.36.1:80/DevicesServer/displayspecific2.php";
-    String showSpecificUrl2 = "http://192.168.36.1:80/DevicesServer/displayspecific4.php";
-    String fetchnumberurl =   "http://192.168.36.1:80/DevicesServer/fetchnumber.php";
+//    String insertUrl = "http://192.168.36.1:80/DevicesServer/insertEntry.php";
+//    String showUrl = "http://192.168.36.1:80/DevicesServer/displayEntry.php";
+//    String showspecificUrl = "http://192.168.36.1:80/DevicesServer/displayspecific2.php";
+//    String showSpecificUrl2 = "http://192.168.36.1:80/DevicesServer/displayspecific4.php";
+//    String fetchnumberurl =   "http://192.168.36.1:80/DevicesServer/fetchnumber.php";
 
 
     // String insertUrl = "http://10.168.46.13:80/DevicesServer/insertEntry.php";
@@ -114,6 +114,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
     // Notifs SMS
     boolean notifsflag = false;
+    int notifsflag_int = 0;
 
     // Location
     double Longitude;   // to send to server
@@ -443,8 +444,6 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
         textViewdisplaydata.setText(generateGraph(masterMACArray, slaveNamesArray, frequencyArray, cummulativeDetectionArray, arraySize));
 
-
-
         // Spinner -----------------------------------------------------------------------------------------------
         // Spinner Logic (Adapter)
 
@@ -765,6 +764,12 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                 }
             }) {
                 protected Map<String, String> getParams() throws AuthFailureError {
+
+                    if (notifsflag)
+                        notifsflag_int = 1;
+                    else
+                        notifsflag_int = 0;
+
                     Map<String, String> parameters = new HashMap<String, String>();
                     parameters.put("MACConnected", finalMACConnected);
                     parameters.put("MACMasterDevice", MACMasterDevice);
@@ -773,7 +778,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                     parameters.put("FrequencyDetection", finalFrequencyDetection);
                     parameters.put("CumulativeDetection", finalCumulativeDetection);
                     parameters.put("MasterName", phoneNumber);
-                    parameters.put("flag", String.valueOf(notifsflag));
+                    parameters.put("flag", String.valueOf(notifsflag_int));
                     parameters.put("longitude", String.valueOf(Longitude));
                     parameters.put("latitude", String.valueOf(Latitude));
 
@@ -792,7 +797,9 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
             Log.d("phonenbavailable", notifFlagArray[i]);
         }
 
-        sendSMS(phoneNumbersArray, notifFlagArray);
+        if(notifsflag)
+            sendSMS(phoneNumbersArray, notifFlagArray);
+
     }
 
 
@@ -814,15 +821,26 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
     }
 
     public void sendSMS(String[] numbers, String[] flags){
+
+        ArrayList<String> myUniquePhoneList = new ArrayList<>();
+
+        for (int i=0; i<arraySize; i++){
+            if ( isMacinList2(myUniquePhoneList, numbers[i]) == -1)
+                myUniquePhoneList.add(0, numbers[i]);
+        }
+
+        String[] uniquePhoneArray = new String[numbers.length];
+        myUniquePhoneList.toArray(uniquePhoneArray);
+
         if ((int) Build.VERSION.SDK_INT < 23)
         {
             try {
                 SmsManager smsManager = SmsManager.getDefault();
 
-                for (int i =0; i<numbers.length; i++){
+                for (int i =0; i<uniquePhoneArray.length; i++){
                     if (flags[i].compareTo("1") == 0){
-                    smsManager.sendTextMessage(numbers[i], null, "A new graph is now available on SynApps!", null, null);
-                    Toast.makeText(getApplicationContext(), "SMS sent to "+numbers[i], Toast.LENGTH_LONG).show();
+                        smsManager.sendTextMessage(uniquePhoneArray[i], null, "A new graph is now available on SynApps!", null, null);
+                    Toast.makeText(getApplicationContext(), "SMS sent to "+uniquePhoneArray[i], Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -838,11 +856,11 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                 try {
                     SmsManager smsManager = SmsManager.getDefault();
 
-                    for (int i = 0; i < numbers.length; i++) {
+                    for (int i = 0; i < uniquePhoneArray.length; i++) {
                         if (flags[i].compareTo("1") == 0) {
-                            smsManager.sendTextMessage(numbers[i], null, "A new graph is now available on SynApps!", null,
+                            smsManager.sendTextMessage(uniquePhoneArray[i], null, "A new graph is now available on SynApps!", null,
                                     null);
-                            Toast.makeText(getApplicationContext(), "SMS sent to " + numbers[i], Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "SMS sent to " + uniquePhoneArray[i], Toast.LENGTH_LONG).show();
                         }
                     }
 
@@ -899,6 +917,12 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
         }){
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
+
+                if (notifsflag)
+                    notifsflag_int = 1;
+                else
+                    notifsflag_int = 0;
+
                 Map<String,String> parameters  = new HashMap<String, String>();
                 parameters.put("MACConnected",s1);
                 parameters.put("MACMasterDevice",MACMasterDevice);
@@ -907,7 +931,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                 parameters.put("FrequencyDetection",s4);
                 parameters.put("CumulativeDetection", s5);
                 parameters.put("MasterName", phoneNumber);
-                parameters.put("flag", String.valueOf(notifsflag));
+                parameters.put("flag", String.valueOf(notifsflag_int));
                 parameters.put("longitude", String.valueOf(Longitude));
                 parameters.put("latitude", String.valueOf(Latitude));
 
