@@ -159,7 +159,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
     int selectedMacPosition;
 
     // Arrays
-    String[] slaveMACArray, slaveNamesArray, masterMACArray, phoneNumbersArray, notifFlagArray, LatArray, LongArray, frequencyArray, lastDetectionArray, cummulativeDetectionArray;
+    String[] slaveMACArray, slaveNamesArray, masterMACArray, masterNamesArray, phoneNumbersArray, notifFlagArray, LatArray, LongArray, frequencyArray, lastDetectionArray, cummulativeDetectionArray;
     int arraySize;
     String[] myAllDeviceList;
 
@@ -375,6 +375,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                     slaveMACArray = new String[posts.length()];
                     slaveNamesArray= new String[posts.length()];
                     masterMACArray= new String[posts.length()];
+                    masterNamesArray= new String[posts.length()];
                     phoneNumbersArray= new String[posts.length()];
                     notifFlagArray= new String[posts.length()];
                     LatArray= new String[posts.length()];
@@ -407,6 +408,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                         slaveMACArray[i] = MACConnected;
                         slaveNamesArray[i] = DeviceName;
                         masterMACArray[i] = MACMasterDevice;
+                        masterNamesArray[i] = MACMasterDevice;
                         phoneNumbersArray[i] = phoneNumber;
                         notifFlagArray[i] = flag;
                         LatArray[i] = latitude;
@@ -426,6 +428,14 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
                     }
 
+                    for (int i=0; i<arraySize; i++){
+                        for (int j=0; j<arraySize; j++){
+                            if (masterMACArray[i] == slaveMACArray[i])
+                                masterNamesArray[i] = slaveNamesArray[i];
+                            break;
+                        }
+                    }
+
                 }
                 catch (JSONException e)
                 {
@@ -442,7 +452,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
         });
         requestQueue.add(jsonObjectRequest);
 
-        textViewdisplaydata.setText(generateGraph(masterMACArray, slaveNamesArray, frequencyArray, cummulativeDetectionArray, arraySize));
+        textViewdisplaydata.setText(generateGraph(masterNamesArray, slaveNamesArray, frequencyArray, cummulativeDetectionArray, arraySize));
 
         // Spinner -----------------------------------------------------------------------------------------------
         // Spinner Logic (Adapter)
@@ -495,7 +505,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                         textViewdisplaydata.setText("");
 
                         // Graph algorithm here
-                        textViewdisplaydata.setText(generateGraph(masterMACArray, slaveNamesArray, frequencyArray, cummulativeDetectionArray, arraySize));
+                        textViewdisplaydata.setText(generateGraph(masterNamesArray, slaveNamesArray, frequencyArray, cummulativeDetectionArray, arraySize));
                         break;
 
                     case 1: // Time Range
@@ -605,8 +615,8 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
                         for (int i=0; i<arraySize; i++){
 
-                            if (isMacinList2(allDevicesList, masterMACArray[i]) == -1)
-                                allDevicesList.add(0, masterMACArray[i]);
+                            if (isMacinList2(allDevicesList, masterNamesArray[i]) == -1)
+                                allDevicesList.add(0, masterNamesArray[i]);
                         }
 
                         for (int i=0; i<arraySize; i++){
@@ -1086,7 +1096,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
             if(Long.parseLong(lastDetectionArray[i]) >= milli1 && Long.parseLong(lastDetectionArray[i]) <= milli2){
                 slaveList.add(0, slaveNamesArray[i]);
-                masterList.add(0, masterMACArray[i]);
+                masterList.add(0, masterNamesArray[i]);
                 frequenyList.add(0, frequencyArray[i]);
                 CummulativeList.add(0, cummulativeDetectionArray[i]);
             }
@@ -1130,7 +1140,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
             if(deviceDistance < distance_radius){
                 slaveList.add(0, slaveNamesArray[i]);
-                masterList.add(0, masterMACArray[i]);
+                masterList.add(0, masterNamesArray[i]);
                 frequenyList.add(0, frequencyArray[i]);
                 CummulativeList.add(0, cummulativeDetectionArray[i]);
             }
@@ -1160,9 +1170,9 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
         for (int i=0; i<arraySize; i++){
 
-            if(masterMACArray[i].compareTo(mac) == 0 || slaveNamesArray[i].compareTo(mac) == 0){
+            if(masterNamesArray[i].compareTo(mac) == 0 || masterNamesArray[i].compareTo(mac) == 0){
                 slaveList.add(0, slaveNamesArray[i]);
-                masterList.add(0, masterMACArray[i]);
+                masterList.add(0, masterNamesArray[i]);
                 frequenyList.add(0, frequencyArray[i]);
                 CummulativeList.add(0, cummulativeDetectionArray[i]);
             }
