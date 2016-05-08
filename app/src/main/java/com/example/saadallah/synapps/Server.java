@@ -94,7 +94,7 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
 
     String insertUrl = "http://192.168.36.1:80/DevicesServer/insertEntry.php";
     String showUrl = "http://192.168.36.1:80/DevicesServer/displayEntry.php";
-    String showspecificUrl = "http://192.36.210.1:80/DevicesServer/displayspecific2.php";
+    String showspecificUrl = "http://192.168.36.1:80/DevicesServer/displayspecific2.php";
     String showSpecificUrl2 = "http://192.168.36.1:80/DevicesServer/displayspecific4.php";
     String fetchnumberurl =   "http://192.168.36.1:80/DevicesServer/fetchnumber.php";
 
@@ -414,6 +414,15 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                         lastDetectionArray[i] = DateLastDetection;
                         cummulativeDetectionArray[i] = CumulativeDetection;
 
+                        slaveMACArray[i] = slaveMACArray[i].substring(0, 2) + ":" + slaveMACArray[i].substring(2, 4) + ":" +
+                                slaveMACArray[i].substring(4, 6) + ":" + slaveMACArray[i].substring(6, 8) + ":" +
+                                slaveMACArray[i].substring(8, 10) + ":" + slaveMACArray[i].substring(10, 12); // puts back the MAC address into a standardized form
+
+                        masterMACArray[i] = masterMACArray[i].substring(0, 2) + ":" + masterMACArray[i].substring(2, 4) + ":" +
+                                masterMACArray[i].substring(4, 6) + ":" + masterMACArray[i].substring(6, 8) + ":" +
+                                masterMACArray[i].substring(8, 10) + ":" + masterMACArray[i].substring(10, 12); // puts back the MAC address into a standardized form
+
+
                     }
 
                 }
@@ -431,6 +440,8 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
             }
         });
         requestQueue.add(jsonObjectRequest);
+
+        textViewdisplaydata.setText(generateGraph(masterMACArray, slaveNamesArray, frequencyArray, cummulativeDetectionArray, arraySize));
 
 
 
@@ -766,6 +777,8 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                     parameters.put("longitude", String.valueOf(Longitude));
                     parameters.put("latitude", String.valueOf(Latitude));
 
+                    Log.d("flagstate", String.valueOf(notifsflag));
+
 
                     return parameters;
                 }
@@ -807,8 +820,8 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                 SmsManager smsManager = SmsManager.getDefault();
 
                 for (int i =0; i<numbers.length; i++){
-                    if (flags[i] != "0"){
-                    smsManager.sendTextMessage(numbers[i], null, "This is a test message sent from the app", null, null);
+                    if (flags[i].compareTo("0") != 0){
+                    smsManager.sendTextMessage(numbers[i], null, "A new graph is now available on SynApps!", null, null);
                     Toast.makeText(getApplicationContext(), "SMS sent to "+numbers[i], Toast.LENGTH_LONG).show();
                     }
                 }
@@ -897,6 +910,8 @@ public class Server extends AppCompatActivity implements View.OnClickListener {
                 parameters.put("flag", String.valueOf(notifsflag));
                 parameters.put("longitude", String.valueOf(Longitude));
                 parameters.put("latitude", String.valueOf(Latitude));
+
+                Log.d("flagstate", String.valueOf(notifsflag));
 
 
                 return parameters;

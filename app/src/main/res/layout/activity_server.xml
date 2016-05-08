@@ -14,26 +14,8 @@
         android:text="insert all"
         android:id="@+id/btninsertall"
         android:onClick="onbtnclickinsertall"
-        android:layout_alignParentTop="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Show Specific"
-        android:id="@+id/btnshowspecific"
-        android:onClick="onbtnclickshowspecific"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
-
-        <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Show all"
-        android:id="@+id/btnshowall"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/btninsertall"
-        android:layout_alignEnd="@+id/btninsertall"
-        android:onClick="onbtnclickshowall" />
 
         <ScrollView
             android:layout_width="fill_parent"
@@ -72,10 +54,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/display_by_spinner"
-            android:layout_below="@+id/btnshowspecific"
             android:layout_alignParentRight="true"
             android:layout_toRightOf="@+id/graph_constraint_textView"
-            android:layout_marginRight="10dp" />
+            android:layout_marginRight="10dp"
+            android:layout_below="@+id/btninsertall" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -93,8 +75,6 @@
             android:ems="10"
             android:id="@+id/date1_edittext"
             android:layout_below="@+id/graph_description"
-            android:layout_alignLeft="@+id/btnshowall"
-            android:layout_alignStart="@+id/btnshowall"
             android:hint="@string/from_date"
             android:visibility="gone" />
 

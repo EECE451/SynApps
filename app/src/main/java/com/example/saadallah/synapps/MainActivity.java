@@ -350,9 +350,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                         peersMacArrayStr[i] = macAddressParts[0] + macAddressParts[1] + macAddressParts[2] + macAddressParts[3] + macAddressParts[4] + macAddressParts[5];
 
 
-
-
-
                         Cursor result_getOldexistsFlag = myDb.getOldExistsFlag(peersMacArrayStr[i]);
 
                         if (result_getOldexistsFlag != null && result_getOldexistsFlag.getCount() > 0) {
@@ -492,7 +489,6 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Ch
                     Log.d("device detected flag", "false");
 
                     //                   while(!mReceiver.isBroadcastFlag()){} // waits for the flag Broadcast flag to turn true
-
 
 
                 }
